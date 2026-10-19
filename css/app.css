@@ -109,6 +109,10 @@ body.sheet-open .near { display: none; }
 .near-small { font-size: 15px; margin-top: 3px; }
 .near-d { font-size: 12px; color: var(--muted); }
 .near .pick { all: unset; cursor: pointer; display: block; }
+.near-c { display: flex; align-items: center; gap: 8px; margin: 4px 0 6px; }
+.near-ll { border: 0; background: none; padding: 4px 0; color: var(--text); font-size: 13px; font-variant-numeric: tabular-nums; text-decoration: underline dotted var(--muted); text-underline-offset: 3px; }
+.near-fav { border: 0; border-radius: 999px; background: var(--panel-2); color: var(--lime); font-family: var(--head); font-weight: 700; font-size: 13px; padding: 5px 11px; min-height: 32px; white-space: nowrap; }
+.near-fav.on { background: var(--lime); color: var(--bg); }
 
 /* ---------- Ficha de resultado (compacta) ---------- */
 .sheet {
@@ -188,6 +192,7 @@ body.sheet-open .near { display: none; }
 .prov-filter { width: 100%; height: 42px; border: 0; border-radius: 10px; background: var(--panel); padding: 0 12px; font-size: 16px; outline: 0; }
 .prov-filter:focus { box-shadow: 0 0 0 2px var(--lime); }
 .comm { font-family: var(--head); font-size: 13px; color: var(--muted); letter-spacing: 1.2px; text-transform: uppercase; margin: 14px 0 4px; }
+.comm.mine { color: var(--lime); }
 .prov { display: flex; align-items: center; gap: 12px; padding: 9px 2px; border-bottom: 1px solid var(--line); cursor: pointer; }
 .prov input { width: 22px; height: 22px; accent-color: var(--lime); flex: none; }
 .prov .pn { flex: 1; font-size: 16px; }
@@ -229,6 +234,10 @@ body.sheet-open .near { display: none; }
 .legend .pk { transform: none; justify-self: center; }
 .target { display: block; width: 30px; height: 30px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: var(--lime); border: 3px solid #111; box-shadow: 0 3px 10px rgba(0,0,0,.45); }
 .target::after { content: ''; position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; background: #111; }
+/* Otros sitios con el mismo km (para elegir) */
+.altpin { display: flex; align-items: center; justify-content: center; transform: translate(-50%, -50%); width: 26px; height: 26px; border-radius: 50%; background: #0B0B0B; color: var(--lime); border: 2.5px solid var(--lime); font-family: var(--head); font-weight: 700; font-size: 14px; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,.5); }
+/* Favorito fijo en el mapa */
+.favpin { display: block; transform: translate(-50%, -50%); font-size: 26px; line-height: 1; color: var(--lime); cursor: pointer; -webkit-text-stroke: 1.5px #0B0B0B; text-shadow: 0 1px 3px rgba(0,0,0,.6); }
 .me { display: block; width: 18px; height: 18px; border-radius: 50%; background: #1A73E8; border: 3px solid #fff; box-shadow: 0 0 0 6px rgba(26,115,232,.25); }
 
 .leaflet-container { font-family: var(--body); }
@@ -237,23 +246,25 @@ body.sheet-open .near { display: none; }
 .leaflet-bar a { background: var(--bg); color: var(--lime); border-color: var(--line); }
 
 @media (min-width: 760px) {
-  .top { right: auto; width: 350px; left: 8px; top: 8px; border-radius: 12px; box-shadow: 0 0 0 1.5px var(--lime); }
-  .sheet, .panel { left: 8px; right: auto; width: 350px; bottom: 8px; border-radius: 12px; box-shadow: 0 0 0 1.5px var(--lime); }
-  .panel { top: calc(var(--top-h, 100px) + 10px); }
+  .top { right: auto; width: 400px; left: 8px; top: 8px; border-radius: 12px; box-shadow: 0 0 0 1.5px var(--lime); }
+  /* Ficha de resultado y paneles justo debajo del buscador, también arriba a la izquierda */
+  .sheet, .panel { left: 8px; right: auto; width: 400px; top: calc(var(--top-h, 100px) + 8px); bottom: auto; border-radius: 12px; box-shadow: 0 0 0 1.5px var(--lime); }
+  .panel { bottom: 8px; }
+  body.sheet-open .map-ctrls { bottom: calc(var(--safe-b) + 18px); }
   .bar { padding: 4px 6px 0 12px; }
   .bar .icon-btn { width: 34px; height: 34px; }
   .b-km { font-size: 19px; }
   .b-es { font-size: 11px; }
-  .search { grid-template-columns: 1fr 58px auto 44px; padding: 2px 6px 6px; }
-  .field input { height: 38px; font-size: 17px; }
-  .dir-btn, .go { height: 38px; }
-  .dir-btn { min-width: 38px; font-size: 14px; }
-  .go { font-size: 17px; }
-  .clear { height: 34px; }
-  .mini { width: 34px; height: 34px; font-size: 20px; }
-  .res { min-height: 34px; margin-bottom: 6px; }
-  .res-km { font-size: 21px; }
-  .act { height: 36px; }
-  .toast { top: 14px; left: calc(50% + 179px); max-width: calc(100% - 380px); }
+  .search { grid-template-columns: 1fr 64px auto 48px; padding: 2px 6px 6px; }
+  .field input { height: 40px; font-size: 18px; }
+  .dir-btn, .go { height: 40px; }
+  .dir-btn { min-width: 40px; font-size: 15px; }
+  .go { font-size: 18px; }
+  .clear { height: 36px; }
+  .mini { width: 36px; height: 36px; font-size: 20px; }
+  .res { min-height: 36px; margin-bottom: 7px; }
+  .res-km { font-size: 22px; }
+  .act { height: 38px; }
+  .toast { top: 14px; left: calc(50% + 204px); max-width: calc(100% - 430px); }
   .leaflet-top { top: 4px; }
 }

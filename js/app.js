@@ -78,16 +78,19 @@
   if (window.ResizeObserver) new ResizeObserver(syncTop).observe(document.querySelector('.top'));
   syncTop();
   function bottomOffset() { return document.body.classList.contains('sheet-open') ? $('sheet').offsetHeight : 0; }
+  // En escritorio los paneles van a la izquierda, uno debajo del otro: el mapa útil queda a su derecha
+  var DESK = window.matchMedia('(min-width: 760px)');
+  function panelRight() { return DESK.matches ? document.querySelector('.top').getBoundingClientRect().right : 0; }
   function fitBounds(b) {
     if (!b) return;
     map.invalidateSize();
-    map.fitBounds(b, { paddingTopLeft: [8, topOffset() + 8], paddingBottomRight: [8, 8 + bottomOffset()], animate: false, maxZoom: 13 });
+    map.fitBounds(b, { paddingTopLeft: [8 + panelRight(), DESK.matches ? 8 : topOffset() + 8], paddingBottomRight: [8, 8 + (DESK.matches ? 0 : bottomOffset())], animate: false, maxZoom: 13 });
   }
   function focusPoint(lat, lon, zoom) {
     var z = zoom == null ? Math.max(map.getZoom(), 15) : zoom;
     var size = map.getSize();
-    var dy = size.y / 2 - (topOffset() + size.y - bottomOffset()) / 2;
-    var pt = map.project([lat, lon], z).add([0, dy]);
+    var shift = DESK.matches ? [-panelRight() / 2, 0] : [0, size.y / 2 - (topOffset() + size.y - bottomOffset()) / 2];
+    var pt = map.project([lat, lon], z).add(shift);
     map.setView(map.unproject(pt, z), z, { animate: true });
   }
 
@@ -202,6 +205,10 @@
     // Antisolape: huecos ocupados en una rejilla de pantalla; la cabecera y la ficha tapan el mapa
     var CPX = 32, occ = {}, want = {}, n = 0;
     var blocked = [screenRect('.top'), screenRect('#sheet'), screenRect('.map-ctrls'), screenRect('#near')].filter(Boolean);
+    (favSpots || []).forEach(function (p) { // las estrellas de favoritos no se tapan
+      var q = map.latLngToContainerPoint(p);
+      blocked.push([q.x - 14, q.y - 14, q.x + 14, q.y + 14]);
+    });
     function free(r) {
       for (var x = Math.floor(r[0] / CPX); x <= Math.floor(r[2] / CPX); x++) for (var y = Math.floor(r[1] / CPX); y <= Math.floor(r[3] / CPX); y++) {
         var list = occ[x + ':' + y];
@@ -294,6 +301,7 @@
     infoCacheReset();
     indexMarkers();
     drawOutline();
+    renderFavMarkers();
     if (selectedRoad) highlightRoad(selectedRoad); else renderMarkers();
     renderSettingsList();
   }
@@ -558,9 +566,14 @@
     if (fromMap) kmInput.value = K.formatKm(list[0].km);
     renderResult();
     addRecent(current);
+    // El mismo km en varios sitios: se ven todos en el mapa (con su número) para elegir el que se busca
+    if (list.length > 1 && !fromMap) {
+      fitBounds(L.latLngBounds(list.map(function (a) { return [a.lat, a.lon]; })).pad(0.3));
+      toast('Este km aparece en ' + list.length + ' sitios: pulsa en el mapa el que buscas', 4000);
+    }
   }
 
-  function showCoord(lat, lon, format) {
+  function showCoord(lat, lon, format, fromTap) {
     var near = C.nearest(lat, lon, 3000, 1)[0];
     var r = { coord: true, lat: lat, lon: lon, format: format, near: near };
     alternatives = [r]; altIdx = 0;
@@ -569,14 +582,14 @@
       setInfo(['Ese punto está en ', el('b', { text: provByCode[prov].name }), ', fuera de tus provincias.', downloadButton(prov, function () { showCoord(lat, lon, format); })]);
     } else if (!prov) {
       setInfo('Ese punto está fuera de España: no hay PK, pero puedes ir hasta él.');
-    } else {
+    } else if (!fromTap) {
       setInfo(null);
     }
-    renderResult();
-    addRecent(r);
+    renderResult(fromTap);
+    if (!fromTap) addRecent(r); // al pulsar el mapa no se llena «Recientes» ni se mueve el mapa
   }
 
-  function renderResult() {
+  function renderResult(keepView) {
     var r = current = alternatives[altIdx];
     var rr = $('resRoad'), km = $('resKm'), sub = $('resSub');
     clear(km); clear(sub);
@@ -610,17 +623,30 @@
     document.body.classList.add('sheet-open');
     document.documentElement.style.setProperty('--sheet-h', sheet.offsetHeight + 'px');
     setTarget(r.lat, r.lon);
-    focusPoint(r.lat, r.lon, Math.max(map.getZoom(), 16));
+    drawAlternatives();
+    if (!keepView) focusPoint(r.lat, r.lon, Math.max(map.getZoom(), 16));
     try {
       history.replaceState(null, '', '#' + (r.coord ? '@' + r.lat.toFixed(6) + ',' + r.lon.toFixed(6) : encodeURIComponent(r.road) + '/' + r.km + (r.dir ? '/' + r.dir : '')));
     } catch (e) { /* */ }
   }
   $('altBtn').addEventListener('click', function () { altIdx = (altIdx + 1) % alternatives.length; renderResult(); });
 
+  var altLayer = L.layerGroup().addTo(map);
+  function drawAlternatives() {
+    altLayer.clearLayers();
+    if (alternatives.length < 2) return;
+    alternatives.forEach(function (a, i) {
+      if (i === altIdx) return;
+      var pin = el('span', { class: 'altpin', text: String(i + 1), title: 'Otro sitio con este km (' + (i + 1) + '/' + alternatives.length + ')' });
+      L.marker([a.lat, a.lon], { icon: L.divIcon({ className: 'pk-icon', html: pin, iconSize: null }), keyboard: false, zIndexOffset: 1500 })
+        .on('click', function () { altIdx = i; renderResult(); }).addTo(altLayer);
+    });
+  }
   function closeSheet() {
     $('sheet').hidden = true;
     document.body.classList.remove('sheet-open');
     if (targetMarker) { map.removeLayer(targetMarker); targetMarker = null; }
+    altLayer.clearLayers();
     current = null;
     try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* */ }
     renderMarkers(); // donde estaba la ficha vuelven a caber PK
@@ -663,24 +689,48 @@
     list.unshift(item);
     S.writeJSON('rec', list.slice(0, 20));
   }
-  function isFav(r) { var k = itemKey(compact(r)); return readList('fav').some(function (x) { return itemKey(x) === k; }); }
+  function isFavItem(item) { return readList('fav').some(function (x) { return itemKey(x) === itemKey(item); }); }
+  function isFav(r) { return isFavItem(compact(r)); }
   function renderFav() { var on = current && isFav(current); $('resFav').classList.toggle('on', !!on); $('resFav').setAttribute('aria-pressed', on ? 'true' : 'false'); }
-  $('resFav').addEventListener('click', function () {
-    if (!current) return;
-    var item = compact(current), list = readList('fav');
-    if (isFav(current)) { list = list.filter(function (x) { return itemKey(x) !== itemKey(item); }); toast('Quitado de favoritos'); }
+  function toggleFav(item) {
+    var list = readList('fav');
+    if (isFavItem(item)) { list = list.filter(function (x) { return itemKey(x) !== itemKey(item); }); toast('Quitado de favoritos'); }
     else { list.unshift(item); toast('Guardado en favoritos'); }
     S.writeJSON('fav', list.slice(0, 50));
     renderFav();
+    renderFavMarkers();
+    renderMarkers();
     if (!$('favPanel').hidden) renderList();
-  });
+  }
+  $('resFav').addEventListener('click', function () { if (current) toggleFav(compact(current)); });
+
+  // Favoritos fijos en el mapa (estrella): siempre a la vista como referencia; al pulsarlos se abren
+  var favLayer = L.layerGroup().addTo(map), favSpots = [];
+  function favPosition(x) {
+    if (x.c) return [x.lat, x.lon];
+    var r = C && C.locate(x.road, x.km, x.dir || 0)[0];
+    return r ? [r.lat, r.lon] : null;
+  }
+  function renderFavMarkers() {
+    favLayer.clearLayers();
+    favSpots = [];
+    readList('fav').forEach(function (x) {
+      var p = favPosition(x);
+      if (!p) return;
+      var star = el('span', { class: 'favpin', text: '★', title: x.c ? 'Favorito · ' + fmtLL(x.lat, x.lon) : 'Favorito · ' + x.road + ' km ' + K.formatKm(x.km) });
+      var mk = L.marker(p, { icon: L.divIcon({ className: 'pk-icon', html: star, iconSize: null }), keyboard: false, zIndexOffset: 2000 });
+      mk.on('click', function () { openItem(x); });
+      mk.addTo(favLayer);
+      favSpots.push(p);
+    });
+  }
 
   var tab = 'fav';
   function renderList() {
     var list = readList(tab), ul = $('list');
     clear(ul);
     if (!list.length) {
-      ul.appendChild(el('li', { class: 'empty', text: tab === 'fav' ? 'Aún no tienes favoritos. Pulsa la estrella de un resultado para guardarlo aquí.' : 'Aquí aparecerán tus últimas búsquedas.' }));
+      ul.appendChild(el('li', { class: 'empty', text: tab === 'fav' ? 'Aún no tienes favoritos. Pulsa la estrella de un resultado, o mantén pulsado un punto del mapa y pulsa «☆ Favorito». Quedan fijos en el mapa.' : 'Aquí aparecerán tus últimas búsquedas.' }));
       return;
     }
     list.forEach(function (x) {
@@ -694,6 +744,7 @@
         el('button', { type: 'button', class: 'del', 'aria-label': 'Quitar', text: '×', onclick: function () {
           S.writeJSON(tab, readList(tab).filter(function (y) { return itemKey(y) !== itemKey(x); }));
           renderList(); if (current) renderFav();
+          if (tab === 'fav') { renderFavMarkers(); renderMarkers(); }
         } }),
       ]));
     });
@@ -722,14 +773,21 @@
   // ---------- Configuración ----------
   var stored = [];
   function fmtSize(b) { return b > 1048576 ? (b / 1048576).toFixed(1).replace('.', ',') + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB'; }
+  var pinnedProvs = [];
   function renderSettingsList() {
     if (!index || $('settings').hidden) return;
     var box = $('provList'), f = K.key($('provFilter').value);
     clear(box);
+    // Tus provincias, fijas arriba para marcarlas o desmarcarlas sin buscarlas (al desmarcar no se mueven hasta
+    // que se vuelve a abrir la configuración)
+    selected.forEach(function (c) { if (pinnedProvs.indexOf(c) < 0) pinnedProvs.push(c); });
+    var mine = index.provs.filter(function (p) { return pinnedProvs.indexOf(p.code) >= 0; });
+    var rest = index.provs.filter(function (p) { return pinnedProvs.indexOf(p.code) < 0; });
     var lastComm = null;
-    index.provs.forEach(function (p) {
+    mine.map(function (p) { return [p, 'Tus provincias']; }).concat(rest.map(function (p) { return [p, p.community]; })).forEach(function (pair) {
+      var p = pair[0];
       if (f && K.key(p.name + ' ' + p.community).indexOf(f) < 0) return;
-      if (p.community !== lastComm) { lastComm = p.community; box.appendChild(el('div', { class: 'comm', text: p.community })); }
+      if (pair[1] !== lastComm) { lastComm = pair[1]; box.appendChild(el('div', { class: 'comm' + (pair[1] === 'Tus provincias' ? ' mine' : ''), text: pair[1] })); }
       var on = selected.indexOf(p.code) >= 0;
       var st = provState[p.code];
       var status = st === 'loading' ? ['Descargando…', ''] : st === 'error' ? ['Error · reintentar', 'err'] :
@@ -756,7 +814,7 @@
   $('btnSettings').addEventListener('click', function () {
     var p = $('settings'); $('favPanel').hidden = true;
     p.hidden = !p.hidden;
-    if (!p.hidden) { renderConn(); renderSettingsList(); }
+    if (!p.hidden) { pinnedProvs = selected.slice(); renderConn(); renderSettingsList(); }
   });
   $('settingsClose').addEventListener('click', function () { $('settings').hidden = true; });
   $('provFilter').addEventListener('input', renderSettingsList);
@@ -764,19 +822,30 @@
   $('optAuto').checked = autoProv;
   $('optAuto').addEventListener('change', function () { autoProv = $('optAuto').checked; S.writeJSON('auto', autoProv); });
   $('appVersion').textContent = 'versión ' + CFG.version;
-  $('apkLink').hidden = IS_NATIVE || IS_IOS;
+  // En el APK el enlace de descarga no existe (lo quita tools/prepare-android.mjs)
+  if ($('apkLink')) $('apkLink').hidden = IS_NATIVE || IS_IOS;
 
   // ---------- Ubicación y PK más cercano ----------
   var watchId = null, meMarker = null, accCircle = null, firstFix = false, autoAsked = {};
-  function nearBox(title, lat, lon, accuracy) {
+  function nearBox(title, lat, lon, accuracy, marked) {
     var box = $('near');
     clear(box);
     box.appendChild(el('div', { class: 'near-t', text: title }));
+    // Punto marcado en el mapa: sus coordenadas (abren la ficha para copiar o ir) y guardarlo como favorito fijo
+    if (marked) {
+      var item = { c: 1, lat: +lat.toFixed(6), lon: +lon.toFixed(6) }, on = isFavItem(item);
+      box.appendChild(el('div', { class: 'near-c' }, [
+        el('button', { type: 'button', class: 'near-ll', text: fmtLL(lat, lon), title: 'Ver ficha de este punto',
+          onclick: function () { $('near').hidden = true; roadInput.value = fmtLL(lat, lon, 6); showCoord(lat, lon, 'punto marcado'); } }),
+        el('button', { type: 'button', class: 'near-fav' + (on ? ' on' : ''), 'aria-pressed': on ? 'true' : 'false', text: on ? '★ Favorito' : '☆ Favorito',
+          onclick: function () { toggleFav(item); nearBox(title, lat, lon, accuracy, true); } }),
+      ]));
+    }
     var prov = borders && borders.provinceAt(lat, lon);
     var res = C ? C.nearest(lat, lon, 3000, 3) : [];
     if (prov && !provData[prov]) {
-      box.appendChild(el('div', { class: 'near-d', text: 'Estás en ' + provByCode[prov].name + ', que no está descargada.' }));
-      box.appendChild(downloadButton(prov, function () { nearBox(title, lat, lon, accuracy); }));
+      box.appendChild(el('div', { class: 'near-d', text: (marked ? 'Este punto está en ' : 'Estás en ') + provByCode[prov].name + ', que no está descargada.' }));
+      box.appendChild(downloadButton(prov, function () { nearBox(title, lat, lon, accuracy, marked); }));
     }
     if (!res.length) {
       if (!prov || provData[prov]) box.appendChild(el('div', { class: 'near-d', text: prov ? 'No hay ninguna carretera con PK a menos de 3 km.' : 'Fuera de España.' }));
@@ -835,10 +904,16 @@
     if (Date.now() - lastPress < 800 || !C) return;
     lastPress = Date.now();
     closeSheet();
-    nearBox('PK más cercano al punto marcado', ll.lat, ll.lng, null);
+    nearBox('PK más cercano al punto marcado', ll.lat, ll.lng, null, true);
     setTarget(ll.lat, ll.lng);
   }
   map.on('contextmenu', function (e) { pressAt(e.latlng); });
+  // Pulsar un sitio del mapa: su ficha como si fuera un PK (coordenadas, PK más cercano, ir con Maps, copiar, favorito)
+  map.on('click', function (e) {
+    if (!C || Date.now() - lastPress < 800) return;
+    $('near').hidden = true;
+    showCoord(e.latlng.lat, e.latlng.lng, 'punto del mapa', true);
+  });
   (function () {
     var timer = null, start = null, box = map.getContainer();
     function cancel() { clearTimeout(timer); timer = null; }
