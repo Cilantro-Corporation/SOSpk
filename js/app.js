@@ -152,6 +152,7 @@
 
   // Contorno lima de las provincias cargadas (unidas si son contiguas) y oscurecido exterior
   var outlineLayer = L.layerGroup().addTo(map);
+  var accent = '#C6F400'; // color de la app (Apariencia): contorno de las provincias
   function drawOutline() {
     outlineLayer.clearLayers();
     var codes = Object.keys(provData);
@@ -166,10 +167,10 @@
     // (la misma línea que el contorno, más fina, con su trazo oscuro debajo para que se vea sobre cualquier mapa)
     if (o.inner.length) {
       L.polyline(o.inner, { color: '#0B0B0B', weight: 3.5, opacity: 0.45, interactive: false }).addTo(outlineLayer);
-      L.polyline(o.inner, { color: '#C6F400', weight: 1.5, opacity: 1, interactive: false }).addTo(outlineLayer);
+      L.polyline(o.inner, { color: accent, weight: 1.5, opacity: 1, interactive: false }).addTo(outlineLayer);
     }
     L.polyline(o.lines, { color: '#0B0B0B', weight: 6, opacity: 0.45, interactive: false }).addTo(outlineLayer);
-    L.polyline(o.lines, { color: '#C6F400', weight: 3, opacity: 1, interactive: false }).addTo(outlineLayer);
+    L.polyline(o.lines, { color: accent, weight: 3, opacity: 1, interactive: false }).addTo(outlineLayer);
   }
   function loadedBounds() {
     var b = null;
@@ -484,9 +485,30 @@
       renderSettingsList();
     });
   }
+  // Sugerencias solo de las provincias descargadas (los municipios de fuera solo se usan para avisar)
   function placeHits(q) {
-    var lists = Object.keys(placeLists).map(function (k) { return placeLists[k]; });
-    return K.searchPlaces(lists, q, 8);
+    var lists = Object.keys(placeLists).map(function (k) {
+      return k === 'municipios:' ? placeLists[k].filter(function (e) { return provData[e.prov]; }) : placeLists[k];
+    });
+    // Nombres repetidos (varios «Camino de…»): como mucho dos de cada tipo
+    var seenN = {};
+    return K.searchPlaces(lists, q, 40).filter(function (p) {
+      var k = p.n + '|' + p.t;
+      seenN[k] = (seenN[k] || 0) + 1;
+      return seenN[k] <= 2;
+    }).slice(0, 8);
+  }
+  // Nombre completo de un municipio de una provincia no descargada: se avisa y se ofrece descargarla (como con los PK)
+  function outsidePlace(q) {
+    var k = K.key(q);
+    if (k.length < 3 || !placeLists['municipios:'] || placeHits(q).some(function (p) { return K.key(p.n) === k; })) return null;
+    return K.searchPlaces([placeLists['municipios:']], q, 8).filter(function (p) { return !provData[p.prov] && provByCode[p.prov] && K.key(p.n) === k; })[0] || null;
+  }
+  function warnOutside(p) {
+    setInfo([
+      el('span', null, [el('b', { text: p.n }), ' está en ', el('b', { text: provByCode[p.prov].name }), ', una zona que no tienes descargada.']),
+      downloadButton(p.prov, function () { pickPlace(p); }),
+    ], true);
   }
   function placeSub(p) {
     var prov = provByCode[p.prov] ? provByCode[p.prov].name : '';
@@ -564,7 +586,7 @@
     if (selectedRoad && C.resolveRoad(val) === selectedRoad) list = list.filter(function (n) { return n !== selectedRoad; }).slice(0, 8);
     // Municipios, pueblos y parajes en la misma casilla: con letras solas van primero; con números, las carreteras
     var places = /[A-Za-zÀ-ÿ]{2}/.test(val) && !selectedRoad ? placeHits(val) : [];
-    if (/[A-Za-zÀ-ÿ]{2}/.test(val) && !placeLists['municipios:']) loadPlaces('municipios').then(renderSuggest, function () { /* sin conexión */ });
+    if (/[A-Za-zÀ-ÿ]{2}/.test(val) && !placeLists['municipios:']) loadPlaces('municipios').then(function () { roadInput.dispatchEvent(new Event('input')); }, function () { /* sin conexión */ });
     var chips = list.map(chip), pchips = places.map(placeChip);
     (/\d/.test(val) ? chips.concat(pchips) : pchips.concat(chips)).forEach(function (n) { suggestBox.appendChild(n); });
     suggestBox.hidden = !suggestBox.firstChild || document.activeElement !== roadInput;
@@ -599,10 +621,40 @@
     var r = C.resolveRoad(roadInput.value) || C.parseQuery(roadInput.value).road;
     if (r !== selectedRoad) { selectedRoad = r; dir = 0; renderDir(); highlightRoad(r); }
     renderSuggest();
+    var out = !selectedRoad && !/\d/.test(roadInput.value) && outsidePlace(roadInput.value);
     if (selectedRoad) setInfo(roadInfoLine(selectedRoad));
+    else if (out) warnOutside(out);
     else setInfo(null);
   });
+  // Nombres largos (municipios, parajes): la letra de la casilla se reduce poco a poco hasta 14 px; a partir de ahí el
+  // texto se desplaza como siempre. En iPhone, mientras se escribe, nunca baja de 16 px (por debajo, Safari hace zoom).
+  var fitCtx = document.createElement('canvas').getContext('2d');
+  function fitRoad() {
+    var cs = getComputedStyle(roadInput), text = roadInput.value.toUpperCase();
+    var max = 18, min = IS_IOS && document.activeElement === roadInput ? 16 : 14, size = max;
+    var avail = roadInput.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - 4;
+    if (text && avail > 0) {
+      fitCtx.font = '700 ' + max + 'px ' + cs.fontFamily;
+      var w = fitCtx.measureText(text).width + text.length * 0.5;
+      if (w > avail) size = Math.max(min, Math.floor((max * avail / w) * 2) / 2);
+    }
+    roadInput.style.fontSize = size === max ? '' : size + 'px';
+  }
+  // También cuando la app cambia el texto (al elegir un lugar, un favorito, un PK del mapa…)
+  (function () {
+    var desc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+    if (!desc || !desc.set) return;
+    Object.defineProperty(roadInput, 'value', { configurable: true,
+      get: function () { return desc.get.call(this); },
+      set: function (v) { desc.set.call(this, v); fitRoad(); } });
+  })();
+  roadInput.addEventListener('input', fitRoad);
+  // Antes de que el iPhone decida si hace zoom al tocar la casilla
+  roadInput.addEventListener('pointerdown', function () { if (IS_IOS && parseFloat(roadInput.style.fontSize) < 16) roadInput.style.fontSize = '16px'; });
+  roadInput.addEventListener('blur', function () { setTimeout(fitRoad, 0); });
+  window.addEventListener('resize', fitRoad);
   roadInput.addEventListener('focus', function () {
+    fitRoad();
     renderSuggest();
   });
   roadInput.addEventListener('blur', function () { setTimeout(function () { if (document.activeElement !== roadInput) suggestBox.hidden = true; }, 200); });
@@ -615,7 +667,9 @@
     if (KC.parse(roadInput.value)) { search(); return; }
     var first = C.suggest(roadInput.value, 1)[0];
     var place = /\d/.test(roadInput.value) ? null : placeHits(roadInput.value)[0];
-    if (place && (!first || C.resolveRoad(roadInput.value) !== first)) pickPlace(place);
+    var out = place || first ? null : outsidePlace(roadInput.value);
+    if (out) warnOutside(out);
+    else if (place && (!first || C.resolveRoad(roadInput.value) !== first)) pickPlace(place);
     else if (first) pickRoad(first, true);
   });
   $('clearRoad').addEventListener('click', function () {
@@ -642,6 +696,8 @@
       road = C.suggest(raw, 1)[0];
       var place = /\d/.test(raw) ? null : placeHits(raw)[0];
       if (place && !C.resolveRoad(raw)) { pickPlace(place); return; }
+      var out = !road && !/\d/.test(raw) ? outsidePlace(raw) : null;
+      if (out) { warnOutside(out); return; }
     }
     var km = K.parseKm(kmInput.value);
     if (!isFinite(km) && q.road && isFinite(q.km)) { km = q.km; road = q.road; }
@@ -1183,6 +1239,51 @@
   $('appVersion').textContent = 'versión ' + CFG.version;
   // En el APK el enlace de descarga no existe (lo quita tools/prepare-android.mjs)
   if ($('apkLink')) $('apkLink').hidden = IS_NATIVE || IS_IOS;
+
+  // ---------- Apariencia: tamaño de las cajas, tamaño de letra y color de la app (los 8 de los favoritos) ----------
+  var LOOK_SIZES = [['s', 'Pequeño', 0.9], ['m', 'Normal', 1], ['l', 'Grande', 1.15]];
+  var FONT_SIZES = [['s', 'Pequeña', 0.9], ['m', 'Normal', 1], ['l', 'Grande', 1.15], ['xl', 'Muy grande', 1.3]];
+  var look = S.readJSON('look', {});
+  if (!look || typeof look !== 'object') look = {};
+  function lookVal(list, k) { return (list.filter(function (x) { return x[0] === k; })[0] || list[1])[2]; }
+  function dim(hex) { // el mismo color algo más oscuro (botones pulsados)
+    var n = parseInt(hex.slice(1), 16);
+    return '#' + [16, 8, 0].map(function (s) { return ('0' + Math.round(((n >> s) & 255) * 0.82).toString(16)).slice(-2); }).join('');
+  }
+  function applyLook() {
+    var acc = FAV_COLORS.indexOf(look.acc) >= 0 ? look.acc : FAV_COLORS[0], st = document.documentElement.style;
+    accent = acc;
+    st.setProperty('--lime', acc);
+    st.setProperty('--lime-dim', dim(acc));
+    st.setProperty('--box', String(lookVal(LOOK_SIZES, look.box)));
+    st.setProperty('--fs', String(lookVal(FONT_SIZES, look.font)));
+    drawOutline();
+    syncTop();
+    fitRoad();
+    renderLook();
+  }
+  function segs(box, list, key) {
+    clear(box);
+    list.forEach(function (x) {
+      var on = (look[key] || 'm') === x[0];
+      box.appendChild(el('button', { type: 'button', class: 'segbtn' + (on ? ' on' : ''), role: 'radio', 'aria-checked': on ? 'true' : 'false', text: x[1],
+        onclick: function () { look[key] = x[0]; S.writeJSON('look', look); applyLook(); } }));
+    });
+  }
+  function renderLook() {
+    segs($('lookBox'), LOOK_SIZES, 'box');
+    segs($('lookFont'), FONT_SIZES, 'font');
+    var box = $('lookColor');
+    clear(box);
+    FAV_COLORS.forEach(function (c, i) {
+      var on = accent === c;
+      var b = el('button', { type: 'button', class: 'fe-col' + (on ? ' on' : ''), role: 'radio', 'aria-checked': on ? 'true' : 'false', 'aria-label': 'Color ' + (i + 1),
+        onclick: function () { look.acc = c; S.writeJSON('look', look); applyLook(); } });
+      b.style.background = c;
+      box.appendChild(b);
+    });
+  }
+  applyLook();
 
   // ---------- Ubicación y PK más cercano (en la misma ficha que cualquier punto) ----------
   var watchId = null, meMarker = null, accCircle = null, firstFix = false, autoAsked = {};
