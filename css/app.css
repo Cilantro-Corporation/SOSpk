@@ -34,7 +34,7 @@ button svg, .act svg, .icon-btn svg { width: 22px; height: 22px; fill: currentCo
 /* ---------- Parte superior ---------- */
 .top {
   position: fixed; left: 0; right: 0; top: 0; z-index: 500; padding-top: var(--safe-t); box-shadow: 0 2px 0 var(--lime);
-  background: rgba(11,11,11,.85); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  background: rgba(11,11,11,.75); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
 }
 .bar { display: flex; align-items: center; gap: 2px; padding: 2px 6px 0 12px; }
 .brand { flex: 1; font-family: var(--head); display: flex; align-items: baseline; gap: 6px; line-height: 1; }
@@ -82,7 +82,7 @@ button svg, .act svg, .icon-btn svg { width: 22px; height: 22px; fill: currentCo
 .info.err { color: var(--danger); }
 .info .seg { white-space: nowrap; }
 .info .seg.off { opacity: .6; }
-.info button.dl, .near button.dl {
+.info button.dl, .sheet-msg button.dl {
   border: 0; border-radius: 999px; background: var(--lime); color: var(--bg); font-family: var(--head); font-weight: 700; font-size: 14px; padding: 4px 12px; min-height: 30px;
 }
 
@@ -96,27 +96,14 @@ button svg, .act svg, .icon-btn svg { width: 22px; height: 22px; fill: currentCo
 /* ---------- Controles del mapa ---------- */
 .map-ctrls { position: fixed; right: 10px; z-index: 450; display: flex; flex-direction: column; gap: 8px; bottom: calc(var(--safe-b) + 18px); }
 .map-ctrls .icon-btn { width: 44px; height: 44px; background: var(--bg); box-shadow: 0 2px 8px rgba(0,0,0,.35); }
+.map-ctrls .icon-btn.on { background: var(--lime); color: var(--bg); }
 body.sheet-open .map-ctrls { bottom: calc(var(--safe-b) + var(--sheet-h, 100px) + 10px); }
 
-.near {
-  position: fixed; left: 10px; z-index: 450; bottom: calc(var(--safe-b) + 18px); max-width: calc(100% - 76px);
-  background: var(--bg); border-radius: 12px; padding: 8px 12px; line-height: 1.25; box-shadow: 0 0 0 2px var(--lime), 0 4px 14px rgba(0,0,0,.35);
-}
-body.sheet-open .near { display: none; }
-.near-t { font-family: var(--head); font-size: 11px; letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; }
-.near-v { font-family: var(--head); font-weight: 700; font-size: 19px; }
-.near-v em { font-style: normal; color: var(--lime); }
-.near-small { font-size: 15px; margin-top: 3px; }
-.near-d { font-size: 12px; color: var(--muted); }
-.near .pick { all: unset; cursor: pointer; display: block; }
-.near-c { display: flex; align-items: center; gap: 8px; margin: 4px 0 6px; }
-.near-ll { border: 0; background: none; padding: 4px 0; color: var(--text); font-size: 13px; font-variant-numeric: tabular-nums; text-decoration: underline dotted var(--muted); text-underline-offset: 3px; }
-.near-fav { border: 0; border-radius: 999px; background: var(--panel-2); color: var(--lime); font-family: var(--head); font-weight: 700; font-size: 13px; padding: 5px 11px; min-height: 32px; white-space: nowrap; }
-.near-fav.on { background: var(--lime); color: var(--bg); }
 
 /* ---------- Ficha de resultado (compacta) ---------- */
 .sheet {
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 600; background: var(--bg);
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 600;
+  background: rgba(11,11,11,.75); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
   padding: 8px 8px calc(var(--safe-b) + 8px); border-radius: 14px 14px 0 0; box-shadow: 0 -3px 0 var(--lime), 0 -8px 24px rgba(0,0,0,.4);
 }
 .res { display: flex; align-items: center; gap: 8px; margin: 0 0 7px 2px; min-height: 40px; }
@@ -146,6 +133,22 @@ body.sheet-open .near { display: none; }
 .act-main { background: var(--lime); color: var(--bg); font-weight: 700; }
 .act-main:active { background: var(--lime-dim); }
 .act-wa svg { color: #25D366; }
+/* PK más cercanos al punto, en la misma ficha */
+.near-list { display: flex; flex-direction: column; gap: 3px; margin: -2px 0 7px; }
+.nl {
+  display: flex; align-items: center; gap: 7px; border: 0; border-radius: 9px; background: rgba(34,34,34,.8); padding: 5px 10px; min-height: 36px; text-align: left;
+  font-family: var(--head); font-weight: 500; font-size: 15px; color: var(--text);
+}
+.nl:active { background: var(--panel-2); }
+.nl b { font-weight: 700; }
+.nl-d { margin-left: auto; font-family: var(--body); font-size: 12px; color: var(--muted); white-space: nowrap; }
+.nl-ll { font-size: 12px; color: var(--muted); padding: 0 2px 2px; font-variant-numeric: tabular-nums; }
+.sheet-msg { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 8px; font-size: 13px; color: var(--muted); margin: -2px 2px 8px; line-height: 1.3; }
+/* PK bloqueado: en grande para leerlo de un vistazo */
+.sheet.locked .res-km { font-size: 38px; }
+.sheet.locked .res-road { font-size: 22px; padding: 3px 9px; }
+.sheet.locked .res-sub { color: var(--lime); white-space: normal; }
+.grip { display: none; }
 .alt { margin-top: 6px; width: 100%; border: 1.5px dashed var(--lime); background: none; color: var(--lime); border-radius: 10px; padding: 6px 10px; font-size: 12px; min-height: 34px; }
 
 /* ---------- Paneles ---------- */
@@ -161,10 +164,30 @@ body.sheet-open .near { display: none; }
 .list { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex: 1; }
 .list li { display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--line); }
 .list .open { flex: 1; display: flex; align-items: center; gap: 10px; border: 0; background: none; text-align: left; padding: 13px 4px; min-width: 0; }
+.list .open-t { display: flex; flex-direction: column; min-width: 0; gap: 1px; }
 .list .open b { font-family: var(--head); font-size: 19px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.list .open span { color: var(--muted); font-size: 13px; }
+.list .open-t span { color: var(--muted); font-size: 13px; }
 .list .del { border: 0; background: none; color: var(--muted); font-size: 22px; width: 40px; height: 40px; }
 .list .empty { color: var(--muted); padding: 24px 4px; border: 0; }
+
+/* Editor de favorito: nombre, color e icono */
+.panel.fav-edit { top: auto; z-index: 800; max-height: calc(100% - var(--safe-t) - 20px); }
+.fe-body { overflow-y: auto; }
+.fe-where { color: var(--muted); font-size: 13px; margin: -4px 0 8px; font-variant-numeric: tabular-nums; }
+.fe-name { width: 100%; height: 44px; border: 2px solid transparent; border-radius: 10px; background: var(--panel); padding: 0 12px; font-size: 17px; outline: 0; }
+.fe-name:focus { border-color: var(--lime); }
+.fe-t { font-family: var(--head); font-size: 13px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); margin: 12px 0 6px; }
+.fe-cols { display: flex; flex-wrap: wrap; gap: 8px; }
+.fe-col { width: 36px; height: 36px; border-radius: 50%; border: 3px solid var(--bg); box-shadow: 0 0 0 2px var(--line); }
+.fe-col.on { box-shadow: 0 0 0 2.5px var(--text); }
+.fe-ics { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.fe-ic { height: 44px; border-radius: 10px; border: 2px solid transparent; background: var(--panel); font-size: 22px; line-height: 1; color: var(--lime); }
+.fe-ic.on { background: var(--panel-2); }
+.fe-acts { display: flex; gap: 8px; margin-top: 14px; }
+.fe-del, .fe-save { height: 44px; border: 0; border-radius: 10px; font-family: var(--head); font-weight: 700; font-size: 15px; letter-spacing: .8px; text-transform: uppercase; padding: 0 14px; }
+.fe-del { background: var(--panel); color: var(--danger); }
+.fe-save { flex: 1; background: var(--lime); color: var(--bg); }
+.fav-n { color: var(--text); font-weight: 600; }
 
 .set-scroll { overflow-y: auto; flex: 1; padding-bottom: 20px; }
 /* Apartados plegables (acordeón) */
@@ -199,6 +222,12 @@ body.sheet-open .near { display: none; }
 .prov .ps { font-size: 12px; color: var(--muted); white-space: nowrap; }
 .prov .ps.ok { color: var(--lime); }
 .prov .ps.err { color: var(--danger); }
+.prov-par { display: flex; align-items: center; gap: 8px; padding: 6px 2px 9px 34px; border-bottom: 1px solid var(--line); margin-top: -1px; }
+.pp-t { flex: 1; font-size: 13px; color: var(--muted); }
+.pp-b { border: 0; border-radius: 999px; background: var(--panel-2); color: var(--lime); font-family: var(--head); font-weight: 700; font-size: 13px; padding: 5px 11px; min-height: 32px; white-space: nowrap; }
+.pp-b.on { background: none; box-shadow: inset 0 0 0 1.5px var(--line); color: var(--muted); }
+.pp-b.err { color: var(--danger); }
+.chip.place .pin { font-size: 13px; line-height: 1; }
 .opt { display: flex; gap: 12px; align-items: flex-start; font-size: 15px; line-height: 1.4; padding: 6px 2px; }
 .opt input { width: 22px; height: 22px; accent-color: var(--lime); flex: none; margin-top: 1px; }
 .apk-link { display: block; text-align: center; margin: 12px 0; padding: 12px; border-radius: 12px; background: var(--panel); color: var(--lime); text-decoration: none; font-family: var(--head); font-size: 15px; letter-spacing: 1px; text-transform: uppercase; }
@@ -238,6 +267,9 @@ body.sheet-open .near { display: none; }
 .altpin { display: flex; align-items: center; justify-content: center; transform: translate(-50%, -50%); width: 26px; height: 26px; border-radius: 50%; background: #0B0B0B; color: var(--lime); border: 2.5px solid var(--lime); font-family: var(--head); font-weight: 700; font-size: 14px; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,.5); }
 /* Favorito fijo en el mapa */
 .favpin { display: block; transform: translate(-50%, -50%); font-size: 26px; line-height: 1; color: var(--lime); cursor: pointer; -webkit-text-stroke: 1.5px #0B0B0B; text-shadow: 0 1px 3px rgba(0,0,0,.6); }
+.favpin.ic { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: #0B0B0B; border: 2.5px solid var(--lime); font-size: 16px; -webkit-text-stroke: 0; text-shadow: none; box-shadow: 0 2px 6px rgba(0,0,0,.5); }
+.favpin.in-list { transform: none; flex: none; width: 30px; text-align: center; }
+.favpin.ic.in-list { width: 30px; }
 .me { display: block; width: 18px; height: 18px; border-radius: 50%; background: #1A73E8; border: 3px solid #fff; box-shadow: 0 0 0 6px rgba(26,115,232,.25); }
 
 .leaflet-container { font-family: var(--body); }
@@ -248,8 +280,16 @@ body.sheet-open .near { display: none; }
 @media (min-width: 760px) {
   .top { right: auto; width: 400px; left: 8px; top: 8px; border-radius: 12px; box-shadow: 0 0 0 1.5px var(--lime); }
   /* Ficha de resultado y paneles justo debajo del buscador, también arriba a la izquierda */
-  .sheet, .panel { left: 8px; right: auto; width: 400px; top: calc(var(--top-h, 100px) + 8px); bottom: auto; border-radius: 12px; box-shadow: 0 0 0 1.5px var(--lime); }
+  .sheet, .panel { left: calc(var(--top-x, 8px)); right: auto; width: 400px; top: calc(var(--top-h, 100px) + 8px); bottom: auto; border-radius: 12px; box-shadow: 0 0 0 1.5px var(--lime); }
   .panel { bottom: 8px; }
+  .panel.fav-edit { top: calc(var(--top-h, 100px) + 8px); bottom: auto; max-height: calc(100% - var(--top-h, 100px) - 16px); }
+  /* Ventanas flotantes: se arrastran por la barra superior (buscador) o por la pestaña de la ficha */
+  .bar { cursor: grab; touch-action: none; }
+  .grip { display: block; height: 14px; margin: -6px -8px 2px; cursor: grab; touch-action: none; position: relative; }
+  .grip::before { content: ''; position: absolute; left: 50%; top: 5px; width: 40px; height: 4px; margin-left: -20px; border-radius: 2px; background: #555; }
+  .grip:hover::before { background: var(--lime); }
+  .dragging, .dragging .bar, .dragging .grip { cursor: grabbing; user-select: none; }
+  .dragging { box-shadow: 0 0 0 2px var(--lime), 0 10px 30px rgba(0,0,0,.45) !important; }
   body.sheet-open .map-ctrls { bottom: calc(var(--safe-b) + 18px); }
   .bar { padding: 4px 6px 0 12px; }
   .bar .icon-btn { width: 34px; height: 34px; }
@@ -267,4 +307,23 @@ body.sheet-open .near { display: none; }
   .act { height: 38px; }
   .toast { top: 14px; left: calc(50% + 204px); max-width: calc(100% - 430px); }
   .leaflet-top { top: 4px; }
+}
+/* Tablet (pantalla táctil grande): tarjetas algo más anchas y botones más grandes para el dedo */
+@media (min-width: 760px) and (pointer: coarse) {
+  .top, .sheet, .panel { width: 420px; }
+  .bar .icon-btn { width: 42px; height: 42px; }
+  .field input { height: 48px; }
+  .dir-btn, .go { height: 48px; }
+  .dir-btn { min-width: 48px; }
+  .clear { height: 44px; }
+  .mini { width: 44px; height: 44px; }
+  .act { height: 46px; font-size: 13px; }
+  .nl { min-height: 42px; font-size: 16px; }
+  .map-ctrls .icon-btn { width: 52px; height: 52px; }
+  .toast { left: calc(50% + 214px); max-width: calc(100% - 450px); }
+}
+/* Pantallas bajas (móvil en horizontal): la ficha no tapa medio mapa */
+@media (max-height: 500px) and (max-width: 1000px) {
+  .near-list { flex-direction: row; overflow-x: auto; }
+  .nl { flex: none; }
 }

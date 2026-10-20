@@ -49,6 +49,70 @@
     var y = (b[0] - a[0]) * RAD;
     return Math.sqrt(x * x + y * y) * R;
   }
+  // Rumbo de a hacia b en grados (0 = norte, 90 = este)
+  function bearing(a, b) {
+    var x = (b[1] - a[1]) * Math.cos(((a[0] + b[0]) / 2) * RAD), y = b[0] - a[0];
+    return ((Math.atan2(x, y) / RAD) + 360) % 360;
+  }
+
+  // ---------- Topónimos del Nomenclátor (municipios, pueblos, parajes): validación y búsqueda ----------
+  // lugares/parajes: { v, code, t: [tipos], base: [lat0, lon0], r: [[nombre, dlat, dlon, tipo], ...] } (diezmilésimas)
+  function validPlaces(d, code) {
+    if (!d || typeof d !== 'object' || d.code !== code || !/^\d{8,12}$/.test(String(d.v)) || !Array.isArray(d.t) || !Array.isArray(d.r) || !Array.isArray(d.base)) return false;
+    if (d.r.length > 300000 || d.t.length > 200 || !isFinite(d.base[0]) || !isFinite(d.base[1]) || Math.abs(d.base[0]) > 90 || Math.abs(d.base[1]) > 180) return false;
+    for (var j = 0; j < d.t.length; j++) if (typeof d.t[j] !== 'string' || d.t[j].length > 100) return false;
+    for (var i = 0; i < d.r.length; i++) {
+      var x = d.r[i];
+      if (!Array.isArray(x) || typeof x[0] !== 'string' || !x[0] || x[0].length > 80 || !isFinite(x[1]) || !isFinite(x[2]) || !(x[3] >= 0 && x[3] < d.t.length)) return false;
+    }
+    return true;
+  }
+  // municipios: { v, r: [[nombre, lat·1e4, lon·1e4, provincia], ...] }
+  function validMunicipios(d) {
+    if (!d || typeof d !== 'object' || !/^\d{8,12}$/.test(String(d.v)) || !Array.isArray(d.r) || d.r.length > 20000) return false;
+    for (var i = 0; i < d.r.length; i++) {
+      var x = d.r[i];
+      if (!Array.isArray(x) || typeof x[0] !== 'string' || !x[0] || x[0].length > 80 || !isFinite(x[1]) || !isFinite(x[2]) ||
+        Math.abs(x[1]) > 900000 || Math.abs(x[2]) > 1800000 || typeof x[3] !== 'string' || !/^[A-Z]{1,2}$/.test(x[3])) return false;
+    }
+    return true;
+  }
+  // Texto normalizado para comparar: mayúsculas, sin tildes, palabras separadas por un espacio
+  function words(s) { return String(s || '').toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Z0-9]+/g, ' ').trim(); }
+  // Filas listas para buscar: {n, lat, lon, t (tipo), prov, rank (0 municipio … 2 paraje), w (palabras)}
+  function placeEntries(d, kind) {
+    var out = [];
+    if (kind === 'municipios') {
+      d.r.forEach(function (x) { out.push({ n: x[0], lat: x[1] / 1e4, lon: x[2] / 1e4, t: 'Municipio', prov: x[3], rank: 0, w: ' ' + words(x[0]) }); });
+    } else {
+      d.r.forEach(function (x) {
+        var t = d.t[x[3]];
+        out.push({ n: x[0], lat: d.base[0] + x[1] / 1e4, lon: d.base[1] + x[2] / 1e4, t: t, prov: d.code,
+          rank: kind === 'parajes' ? 2 : /^(Municipio|Capital de |Ciudad con estatuto)/.test(t) ? 0 : 1, w: ' ' + words(x[0]) });
+      });
+    }
+    return out;
+  }
+  // Busca por el principio del nombre o de cualquiera de sus palabras («torija», «tio casillas», «valdeave»)
+  function searchPlaces(lists, query, limit) {
+    var q = words(query);
+    if (q.length < 2) return [];
+    var hits = [], seen = {};
+    lists.forEach(function (list) {
+      for (var i = 0; i < list.length; i++) {
+        var e = list[i], p = e.w.indexOf(' ' + q);
+        if (p < 0) continue;
+        var score = (e.w === ' ' + q ? 0 : p === 0 ? 1 : 2) * 3 + e.rank;
+        var k = e.n + '|' + Math.round(e.lat * 100) + '|' + Math.round(e.lon * 100);
+        if (seen[k] != null && hits[seen[k]].score <= score) continue;
+        if (seen[k] != null) { hits[seen[k]].score = score; hits[seen[k]].e = e; continue; }
+        seen[k] = hits.length;
+        hits.push({ e: e, score: score });
+      }
+    });
+    hits.sort(function (a, b) { return a.score - b.score || a.e.n.length - b.e.n.length || a.e.n.localeCompare(b.e.n, 'es'); });
+    return hits.slice(0, limit || 8).map(function (h) { return h.e; });
+  }
 
   // ---------- Validación de un archivo de provincia descargado ----------
   function validProvince(d, code) {
@@ -505,5 +569,10 @@
     formatDist: formatDist,
     cardinal: cardinal,
     distance: distance,
+    bearing: bearing,
+    validPlaces: validPlaces,
+    validMunicipios: validMunicipios,
+    placeEntries: placeEntries,
+    searchPlaces: searchPlaces,
   };
 })(typeof window !== 'undefined' ? window : globalThis);

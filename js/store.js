@@ -86,6 +86,53 @@
     }).catch(function () { return []; });
   }
 
+  // ---- Topónimos: municipios de España, lugares de cada provincia y parajes (descarga opcional) ----
+  // kind: 'municipios' (code '') | 'lugares' | 'parajes'. Primero lo guardado (si es de esa versión), luego la app
+  // o la web. Sin conexión vale lo guardado aunque sea antiguo.
+  function placesKey(kind, code) { return new URL('kmes-' + kind + '/' + (code || 'es') + '.json', root.location.href).href; }
+  function placesPath(kind, code) { return kind === 'municipios' ? 'data/municipios.json' : 'data/' + kind + '/' + code + '.json'; }
+  function parsePlaces(text, kind, code) {
+    var d = JSON.parse(text);
+    if (kind === 'municipios' ? !root.KMCore.validMunicipios(d) : !root.KMCore.validPlaces(d, code)) throw new Error('datos no válidos');
+    return d;
+  }
+  function getPlaces(kind, code, version) {
+    if (!/^(municipios|lugares|parajes)$/.test(kind) || (kind !== 'municipios' && !/^[A-Z]{1,2}$/.test(code))) return Promise.reject(new Error('no válido'));
+    var cached = null;
+    var fromCache = !hasCache ? Promise.resolve(null) : caches.open(CACHE).then(function (c) { return c.match(placesKey(kind, code)); })
+      .then(function (res) { return res ? res.text() : null; })
+      .then(function (t) {
+        if (!t) return null;
+        try { cached = parsePlaces(t, kind, code); } catch (e) { cached = null; }
+        return cached && (!version || String(cached.v) === String(version)) ? cached : null;
+      }).catch(function () { return null; });
+    return fromCache.then(function (hit) {
+      if (hit) return hit;
+      var sameOrigin = new URL(CFG.remoteBase).origin === root.location.origin;
+      function load(url) { return fetchJson(url).then(function (r) { return { d: parsePlaces(r.text, kind, code), text: r.text }; }); }
+      return load(placesPath(kind, code)).then(function (x) {
+        if (sameOrigin || !version || String(x.d.v) === String(version)) return x;
+        return load(CFG.remoteBase + placesPath(kind, code)).catch(function () { return x; });
+      }, function (e) {
+        if (sameOrigin) throw e;
+        return load(CFG.remoteBase + placesPath(kind, code));
+      }).then(function (x) {
+        if (cached && cached.v > x.d.v) return cached;
+        if (hasCache) caches.open(CACHE).then(function (c) {
+          return c.put(placesKey(kind, code), new Response(x.text, { headers: { 'Content-Type': 'application/json' } }));
+        }).catch(function () { /* sin espacio */ });
+        return x.d;
+      }).catch(function (e) {
+        if (cached) return cached;
+        throw e;
+      });
+    });
+  }
+  function removePlaces(kind, code) {
+    if (!hasCache) return Promise.resolve();
+    return caches.open(CACHE).then(function (c) { return c.delete(placesKey(kind, code)); }).catch(function () { /* */ });
+  }
+
   // ---- Índice y límites más nuevos que los incluidos en la app (APK), guardados para usarlos sin conexión ----
   function dataKey(name) { return new URL('kmes-data/' + name + '.json', root.location.href).href; }
   function storedData() {
@@ -118,6 +165,8 @@
     getProvince: getProvince,
     removeProvince: removeProvince,
     storedProvinces: storedProvinces,
+    getPlaces: getPlaces,
+    removePlaces: removePlaces,
     storedData: storedData,
     storeData: storeData,
     readJSON: readJSON,

@@ -78,9 +78,65 @@
   if (window.ResizeObserver) new ResizeObserver(syncTop).observe(document.querySelector('.top'));
   syncTop();
   function bottomOffset() { return document.body.classList.contains('sheet-open') ? $('sheet').offsetHeight : 0; }
-  // En escritorio los paneles van a la izquierda, uno debajo del otro: el mapa útil queda a su derecha
+  // En tablet y PC los paneles flotan a la izquierda, uno debajo del otro: el mapa útil queda a su derecha
   var DESK = window.matchMedia('(min-width: 760px)');
-  function panelRight() { return DESK.matches ? document.querySelector('.top').getBoundingClientRect().right : 0; }
+  function panelRight() {
+    if (!DESK.matches) return 0;
+    var r = document.querySelector('.top').getBoundingClientRect();
+    return r.left + r.width / 2 < window.innerWidth / 2 ? r.right : 0; // si se ha llevado a la derecha, no se compensa
+  }
+
+  // ---------- Ventanas flotantes (tablet y PC): se arrastran por su barra y recuerdan su sitio ----------
+  // Doble clic en la barra: vuelve a su sitio. La ficha, si no se ha movido, va siempre debajo del buscador.
+  var pos = S.readJSON('pos', {});
+  if (!pos || typeof pos !== 'object') pos = {};
+  function validPos(p) { return Array.isArray(p) && p.length === 2 && isFinite(p[0]) && isFinite(p[1]); }
+  function clampPos(p, n) {
+    // siempre entera dentro de la pantalla (si cabe)
+    var w = n.offsetWidth || 400, h = n.offsetHeight || 60;
+    return [Math.round(Math.max(0, Math.min(window.innerWidth - w, p[0]))), Math.round(Math.max(0, Math.min(window.innerHeight - h, p[1])))];
+  }
+  function applyPos() {
+    var top = document.querySelector('.top');
+    [['top', top], ['sheet', $('sheet')]].forEach(function (pair) {
+      var n = pair[1], p = pos[pair[0]];
+      if (DESK.matches && validPos(p)) { p = clampPos(p, n); n.style.left = p[0] + 'px'; n.style.top = p[1] + 'px'; n.classList.add('moved'); }
+      else { n.style.left = n.style.top = ''; n.classList.remove('moved'); }
+    });
+    document.documentElement.style.setProperty('--top-x', (DESK.matches ? Math.round(top.getBoundingClientRect().left) : 0) + 'px');
+    syncTop();
+  }
+  function draggable(key, node, handle) {
+    var start = null;
+    handle.addEventListener('pointerdown', function (e) {
+      if (!DESK.matches || e.button !== 0 || (e.target.closest && e.target.closest('button, input, a'))) return;
+      var r = node.getBoundingClientRect();
+      start = [e.clientX - r.left, e.clientY - r.top];
+      try { handle.setPointerCapture(e.pointerId); } catch (err) { /* */ }
+      node.classList.add('dragging');
+      e.preventDefault();
+    });
+    handle.addEventListener('pointermove', function (e) {
+      if (!start) return;
+      pos[key] = clampPos([e.clientX - start[0], e.clientY - start[1]], node);
+      applyPos();
+    });
+    function end() {
+      if (!start) return;
+      start = null;
+      node.classList.remove('dragging');
+      S.writeJSON('pos', pos);
+      renderMarkers();
+    }
+    handle.addEventListener('pointerup', end);
+    handle.addEventListener('pointercancel', end);
+    handle.addEventListener('dblclick', function () { delete pos[key]; S.writeJSON('pos', pos); applyPos(); renderMarkers(); });
+  }
+  draggable('top', document.querySelector('.top'), document.querySelector('.bar'));
+  draggable('sheet', $('sheet'), $('sheetGrip'));
+  if (DESK.addEventListener) DESK.addEventListener('change', applyPos); else if (DESK.addListener) DESK.addListener(applyPos);
+  window.addEventListener('resize', applyPos);
+  applyPos();
   function fitBounds(b) {
     if (!b) return;
     map.invalidateSize();
@@ -204,7 +260,7 @@
 
     // Antisolape: huecos ocupados en una rejilla de pantalla; la cabecera y la ficha tapan el mapa
     var CPX = 32, occ = {}, want = {}, n = 0;
-    var blocked = [screenRect('.top'), screenRect('#sheet'), screenRect('.map-ctrls'), screenRect('#near')].filter(Boolean);
+    var blocked = [screenRect('.top'), screenRect('#sheet'), screenRect('.map-ctrls')].filter(Boolean);
     (favSpots || []).forEach(function (p) { // las estrellas de favoritos no se tapan
       var q = map.latLngToContainerPoint(p);
       blocked.push([q.x - 14, q.y - 14, q.x + 14, q.y + 14]);
@@ -314,6 +370,7 @@
     return S.getProvince(code, index.v).then(function (d) {
       provData[code] = d;
       provState[code] = 'ok';
+      loadProvincePlaces(code);
       return true;
     }).catch(function () {
       provState[code] = 'error';
@@ -340,6 +397,7 @@
     delete provData[code];
     delete provState[code];
     S.removeProvince(code);
+    dropProvincePlaces(code);
     rebuild();
   }
   function downloadButton(code, then) {
@@ -347,6 +405,110 @@
       type: 'button', class: 'dl', text: 'Descargar ' + provByCode[code].name,
       onclick: function () { addProvince(code).then(function (ok) { if (ok && then) then(); }); },
     });
+  }
+
+  // ---------- Topónimos: municipios, pueblos y parajes (Nomenclátor Geográfico Básico del IGN) ----------
+  // Los municipios de toda España se cargan al empezar a escribir; los pueblos de cada provincia se descargan con
+  // ella; los parajes son una descarga opcional por provincia (Configuración › Provincias).
+  var placesMeta = null, placesMetaP = null, placeLists = {};
+  var parajesOn = (function () {
+    var v = S.readJSON('parajes', []);
+    return Array.isArray(v) ? v.filter(function (c, i) { return typeof c === 'string' && /^[A-Z]{1,2}$/.test(c) && v.indexOf(c) === i; }) : [];
+  })();
+  function metaOk(m) { return !!m && /^\d{8,12}$/.test(String(m.v)) && !!m.sizes && typeof m.sizes === 'object' ? m : null; }
+  function loadPlacesMeta() {
+    if (placesMetaP) return placesMetaP;
+    var local = S.loadJSON('data/lugares.json').then(metaOk, function () { return null; });
+    // APK: la web puede tener topónimos más nuevos que los incluidos en la app
+    var remote = IS_NATIVE ? S.loadJSON(CFG.remoteBase + 'data/lugares.json').then(metaOk, function () { return null; }) : Promise.resolve(null);
+    placesMetaP = Promise.all([local, remote]).then(function (r) {
+      placesMeta = r[1] && (!r[0] || r[1].v > r[0].v) ? r[1] : r[0];
+      return placesMeta;
+    });
+    placesMetaP.then(function (m) { if (!m) placesMetaP = null; }); // sin conexión: se reintenta más tarde
+    return placesMetaP;
+  }
+  var placePending = {};
+  function loadPlaces(kind, code) {
+    var id = kind + ':' + (code || '');
+    if (placeLists[id]) return Promise.resolve(placeLists[id]);
+    if (placePending[id]) return placePending[id];
+    var p = placePending[id] = loadPlacesMeta().then(function (m) {
+      if (m && kind !== 'municipios' && !m.sizes[code]) throw new Error('sin datos');
+      return S.getPlaces(kind, code, m && m.v);
+    }).then(function (d) {
+      placeLists[id] = K.placeEntries(d, kind);
+      return placeLists[id];
+    });
+    p.then(function () { delete placePending[id]; }, function () { delete placePending[id]; });
+    return p;
+  }
+  // Pueblos de las provincias elegidas y sus parajes (si se pidieron); sin aviso si falla (no es imprescindible)
+  function loadProvincePlaces(code) {
+    var jobs = [loadPlaces('lugares', code).catch(function () { return null; })];
+    if (parajesOn.indexOf(code) >= 0) jobs.push(loadPlaces('parajes', code).catch(function () { return null; }));
+    return Promise.all(jobs).then(function () { if (document.activeElement === roadInput) renderSuggest(); });
+  }
+  function dropProvincePlaces(code) {
+    delete placeLists['lugares:' + code];
+    delete placeLists['parajes:' + code];
+    S.removePlaces('lugares', code);
+    S.removePlaces('parajes', code);
+    setParajes(code, false);
+  }
+  function setParajes(code, on) {
+    parajesOn = parajesOn.filter(function (c) { return c !== code; });
+    if (on) parajesOn.push(code);
+    S.writeJSON('parajes', parajesOn);
+  }
+  var parajesState = {}; // code -> 'loading' | 'error'
+  function toggleParajes(code) {
+    if (parajesOn.indexOf(code) >= 0) {
+      setParajes(code, false);
+      delete placeLists['parajes:' + code];
+      S.removePlaces('parajes', code);
+      toast('Parajes de ' + provByCode[code].name + ' borrados');
+      renderSettingsList();
+      return;
+    }
+    parajesState[code] = 'loading';
+    renderSettingsList();
+    loadPlaces('parajes', code).then(function (list) {
+      delete parajesState[code];
+      setParajes(code, true);
+      toast(list.length.toLocaleString('es-ES') + ' parajes de ' + provByCode[code].name + ' listos para buscar');
+      renderSettingsList();
+    }, function () {
+      parajesState[code] = 'error';
+      toast('No se pudieron descargar los parajes' + (navigator.onLine ? '' : ' (sin conexión)'));
+      renderSettingsList();
+    });
+  }
+  function placeHits(q) {
+    var lists = Object.keys(placeLists).map(function (k) { return placeLists[k]; });
+    return K.searchPlaces(lists, q, 8);
+  }
+  function placeSub(p) {
+    var prov = provByCode[p.prov] ? provByCode[p.prov].name : '';
+    return p.rank === 2 ? p.t : p.rank === 0 ? prov : p.t === 'Entidad singular' || p.t === 'Núcleos de población' ? 'Pueblo · ' + prov : p.t + ' · ' + prov;
+  }
+  function placeChip(p) {
+    return el('button', { type: 'button', class: 'chip place' + (p.rank === 2 ? ' paraje' : ''), role: 'option', onclick: function () { pickPlace(p); } }, [
+      el('span', { class: 'pin', text: p.rank === 2 ? '⛰️' : '📍' }),
+      el('span', { text: p.n }),
+      el('small', { text: placeSub(p) }),
+    ]);
+  }
+  function pickPlace(p) {
+    roadInput.value = p.n;
+    kmInput.value = '';
+    selectedRoad = null; dir = 0;
+    renderDir(); highlightRoad(null);
+    suggestBox.hidden = true;
+    $('clearRoad').hidden = false;
+    roadInput.blur();
+    setInfo(null);
+    showCoord(p.lat, p.lon, p.rank === 0 ? joinDot(['Municipio', placeSub(p)]) : placeSub(p) || p.t, false, p.n);
   }
 
   // ---------- Buscador ----------
@@ -400,8 +562,12 @@
     if (!C || looksLikeCoords(val)) { suggestBox.hidden = true; return; }
     var list = C.suggest(val, 20);
     if (selectedRoad && C.resolveRoad(val) === selectedRoad) list = list.filter(function (n) { return n !== selectedRoad; }).slice(0, 8);
-    list.forEach(function (n) { suggestBox.appendChild(chip(n)); });
-    suggestBox.hidden = !list.length || document.activeElement !== roadInput;
+    // Municipios, pueblos y parajes en la misma casilla: con letras solas van primero; con números, las carreteras
+    var places = /[A-Za-zÀ-ÿ]{2}/.test(val) && !selectedRoad ? placeHits(val) : [];
+    if (/[A-Za-zÀ-ÿ]{2}/.test(val) && !placeLists['municipios:']) loadPlaces('municipios').then(renderSuggest, function () { /* sin conexión */ });
+    var chips = list.map(chip), pchips = places.map(placeChip);
+    (/\d/.test(val) ? chips.concat(pchips) : pchips.concat(chips)).forEach(function (n) { suggestBox.appendChild(n); });
+    suggestBox.hidden = !suggestBox.firstChild || document.activeElement !== roadInput;
   }
   function looksLikeCoords(v) { return /^\s*(https?:|geo:|[NSEWO]?\s*-?\d{1,3}[.,°º ]\d)/i.test(v) && !C.resolveRoad(v) && !C.parseQuery(v).road; }
 
@@ -448,7 +614,9 @@
     if (q.road) { pickRoad(q.road, true); return; }
     if (KC.parse(roadInput.value)) { search(); return; }
     var first = C.suggest(roadInput.value, 1)[0];
-    if (first) pickRoad(first, true);
+    var place = /\d/.test(roadInput.value) ? null : placeHits(roadInput.value)[0];
+    if (place && (!first || C.resolveRoad(roadInput.value) !== first)) pickPlace(place);
+    else if (first) pickRoad(first, true);
   });
   $('clearRoad').addEventListener('click', function () {
     roadInput.value = ''; kmInput.value = ''; selectedRoad = null; dir = 0;
@@ -472,10 +640,12 @@
       var co = KC.parse(raw);
       if (co) { searchCoords(co); return; }
       road = C.suggest(raw, 1)[0];
+      var place = /\d/.test(raw) ? null : placeHits(raw)[0];
+      if (place && !C.resolveRoad(raw)) { pickPlace(place); return; }
     }
     var km = K.parseKm(kmInput.value);
     if (!isFinite(km) && q.road && isFinite(q.km)) { km = q.km; road = q.road; }
-    if (!road) { setInfo('No encuentro esa carretera ni reconozco unas coordenadas.', true); roadInput.focus(); return; }
+    if (!road) { setInfo('No encuentro esa carretera, lugar ni coordenadas.', true); roadInput.focus(); return; }
     if (road !== selectedRoad) pickRoad(road, false);
     var inf = C.roadInfo(road);
     if (!kmInput.value.trim()) {
@@ -551,6 +721,8 @@
     return (r.dir === 1 ? '↑ ' + K.cardinal(inf.heading) : '↓ ' + K.cardinal(inf.heading + 180));
   }
   function label(r) {
+    if (r.me && r.near[0]) return r.near[0].road + ' km ' + K.formatKm(round1(r.near[0].km)) + ' ≈ (mi ubicación)';
+    if (r.place) return r.place + ' · ' + fmtLL(r.lat, r.lon);
     if (r.coord) return fmtLL(r.lat, r.lon);
     return r.road + ' km ' + K.formatKm(r.km) + (r.exact ? '' : ' ≈') + (r.dir ? ' (' + dirLabel(r) + ')' : '');
   }
@@ -573,39 +745,99 @@
     }
   }
 
-  function showCoord(lat, lon, format, fromTap) {
-    var near = C.nearest(lat, lon, 3000, 1)[0];
-    var r = { coord: true, lat: lat, lon: lon, format: format, near: near };
-    alternatives = [r]; altIdx = 0;
-    var prov = borders.provinceAt(lat, lon);
-    if (prov && !provData[prov]) {
-      setInfo(['Ese punto está en ', el('b', { text: provByCode[prov].name }), ', fuera de tus provincias.', downloadButton(prov, function () { showCoord(lat, lon, format); })]);
-    } else if (!prov) {
-      setInfo('Ese punto está fuera de España: no hay PK, pero puedes ir hasta él.');
-    } else if (!fromTap) {
-      setInfo(null);
-    }
+  // Un punto (pulsado en el mapa, coordenadas, favorito o mi ubicación): sus 3 PK más cercanos van en la misma ficha
+  function coordResult(lat, lon, format, isMe, acc) {
+    return { coord: true, me: !!isMe, lat: lat, lon: lon, format: format, acc: acc, near: C ? C.nearest(lat, lon, 3000, 3) : [] };
+  }
+  // place: nombre del municipio, pueblo, paraje o favorito (se muestra en grande en lugar de las coordenadas)
+  function showCoord(lat, lon, format, fromTap, place) {
+    alternatives = [coordResult(lat, lon, format)]; altIdx = 0;
+    if (place) alternatives[0].place = place;
+    if (!fromTap) setInfo(null);
     renderResult(fromTap);
-    if (!fromTap) addRecent(r); // al pulsar el mapa no se llena «Recientes» ni se mueve el mapa
+    if (!fromTap) addRecent(current); // al pulsar el mapa no se llena «Recientes» ni se mueve el mapa
+  }
+  // Tras descargar la provincia del punto, se recalculan sus PK cercanos
+  function refreshCoord() {
+    if (!current || !current.coord) return;
+    current.near = C.nearest(current.lat, current.lon, 3000, 3);
+    renderResult(true);
+  }
+
+  // Distancia en línea recta y rumbo desde mi última posición (si es de hace menos de 10 minutos)
+  var me = null, locked = false, lockedAt = 0;
+  function fromMe(lat, lon) {
+    if (!me || Date.now() - me.t > 600000) return '';
+    var d = K.distance([me.lat, me.lon], [lat, lon]);
+    return d < 30 ? '' : 'a ' + K.formatDist(d) + ' de ti (' + K.cardinal(K.bearing([me.lat, me.lon], [lat, lon])) + ')';
+  }
+  function round1(km) { return Math.round(km * 10) / 10; }
+  function hhmm(t) { var d = new Date(t); return d.getHours() + ':' + ('0' + d.getMinutes()).slice(-2); }
+  function joinDot(parts) { return parts.filter(Boolean).join(' · '); }
+  function cap(s) { s = String(s || ''); return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  function openNear(n) {
+    var km = round1(n.km), loc = C.locate(n.road, km, 0);
+    showResult(loc.length ? loc : [{ road: n.road, km: km, dir: 0, lat: n.lat, lon: n.lon, exact: false }], true);
+  }
+  function renderNear(r) {
+    var box = $('nearList'), msg = $('sheetMsg');
+    clear(box); clear(msg);
+    box.hidden = msg.hidden = true;
+    if (!r.coord) return;
+    var list = r.me && r.near.length ? r.near.slice(1) : r.near;
+    if (r.me && r.near.length) box.appendChild(el('div', { class: 'nl-ll', text: '📍 ' + fmtLL(r.lat, r.lon) }));
+    list.forEach(function (n) {
+      box.appendChild(el('button', { type: 'button', class: 'nl', title: 'Ver este PK', onclick: function () { openNear(n); } }, [
+        el('span', { class: 'dot ty-' + C.typeOf(n.road) }), el('b', { text: n.road }), ' km ' + K.formatKm(round1(n.km)) + ' ≈',
+        el('span', { class: 'nl-d', text: 'a ' + K.formatDist(n.d) }),
+      ]));
+    });
+    box.hidden = !box.firstChild;
+    var prov = borders && borders.provinceAt(r.lat, r.lon);
+    if (prov && !provData[prov]) {
+      msg.appendChild(el('span', { text: (r.me ? 'Estás en ' : 'Este punto está en ') + provByCode[prov].name + ', que no está descargada.' }));
+      msg.appendChild(downloadButton(prov, refreshCoord));
+    } else if (!prov) msg.textContent = 'Fuera de España: no hay PK, pero puedes ir hasta allí.';
+    else if (!r.near.length) msg.textContent = 'No hay ninguna carretera con PK a menos de 3 km.';
+    msg.hidden = !msg.firstChild;
   }
 
   function renderResult(keepView) {
     var r = current = alternatives[altIdx];
-    var rr = $('resRoad'), km = $('resKm'), sub = $('resSub');
+    var rr = $('resRoad'), km = $('resKm'), sub = $('resSub'), n0 = r.coord && r.near[0];
     clear(km); clear(sub);
-    km.classList.toggle('is-coord', !!r.coord);
-    if (r.coord) {
+    var bigMe = !!(r.me && n0);
+    km.classList.toggle('is-coord', !!r.coord && !bigMe && !r.place);
+    $('resLock').hidden = !bigMe;
+    $('resLock').classList.toggle('on', bigMe && locked);
+    $('resLock').setAttribute('aria-pressed', bigMe && locked ? 'true' : 'false');
+    $('sheet').classList.toggle('locked', bigMe && locked);
+    if (bigMe) {
+      // Mi ubicación: el PK más cercano en grande (con «Bloquear» queda fijo para dar el aviso circulando)
+      rr.textContent = n0.road;
+      rr.className = 'res-road ty-' + C.typeOf(n0.road);
+      km.appendChild(document.createTextNode('km ' + K.formatKm(round1(n0.km))));
+      km.appendChild(el('span', { class: 'approx', text: '≈' }));
+      sub.textContent = joinDot([locked ? '🔒 Bloqueado a las ' + hhmm(lockedAt) : 'Tu ubicación', 'a ' + K.formatDist(n0.d), r.acc ? 'GPS ±' + Math.round(r.acc) + ' m' : '']);
+    } else if (r.place) {
       rr.textContent = '📍';
       rr.className = 'res-road coord';
+      km.textContent = r.place;
+      sub.textContent = joinDot([r.format, fmtLL(r.lat, r.lon), fromMe(r.lat, r.lon)]);
+    } else if (r.coord) {
+      rr.textContent = r.me ? '🧭' : '📍';
+      rr.className = 'res-road coord';
       km.textContent = fmtLL(r.lat, r.lon);
-      sub.textContent = r.near ? 'Cerca: ' + r.near.road + ' km ' + K.formatKm(Math.round(r.near.km * 10) / 10) + ' ≈ · a ' + K.formatDist(r.near.d) : 'Sin PK cercano en tus provincias';
+      sub.textContent = joinDot([cap(r.me ? 'tu ubicación' : r.format), r.me && r.acc ? 'GPS ±' + Math.round(r.acc) + ' m' : '', r.me ? '' : fromMe(r.lat, r.lon)]);
     } else {
       rr.textContent = r.road;
       rr.className = 'res-road ty-' + C.typeOf(r.road);
       km.appendChild(document.createTextNode('km ' + K.formatKm(r.km)));
       if (!r.exact) km.appendChild(el('span', { class: 'approx', text: '≈', title: 'Posición calculada entre hitos' }));
-      sub.textContent = fmtLL(r.lat, r.lon) + (r.dir ? ' · ' + dirLabel(r) : '');
+      sub.textContent = joinDot([fmtLL(r.lat, r.lon), r.dir ? dirLabel(r) : '', fromMe(r.lat, r.lon)]);
     }
+    renderNear(r);
     var alt = $('altBtn');
     alt.hidden = alternatives.length < 2;
     if (alternatives.length > 1) alt.textContent = 'Este km aparece en ' + alternatives.length + ' sitios · ver otro (' + (altIdx + 1) + '/' + alternatives.length + ')';
@@ -622,10 +854,11 @@
     sheet.hidden = false;
     document.body.classList.add('sheet-open');
     document.documentElement.style.setProperty('--sheet-h', sheet.offsetHeight + 'px');
-    setTarget(r.lat, r.lon);
+    if (DESK.matches && pos.sheet) applyPos(); // la ficha cambia de alto: que no quede cortada
+    if (r.me) { if (targetMarker) { map.removeLayer(targetMarker); targetMarker = null; } } else setTarget(r.lat, r.lon);
     drawAlternatives();
     if (!keepView) focusPoint(r.lat, r.lon, Math.max(map.getZoom(), 16));
-    try {
+    if (!r.me) try {
       history.replaceState(null, '', '#' + (r.coord ? '@' + r.lat.toFixed(6) + ',' + r.lon.toFixed(6) : encodeURIComponent(r.road) + '/' + r.km + (r.dir ? '/' + r.dir : '')));
     } catch (e) { /* */ }
   }
@@ -647,7 +880,7 @@
     document.body.classList.remove('sheet-open');
     if (targetMarker) { map.removeLayer(targetMarker); targetMarker = null; }
     altLayer.clearLayers();
-    current = null;
+    current = null; locked = false;
     try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* */ }
     renderMarkers(); // donde estaba la ficha vuelven a caber PK
   }
@@ -675,41 +908,149 @@
   });
 
   // ---------- Favoritos y recientes ----------
-  function compact(r) { return r.coord ? { c: 1, lat: +r.lat.toFixed(6), lon: +r.lon.toFixed(6) } : { road: r.road, km: r.km, dir: r.dir || 0 }; }
+  // Los favoritos pueden llevar nombre (n), color (col) e icono (ic); se guardan solo en este dispositivo
+  var FAV_COLORS = ['#C6F400', '#FF4B3E', '#FF9F1C', '#F2D600', '#17A04A', '#2F6BFF', '#A259FF', '#F2F2F2'];
+  var FAV_ICONS = [['⛰️', 'Montaña'], ['🌲', 'Bosque'], ['💧', 'Fuente'], ['🏕️', 'Campamento'], ['🌾', 'Campo'],
+    ['🚗', 'Coche'], ['🚚', 'Camión'], ['🚑', 'Ambulancia'], ['🚒', 'Bomberos'],
+    ['🏠', 'Casa'], ['🏭', 'Nave o fábrica'], ['⛪', 'Iglesia o ermita'], ['🏰', 'Castillo'], ['⛽', 'Gasolinera']];
+  var ICON_OK = FAV_ICONS.map(function (x) { return x[0]; });
+  function compact(r) {
+    if (!r.coord) return { road: r.road, km: r.km, dir: r.dir || 0 };
+    var o = { c: 1, lat: +r.lat.toFixed(6), lon: +r.lon.toFixed(6) };
+    if (r.place) o.n = r.place.slice(0, 40);
+    return o;
+  }
   function validItem(x) {
     if (!x || typeof x !== 'object') return false;
     if (x.c === 1) return typeof x.lat === 'number' && typeof x.lon === 'number' && Math.abs(x.lat) <= 90 && Math.abs(x.lon) <= 180;
     return typeof x.road === 'string' && /^[A-Z0-9-]{3,16}$/.test(x.road) && typeof x.km === 'number' && isFinite(x.km) && x.km >= 0 && x.km <= 2000 && (x.dir === 0 || x.dir === 1 || x.dir === -1);
   }
+  // Solo se conservan campos conocidos con valores permitidos (lo guardado podría estar manipulado)
+  function cleanItem(x) {
+    var o = x.c === 1 ? { c: 1, lat: x.lat, lon: x.lon } : { road: x.road, km: x.km, dir: x.dir };
+    if (typeof x.n === 'string' && x.n.trim()) o.n = x.n.trim().slice(0, 40);
+    if (FAV_COLORS.indexOf(x.col) >= 0) o.col = x.col;
+    if (ICON_OK.indexOf(x.ic) >= 0) o.ic = x.ic;
+    return o;
+  }
   function itemKey(x) { return x.c ? 'c|' + x.lat + '|' + x.lon : x.road + '|' + x.km + '|' + x.dir; }
-  function readList(k) { var v = S.readJSON(k, []); return Array.isArray(v) ? v.filter(validItem).slice(0, 50) : []; }
+  function readList(k) { var v = S.readJSON(k, []); return Array.isArray(v) ? v.filter(validItem).slice(0, 50).map(cleanItem) : []; }
   function addRecent(r) {
     var item = compact(r);
     var list = readList('rec').filter(function (x) { return itemKey(x) !== itemKey(item); });
     list.unshift(item);
     S.writeJSON('rec', list.slice(0, 20));
   }
-  function isFavItem(item) { return readList('fav').some(function (x) { return itemKey(x) === itemKey(item); }); }
+  function favOf(item) { var k = itemKey(item); return readList('fav').filter(function (x) { return itemKey(x) === k; })[0] || null; }
+  function isFavItem(item) { return !!favOf(item); }
   function isFav(r) { return isFavItem(compact(r)); }
-  function renderFav() { var on = current && isFav(current); $('resFav').classList.toggle('on', !!on); $('resFav').setAttribute('aria-pressed', on ? 'true' : 'false'); }
-  function toggleFav(item) {
-    var list = readList('fav');
-    if (isFavItem(item)) { list = list.filter(function (x) { return itemKey(x) !== itemKey(item); }); toast('Quitado de favoritos'); }
-    else { list.unshift(item); toast('Guardado en favoritos'); }
-    S.writeJSON('fav', list.slice(0, 50));
-    renderFav();
+  function itemTitle(x) { return x.c ? fmtLL(x.lat, x.lon) : x.road + ' km ' + K.formatKm(x.km); }
+  function renderFav() {
+    var f = current && favOf(compact(current));
+    $('resFav').classList.toggle('on', !!f);
+    $('resFav').setAttribute('aria-pressed', f ? 'true' : 'false');
+    $('resFav').setAttribute('aria-label', f ? 'Editar favorito' : 'Guardar en favoritos');
+    var sub = $('resSub'), old = sub.querySelector('.fav-n');
+    if (old) sub.removeChild(old);
+    if (f && f.n && f.n !== current.place) sub.insertBefore(el('b', { class: 'fav-n', text: (f.ic || '★') + ' ' + f.n + ' · ' }), sub.firstChild);
+  }
+  function favsChanged() {
+    if (current) renderFav();
     renderFavMarkers();
     renderMarkers();
     if (!$('favPanel').hidden) renderList();
   }
+  function saveFav(item) {
+    var k = itemKey(item), list = readList('fav'), i = -1;
+    list.forEach(function (x, j) { if (itemKey(x) === k) i = j; });
+    if (i >= 0) list[i] = cleanItem(item); else list.unshift(cleanItem(item));
+    S.writeJSON('fav', list.slice(0, 50));
+    favsChanged();
+  }
+  function removeFav(item) {
+    var k = itemKey(item);
+    S.writeJSON('fav', readList('fav').filter(function (x) { return itemKey(x) !== k; }));
+    favsChanged();
+  }
+  // La estrella guarda el favorito y abre su edición (nombre, color, icono); si ya lo es, abre la edición
+  function toggleFav(item) {
+    var f = favOf(item);
+    if (!f) { saveFav(item); toast('Guardado en favoritos'); f = favOf(item); }
+    editFav(f);
+  }
   $('resFav').addEventListener('click', function () { if (current) toggleFav(compact(current)); });
 
-  // Favoritos fijos en el mapa (estrella): siempre a la vista como referencia; al pulsarlos se abren
+  // Editor de favorito
+  var editing = null;
+  function editFav(x) {
+    editing = cleanItem(x);
+    var box = $('favEditBody');
+    clear(box);
+    box.appendChild(el('div', { class: 'fe-where', text: itemTitle(editing) }));
+    var name = el('input', { class: 'fe-name', id: 'favName', type: 'text', maxlength: '40', placeholder: 'Nombre (opcional)', 'aria-label': 'Nombre del favorito', spellcheck: 'false', enterkeyhint: 'done' });
+    name.value = editing.n || '';
+    name.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); $('favSave').click(); } });
+    box.appendChild(name);
+    box.appendChild(el('div', { class: 'fe-t', text: 'Color' }));
+    var cols = el('div', { class: 'fe-cols', role: 'radiogroup', 'aria-label': 'Color' });
+    FAV_COLORS.forEach(function (c, i) {
+      var b = el('button', { type: 'button', class: 'fe-col', role: 'radio', 'aria-label': 'Color ' + (i + 1), onclick: function () { editing.col = c; mark(); } });
+      b.style.background = c;
+      b.dataset.v = c;
+      cols.appendChild(b);
+    });
+    box.appendChild(cols);
+    box.appendChild(el('div', { class: 'fe-t', text: 'Icono' }));
+    var ics = el('div', { class: 'fe-ics', role: 'radiogroup', 'aria-label': 'Icono' });
+    [['', 'Estrella']].concat(FAV_ICONS).forEach(function (ic) {
+      var b = el('button', { type: 'button', class: 'fe-ic', role: 'radio', title: ic[1], 'aria-label': ic[1], text: ic[0] || '★',
+        onclick: function () { if (ic[0]) editing.ic = ic[0]; else delete editing.ic; mark(); } });
+      b.dataset.v = ic[0];
+      ics.appendChild(b);
+    });
+    box.appendChild(ics);
+    function mark() {
+      var col = editing.col || FAV_COLORS[0];
+      Array.prototype.forEach.call(cols.children, function (b) { var on = b.dataset.v === col; b.classList.toggle('on', on); b.setAttribute('aria-checked', on ? 'true' : 'false'); });
+      Array.prototype.forEach.call(ics.children, function (b) {
+        var on = b.dataset.v === (editing.ic || '');
+        b.classList.toggle('on', on); b.setAttribute('aria-checked', on ? 'true' : 'false');
+        b.style.borderColor = on ? col : '';
+      });
+    }
+    mark();
+    $('favEdit').hidden = false;
+  }
+  function closeEdit() { $('favEdit').hidden = true; editing = null; }
+  $('favEditClose').addEventListener('click', closeEdit);
+  $('favSave').addEventListener('click', function () {
+    if (!editing) return;
+    var n = $('favName').value.trim();
+    if (n) editing.n = n; else delete editing.n;
+    saveFav(editing);
+    closeEdit();
+    toast('Favorito guardado');
+  });
+  $('favDel').addEventListener('click', function () {
+    if (!editing) return;
+    removeFav(editing);
+    closeEdit();
+    toast('Quitado de favoritos');
+  });
+
+  // Favoritos fijos en el mapa (con su icono y color): siempre a la vista como referencia; al pulsarlos se abren
   var favLayer = L.layerGroup().addTo(map), favSpots = [];
   function favPosition(x) {
     if (x.c) return [x.lat, x.lon];
     var r = C && C.locate(x.road, x.km, x.dir || 0)[0];
     return r ? [r.lat, r.lon] : null;
+  }
+  function favPin(x) {
+    var col = x.col || FAV_COLORS[0];
+    var pin = el('span', { class: x.ic ? 'favpin ic' : 'favpin', text: x.ic || '★' });
+    if (x.ic) pin.style.borderColor = col; else pin.style.color = col;
+    pin.title = (x.n ? x.n + ' · ' : 'Favorito · ') + itemTitle(x);
+    return pin;
   }
   function renderFavMarkers() {
     favLayer.clearLayers();
@@ -717,8 +1058,7 @@
     readList('fav').forEach(function (x) {
       var p = favPosition(x);
       if (!p) return;
-      var star = el('span', { class: 'favpin', text: '★', title: x.c ? 'Favorito · ' + fmtLL(x.lat, x.lon) : 'Favorito · ' + x.road + ' km ' + K.formatKm(x.km) });
-      var mk = L.marker(p, { icon: L.divIcon({ className: 'pk-icon', html: star, iconSize: null }), keyboard: false, zIndexOffset: 2000 });
+      var mk = L.marker(p, { icon: L.divIcon({ className: 'pk-icon', html: favPin(x), iconSize: null }), keyboard: false, zIndexOffset: 2000 });
       mk.on('click', function () { openItem(x); });
       mk.addTo(favLayer);
       favSpots.push(p);
@@ -730,18 +1070,22 @@
     var list = readList(tab), ul = $('list');
     clear(ul);
     if (!list.length) {
-      ul.appendChild(el('li', { class: 'empty', text: tab === 'fav' ? 'Aún no tienes favoritos. Pulsa la estrella de un resultado, o mantén pulsado un punto del mapa y pulsa «☆ Favorito». Quedan fijos en el mapa.' : 'Aquí aparecerán tus últimas búsquedas.' }));
+      ul.appendChild(el('li', { class: 'empty', text: tab === 'fav' ? 'Aún no tienes favoritos. Pulsa la estrella de un resultado o de cualquier punto del mapa: puedes ponerle nombre, color e icono, y queda fijo en el mapa.' : 'Aquí aparecerán tus últimas búsquedas.' }));
       return;
     }
     list.forEach(function (x) {
-      var title = x.c ? '📍 ' + fmtLL(x.lat, x.lon) : x.road + ' · km ' + K.formatKm(x.km);
+      var lead = tab === 'fav' ? favPin(x) : x.c ? null : el('span', { class: 'dot ty-' + (C ? C.typeOf(x.road) : K.roadType(x.road)) });
+      if (tab === 'fav') lead.className += ' in-list';
       ul.appendChild(el('li', null, [
         el('button', { type: 'button', class: 'open', onclick: function () { openItem(x); } }, [
-          x.c ? null : el('span', { class: 'dot ty-' + (C ? C.typeOf(x.road) : K.roadType(x.road)) }),
-          el('b', { text: title }),
-          x.dir ? el('span', { text: x.dir === 1 ? 'km ↑' : 'km ↓' }) : null,
+          lead,
+          el('span', { class: 'open-t' }, [
+            el('b', { text: x.n || (x.c ? '📍 ' : '') + itemTitle(x) }),
+            x.n ? el('span', { text: itemTitle(x) }) : x.dir ? el('span', { text: x.dir === 1 ? 'km ↑' : 'km ↓' }) : null,
+          ]),
         ]),
-        el('button', { type: 'button', class: 'del', 'aria-label': 'Quitar', text: '×', onclick: function () {
+        tab === 'fav' ? el('button', { type: 'button', class: 'del', 'aria-label': 'Editar', title: 'Editar', text: '✎', onclick: function () { editFav(x); } }) : null,
+        el('button', { type: 'button', class: 'del', 'aria-label': 'Quitar', title: 'Quitar', text: '×', onclick: function () {
           S.writeJSON(tab, readList(tab).filter(function (y) { return itemKey(y) !== itemKey(x); }));
           renderList(); if (current) renderFav();
           if (tab === 'fav') { renderFavMarkers(); renderMarkers(); }
@@ -751,7 +1095,11 @@
   }
   function openItem(x) {
     $('favPanel').hidden = true;
-    if (x.c) { roadInput.value = fmtLL(x.lat, x.lon, 6); selectedRoad = null; renderDir(); highlightRoad(null); showCoord(x.lat, x.lon, 'favorito'); return; }
+    if (x.c) {
+      roadInput.value = x.n || fmtLL(x.lat, x.lon, 6); kmInput.value = ''; selectedRoad = null; renderDir(); highlightRoad(null);
+      showCoord(x.lat, x.lon, tab === 'fav' && isFavItem(x) ? 'favorito' : 'búsqueda reciente', false, x.n);
+      return;
+    }
     pickRoad(x.road, false);
     dir = C.roadInfo(x.road) && C.roadInfo(x.road).dual ? x.dir : 0; renderDir();
     kmInput.value = K.formatKm(x.km);
@@ -799,6 +1147,17 @@
         else removeProvince(p.code);
       });
       box.appendChild(el('label', { class: 'prov' }, [cb, el('span', { class: 'pn', text: p.name }), el('span', { class: 'ps ' + status[1], text: status[0] })]));
+      // Parajes de la provincia: descarga opcional (para buscarlos por su nombre)
+      var psize = on && placesMeta && placesMeta.sizes[p.code] && placesMeta.sizes[p.code][1];
+      if (psize) {
+        var pon = parajesOn.indexOf(p.code) >= 0, pst = parajesState[p.code];
+        box.appendChild(el('div', { class: 'prov-par' }, [
+          el('span', { class: 'pp-t', text: '⛰️ Parajes, cerros, fuentes, ermitas…' }),
+          el('button', { type: 'button', class: 'pp-b' + (pon ? ' on' : '') + (pst === 'error' ? ' err' : ''), 'aria-label': (pon ? 'Borrar' : 'Descargar') + ' parajes de ' + p.name,
+            text: pst === 'loading' ? 'Descargando…' : pon ? '✓ ' + fmtSize(psize) + ' · Borrar' : (pst === 'error' ? 'Reintentar ' : 'Descargar ') + fmtSize(psize),
+            onclick: function () { toggleParajes(p.code); } }),
+        ]));
+      }
     });
     var total = selected.reduce(function (s, c) { return s + (provByCode[c] ? provByCode[c].size : 0); }, 0);
     $('provCount').textContent = selected.length + ' elegidas · ' + fmtSize(total) +
@@ -814,7 +1173,7 @@
   $('btnSettings').addEventListener('click', function () {
     var p = $('settings'); $('favPanel').hidden = true;
     p.hidden = !p.hidden;
-    if (!p.hidden) { pinnedProvs = selected.slice(); renderConn(); renderSettingsList(); }
+    if (!p.hidden) { pinnedProvs = selected.slice(); renderConn(); renderSettingsList(); loadPlacesMeta().then(renderSettingsList); }
   });
   $('settingsClose').addEventListener('click', function () { $('settings').hidden = true; });
   $('provFilter').addEventListener('input', renderSettingsList);
@@ -825,54 +1184,20 @@
   // En el APK el enlace de descarga no existe (lo quita tools/prepare-android.mjs)
   if ($('apkLink')) $('apkLink').hidden = IS_NATIVE || IS_IOS;
 
-  // ---------- Ubicación y PK más cercano ----------
+  // ---------- Ubicación y PK más cercano (en la misma ficha que cualquier punto) ----------
   var watchId = null, meMarker = null, accCircle = null, firstFix = false, autoAsked = {};
-  function nearBox(title, lat, lon, accuracy, marked) {
-    var box = $('near');
-    clear(box);
-    box.appendChild(el('div', { class: 'near-t', text: title }));
-    // Punto marcado en el mapa: sus coordenadas (abren la ficha para copiar o ir) y guardarlo como favorito fijo
-    if (marked) {
-      var item = { c: 1, lat: +lat.toFixed(6), lon: +lon.toFixed(6) }, on = isFavItem(item);
-      box.appendChild(el('div', { class: 'near-c' }, [
-        el('button', { type: 'button', class: 'near-ll', text: fmtLL(lat, lon), title: 'Ver ficha de este punto',
-          onclick: function () { $('near').hidden = true; roadInput.value = fmtLL(lat, lon, 6); showCoord(lat, lon, 'punto marcado'); } }),
-        el('button', { type: 'button', class: 'near-fav' + (on ? ' on' : ''), 'aria-pressed': on ? 'true' : 'false', text: on ? '★ Favorito' : '☆ Favorito',
-          onclick: function () { toggleFav(item); nearBox(title, lat, lon, accuracy, true); } }),
-      ]));
-    }
-    var prov = borders && borders.provinceAt(lat, lon);
-    var res = C ? C.nearest(lat, lon, 3000, 3) : [];
-    if (prov && !provData[prov]) {
-      box.appendChild(el('div', { class: 'near-d', text: (marked ? 'Este punto está en ' : 'Estás en ') + provByCode[prov].name + ', que no está descargada.' }));
-      box.appendChild(downloadButton(prov, function () { nearBox(title, lat, lon, accuracy, marked); }));
-    }
-    if (!res.length) {
-      if (!prov || provData[prov]) box.appendChild(el('div', { class: 'near-d', text: prov ? 'No hay ninguna carretera con PK a menos de 3 km.' : 'Fuera de España.' }));
-    } else {
-      res.forEach(function (n, i) {
-        var km = Math.round(n.km * 10) / 10;
-        box.appendChild(el('button', {
-          type: 'button', class: 'pick',
-          onclick: function () {
-            var loc = C.locate(n.road, km, 0);
-            showResult(loc.length ? loc : [{ road: n.road, km: km, dir: 0, lat: n.lat, lon: n.lon, exact: false }], true);
-          },
-        }, [
-          el('div', { class: i ? 'near-v near-small' : 'near-v' }, [el('em', { text: n.road }), ' km ' + K.formatKm(km) + ' ≈']),
-          el('div', { class: 'near-d', text: 'a ' + K.formatDist(n.d) + (accuracy && !i ? ' · GPS ±' + Math.round(accuracy) + ' m' : '') }),
-        ]));
-      });
-    }
-    box.hidden = false;
-    return prov;
+  function showMe() {
+    if (!me) return;
+    alternatives = [coordResult(me.lat, me.lon, 'tu ubicación', true, me.acc)]; altIdx = 0;
+    renderResult(true);
   }
   function stopLocate() {
     if (watchId != null) navigator.geolocation.clearWatch(watchId);
     watchId = null;
     if (meMarker) { map.removeLayer(meMarker); map.removeLayer(accCircle); meMarker = accCircle = null; }
     $('btnLocate').classList.remove('on');
-    $('near').hidden = true;
+    if (current && current.me) closeSheet();
+    locked = false;
   }
   $('btnLocate').addEventListener('click', function () {
     if (watchId != null) { stopLocate(); return; }
@@ -882,36 +1207,46 @@
     toast('Buscando tu ubicación…');
     watchId = navigator.geolocation.watchPosition(function (pos) {
       var lat = pos.coords.latitude, lon = pos.coords.longitude, acc = pos.coords.accuracy;
+      me = { lat: lat, lon: lon, acc: acc, t: Date.now() };
       if (!meMarker) {
         accCircle = L.circle([lat, lon], { radius: acc, color: '#1A73E8', weight: 1, fillOpacity: 0.1, interactive: false }).addTo(map);
         meMarker = L.marker([lat, lon], { icon: L.divIcon({ className: 'pk-icon', html: '<span class="me"></span>', iconSize: [18, 18], iconAnchor: [9, 9] }), interactive: false, keyboard: false }).addTo(map);
       } else { meMarker.setLatLng([lat, lon]); accCircle.setLatLng([lat, lon]).setRadius(acc); }
-      var prov = nearBox('PK más cercano a ti', lat, lon, acc);
+      // Con el PK bloqueado la ficha no cambia; si se está viendo otro resultado, solo se actualiza su distancia
+      if (!locked) {
+        if (firstFix || (current && current.me)) showMe();
+        else if (current) renderResult(true);
+      }
+      var prov = borders && borders.provinceAt(lat, lon);
       if (prov && !provData[prov] && autoProv && !autoAsked[prov] && provState[prov] !== 'loading') {
         autoAsked[prov] = true;
-        addProvince(prov, { suffix: ' (tu ubicación)' }).then(function () { nearBox('PK más cercano a ti', lat, lon, acc); });
+        addProvince(prov, { suffix: ' (tu ubicación)' }).then(function () { if (current && current.me && !locked) showMe(); });
       }
-      if (firstFix) { firstFix = false; closeSheet(); focusPoint(lat, lon, 15); }
+      if (firstFix) { firstFix = false; focusPoint(lat, lon, 15); }
     }, function (err) {
       stopLocate();
       toast(err.code === 1 ? 'Permiso de ubicación denegado. Actívalo en los ajustes.' : 'No se pudo obtener la ubicación');
     }, { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 });
   });
+  // Bloquear PK: el PK más cercano queda fijo en grande (para dar el aviso aunque se siga circulando)
+  $('resLock').addEventListener('click', function () {
+    locked = !locked;
+    lockedAt = Date.now();
+    if (!locked && me) showMe(); else renderResult(true);
+    toast(locked ? 'PK bloqueado: no cambiará hasta que lo desbloquees' : 'PK desbloqueado');
+  });
 
-  // Mantener pulsado (o clic derecho): PK más cercano a ese punto (iOS no lanza contextmenu: se detecta a mano)
+  // Mantener pulsado (o clic derecho) igual que pulsar: la ficha del punto (iOS no lanza contextmenu: se detecta a mano)
   var lastPress = 0;
   function pressAt(ll) {
     if (Date.now() - lastPress < 800 || !C) return;
     lastPress = Date.now();
-    closeSheet();
-    nearBox('PK más cercano al punto marcado', ll.lat, ll.lng, null, true);
-    setTarget(ll.lat, ll.lng);
+    showCoord(ll.lat, ll.lng, 'punto marcado', true);
   }
   map.on('contextmenu', function (e) { pressAt(e.latlng); });
-  // Pulsar un sitio del mapa: su ficha como si fuera un PK (coordenadas, PK más cercano, ir con Maps, copiar, favorito)
+  // Pulsar un sitio del mapa: su ficha como si fuera un PK (coordenadas, PK más cercanos, ir con Maps, copiar, favorito)
   map.on('click', function (e) {
     if (!C || Date.now() - lastPress < 800) return;
-    $('near').hidden = true;
     showCoord(e.latlng.lat, e.latlng.lng, 'punto del mapa', true);
   });
   (function () {
@@ -1063,7 +1398,7 @@
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === '127.0.0.1') && location.hostname !== 'localhost' && !IS_NATIVE) {
     var hadController = !!navigator.serviceWorker.controller, updateReady = false;
     var safeToReload = function () {
-      return $('sheet').hidden && $('settings').hidden && $('favPanel').hidden && watchId == null &&
+      return $('sheet').hidden && $('settings').hidden && $('favPanel').hidden && $('favEdit').hidden && watchId == null &&
         !roadInput.value.trim() && !kmInput.value.trim() && !Object.keys(provState).some(function (c) { return provState[c] === 'loading'; });
     };
     var reloadIfSafe = function () { if (updateReady && safeToReload()) { updateReady = false; location.reload(); } };

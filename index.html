@@ -35,7 +35,7 @@
 
     <form class="search" id="searchForm" autocomplete="off" novalidate>
       <div class="field f-road">
-        <input id="road" type="text" placeholder="CARRETERA / MAPS / COORD" aria-label="Carretera, enlace de Maps o coordenadas" autocapitalize="characters" spellcheck="false" enterkeyhint="next" maxlength="2000">
+        <input id="road" type="text" placeholder="CARRETERA / LUGAR / COORD" aria-label="Carretera, municipio, paraje, enlace de Maps o coordenadas" autocapitalize="characters" spellcheck="false" enterkeyhint="next" maxlength="2000">
         <button type="button" class="clear" id="clearRoad" aria-label="Borrar" hidden>×</button>
       </div>
       <div class="field f-km">
@@ -63,20 +63,24 @@
     </button>
   </div>
 
-  <div class="near" id="near" hidden></div>
-
   <section class="sheet" id="sheet" hidden aria-live="polite">
+    <div class="grip" id="sheetGrip" title="Arrastra para mover"></div>
     <div class="res">
       <span class="res-road" id="resRoad"></span>
       <div class="res-main">
         <div class="res-km" id="resKm"></div>
         <div class="res-sub" id="resSub"></div>
       </div>
+      <button class="mini lock" id="resLock" type="button" aria-label="Bloquear PK" hidden>
+        <svg viewBox="0 0 24 24"><path d="M7 10V7a5 5 0 0 1 10 0v3h1a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1zm2 0h6V7a3 3 0 0 0-6 0z"/></svg>
+      </button>
       <button class="mini" id="resFav" type="button" aria-label="Guardar en favoritos">
         <svg viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg>
       </button>
       <button class="mini" id="sheetClose" type="button" aria-label="Cerrar">×</button>
     </div>
+    <div class="near-list" id="nearList" hidden></div>
+    <div class="sheet-msg" id="sheetMsg" hidden></div>
     <div class="acts" id="acts">
       <a class="act act-main" id="navGoogle" target="_blank" rel="noopener noreferrer">
         <svg viewBox="0 0 24 24"><path d="M12 2C8 2 5 5 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-4-3-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
@@ -109,6 +113,18 @@
     <ul class="list" id="list"></ul>
   </section>
 
+  <section class="panel fav-edit" id="favEdit" hidden aria-label="Editar favorito">
+    <div class="panel-head">
+      <h2>Favorito</h2>
+      <button class="mini" id="favEditClose" type="button" aria-label="Cerrar">×</button>
+    </div>
+    <div class="fe-body" id="favEditBody"></div>
+    <div class="fe-acts">
+      <button class="fe-del" id="favDel" type="button">Quitar de favoritos</button>
+      <button class="fe-save" id="favSave" type="button">Guardar</button>
+    </div>
+  </section>
+
   <section class="panel settings" id="settings" hidden aria-label="Configuración">
     <div class="panel-head">
       <h2>Configuración</h2>
@@ -118,7 +134,7 @@
       <details class="sec">
         <summary>Provincias <small id="provCount"></small></summary>
         <div class="conn" id="conn"></div>
-        <p class="set-help">Marca las provincias que quieras usar. Se guardan en el móvil y funcionan sin cobertura.</p>
+        <p class="set-help">Marca las provincias que quieras usar. Se guardan en el móvil y funcionan sin cobertura, con sus pueblos para buscarlos por el nombre. Los parajes (cerros, fuentes, ermitas, cortijos…) son una descarga aparte en cada provincia.</p>
         <input class="prov-filter" id="provFilter" type="search" placeholder="Buscar provincia" aria-label="Buscar provincia" maxlength="40">
         <div id="provList"></div>
       </details>
@@ -129,7 +145,7 @@
           <input type="checkbox" id="optAuto">
           <span>Al pulsar <b>mi ubicación</b>, descargar automáticamente la provincia en la que estoy</span>
         </label>
-        <p class="set-help"><b>Consejo:</b> pulsa cualquier punto del mapa para ver sus coordenadas, el PK más cercano e ir hasta allí; mantenlo pulsado para ver los PK cercanos y guardarlo como favorito. En el buscador también puedes pegar coordenadas o un enlace de Google Maps o WhatsApp.</p>
+        <p class="set-help"><b>Consejo:</b> pulsa cualquier punto del mapa para ver sus coordenadas, el PK más cercano e ir hasta allí; mantenlo pulsado para ver los PK cercanos y guardarlo como favorito. En el buscador puedes escribir una carretera, un municipio, un pueblo o un paraje, o pegar coordenadas o un enlace de Google Maps o WhatsApp.</p>
         <a class="apk-link" id="apkLink" href="https://github.com/Cilantro-Corporation/km-espana/releases/latest/download/km-espana.apk" rel="noopener noreferrer">Descargar app para Android (APK)</a>
       </details>
 
@@ -152,7 +168,8 @@
           <div class="cr-by">Created by CIL</div>
           <div class="cr-corp">Cilantro Corporation</div>
         </div>
-        <p class="set-help">Datos: hitos kilométricos oficiales del Instituto Geográfico Nacional (IGR Redes de Transporte, CC BY 4.0), puntos kilométricos de CartoCiudad (IGN · SCNE, CC BY 4.0 scne.es) y trazado de © colaboradores de OpenStreetMap (ODbL). Mapas: IGN / PNOA. Las posiciones entre hitos (≈) son una estimación. <span id="dataDate"></span></p>
+        <p class="set-help">Datos: hitos kilométricos oficiales del Instituto Geográfico Nacional (IGR Redes de Transporte, CC BY 4.0), puntos kilométricos de CartoCiudad (IGN · SCNE, CC BY 4.0 scne.es) y trazado de © colaboradores de OpenStreetMap (ODbL) y nombres de lugares del Nomenclátor Geográfico Básico de España (IGN, CC BY 4.0). Mapas: IGN / PNOA. Las posiciones entre hitos (≈) son una estimación. <span id="dataDate"></span></p>
+        <p class="set-help">Aviso: la información es orientativa. Los PK y las posiciones calculadas (≈) pueden contener errores y no sustituyen a la señalización de la carretera ni a la información de los servicios oficiales. No se garantiza su exactitud ni se asume responsabilidad por su uso.</p>
       </details>
     </div>
   </section>
