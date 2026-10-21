@@ -23,17 +23,9 @@
   <div id="map" aria-label="Mapa"></div>
 
   <div class="top">
-    <header class="bar">
-      <div class="brand"><span class="b-km">km.</span><span class="b-es">España</span></div>
-      <button class="icon-btn" id="btnFav" type="button" aria-label="Favoritos y recientes">
-        <svg viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg>
-      </button>
-      <button class="icon-btn" id="btnSettings" type="button" aria-label="Configuración">
-        <svg viewBox="0 0 24 24"><path d="M19.4 13a7.5 7.5 0 0 0 0-2l2-1.6-2-3.4-2.4 1a7.4 7.4 0 0 0-1.7-1L15 3.5h-4L10.7 6a7.4 7.4 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.6a7.5 7.5 0 0 0 0 2l-2 1.6 2 3.4 2.4-1a7.4 7.4 0 0 0 1.7 1l.3 2.5h4l.3-2.5a7.4 7.4 0 0 0 1.7-1l2.4 1 2-3.4zM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7z"/></svg>
-      </button>
-    </header>
 
     <form class="search" id="searchForm" autocomplete="off" novalidate>
+      <div class="brand" aria-hidden="true"><span class="b-km">km.</span></div>
       <div class="field f-road">
         <input id="road" type="text" placeholder="CARRETERA / LUGAR / COORD" aria-label="Carretera, municipio, paraje, enlace de Maps o coordenadas" autocapitalize="characters" spellcheck="false" enterkeyhint="next" maxlength="2000">
         <button type="button" class="clear" id="clearRoad" aria-label="Borrar" hidden>×</button>
@@ -43,6 +35,12 @@
       </div>
       <button type="button" class="dir-btn" id="dirBtn" aria-label="Sentido de circulación" hidden>⇅</button>
       <button class="go" type="submit">IR</button>
+      <button class="icon-btn" id="btnFav" type="button" aria-label="Favoritos y recientes">
+        <svg viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg>
+      </button>
+      <button class="icon-btn" id="btnSettings" type="button" aria-label="Configuración">
+        <svg viewBox="0 0 24 24"><path d="M19.4 13a7.5 7.5 0 0 0 0-2l2-1.6-2-3.4-2.4 1a7.4 7.4 0 0 0-1.7-1L15 3.5h-4L10.7 6a7.4 7.4 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.6a7.5 7.5 0 0 0 0 2l-2 1.6 2 3.4 2.4-1a7.4 7.4 0 0 0 1.7 1l.3 2.5h4l.3-2.5a7.4 7.4 0 0 0 1.7-1l2.4 1 2-3.4zM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7z"/></svg>
+      </button>
       <div class="suggest" id="suggest" role="listbox" hidden></div>
       <div class="info" id="info" hidden></div>
     </form>
@@ -52,6 +50,43 @@
       </a>
       <button type="button" class="up-close" id="updateClose" aria-label="Cerrar aviso">×</button>
     </div>
+    <section class="sheet" id="sheet" hidden aria-live="polite">
+      <div class="res">
+        <span class="res-road" id="resRoad"></span>
+        <div class="res-main">
+          <div class="res-km" id="resKm"></div>
+          <div class="res-sub" id="resSub"></div>
+        </div>
+        <button class="mini lock" id="resLock" type="button" aria-label="Bloquear PK" hidden>
+          <svg viewBox="0 0 24 24"><path d="M7 10V7a5 5 0 0 1 10 0v3h1a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1zm2 0h6V7a3 3 0 0 0-6 0z"/></svg>
+        </button>
+        <button class="mini" id="resFav" type="button" aria-label="Guardar en favoritos">
+          <svg viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg>
+        </button>
+        <button class="mini" id="sheetClose" type="button" aria-label="Cerrar">×</button>
+      </div>
+      <div class="near-list" id="nearList" hidden></div>
+      <div class="sheet-msg" id="sheetMsg" hidden></div>
+      <div class="acts" id="acts">
+        <a class="act act-main" id="navGoogle" target="_blank" rel="noopener noreferrer" aria-label="Ir con Google Maps" title="Ir con Google Maps">
+          <svg viewBox="0 0 24 24"><path d="M12 2C8 2 5 5 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-4-3-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
+          <span>Google<span class="lg"> Maps</span></span>
+        </a>
+        <a class="act act-main" id="navApple" target="_blank" rel="noopener noreferrer" aria-label="Ir con Mapas de Apple" title="Ir con Mapas de Apple">
+          <svg viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-8z"/></svg>
+          <span>Apple</span>
+        </a>
+        <button class="act" id="actCopy" type="button" aria-label="Copiar coordenadas" title="Copiar coordenadas">
+          <svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2" fill="none" stroke-width="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3" fill="none" stroke-width="2"/></svg>
+          <span>Copiar</span>
+        </button>
+        <a class="act act-wa" id="actWhats" target="_blank" rel="noopener noreferrer" aria-label="Compartir por WhatsApp" title="Compartir por WhatsApp">
+          <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.4 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6-.4.4c-.1.1-.3.3-.1.6.2.3.7 1.2 1.5 1.9 1 .9 1.9 1.2 2.2 1.3.3.1.4.1.6-.1l.8-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.3z"/></svg>
+          <span>WhatsApp</span>
+        </a>
+      </div>
+      <button class="alt" id="altBtn" type="button" hidden></button>
+    </section>
   </div>
 
   <div class="map-ctrls">
@@ -63,44 +98,6 @@
     </button>
   </div>
 
-  <section class="sheet" id="sheet" hidden aria-live="polite">
-    <div class="grip" id="sheetGrip" title="Arrastra para mover"></div>
-    <div class="res">
-      <span class="res-road" id="resRoad"></span>
-      <div class="res-main">
-        <div class="res-km" id="resKm"></div>
-        <div class="res-sub" id="resSub"></div>
-      </div>
-      <button class="mini lock" id="resLock" type="button" aria-label="Bloquear PK" hidden>
-        <svg viewBox="0 0 24 24"><path d="M7 10V7a5 5 0 0 1 10 0v3h1a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1zm2 0h6V7a3 3 0 0 0-6 0z"/></svg>
-      </button>
-      <button class="mini" id="resFav" type="button" aria-label="Guardar en favoritos">
-        <svg viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg>
-      </button>
-      <button class="mini" id="sheetClose" type="button" aria-label="Cerrar">×</button>
-    </div>
-    <div class="near-list" id="nearList" hidden></div>
-    <div class="sheet-msg" id="sheetMsg" hidden></div>
-    <div class="acts" id="acts">
-      <a class="act act-main" id="navGoogle" target="_blank" rel="noopener noreferrer">
-        <svg viewBox="0 0 24 24"><path d="M12 2C8 2 5 5 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-4-3-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
-        <span>Google<span class="lg"> Maps</span></span>
-      </a>
-      <a class="act act-main" id="navApple" target="_blank" rel="noopener noreferrer">
-        <svg viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-8z"/></svg>
-        <span>Apple</span>
-      </a>
-      <button class="act" id="actCopy" type="button">
-        <svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2" fill="none" stroke-width="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3" fill="none" stroke-width="2"/></svg>
-        <span>Copiar</span>
-      </button>
-      <a class="act act-wa" id="actWhats" target="_blank" rel="noopener noreferrer">
-        <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.4 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6-.4.4c-.1.1-.3.3-.1.6.2.3.7 1.2 1.5 1.9 1 .9 1.9 1.2 2.2 1.3.3.1.4.1.6-.1l.8-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.3z"/></svg>
-        <span>WhatsApp</span>
-      </a>
-    </div>
-    <button class="alt" id="altBtn" type="button" hidden></button>
-  </section>
 
   <section class="panel" id="favPanel" hidden aria-label="Favoritos y recientes">
     <div class="panel-head">
@@ -134,7 +131,7 @@
       <details class="sec">
         <summary>Provincias <small id="provCount"></small></summary>
         <div class="conn" id="conn"></div>
-        <p class="set-help">Marca las provincias que quieras usar. Se guardan en el móvil y funcionan sin cobertura, con sus pueblos para buscarlos por el nombre. Los parajes (cerros, fuentes, ermitas, cortijos…) son una descarga aparte en cada provincia.</p>
+        <p class="set-help">Marca las provincias que quieras usar. Se guardan en el dispositivo y funcionan sin cobertura, con sus pueblos para buscarlos por el nombre. Los parajes (cerros, fuentes, ermitas, cortijos…) son una descarga aparte en cada provincia.</p>
         <input class="prov-filter" id="provFilter" type="search" placeholder="Buscar provincia" aria-label="Buscar provincia" maxlength="40">
         <div id="provList"></div>
       </details>

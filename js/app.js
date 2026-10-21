@@ -72,12 +72,14 @@
   if (window.matchMedia('(min-width: 760px)').matches) L.control.zoom({ position: 'topright' }).addTo(map);
   map.setView([40.2, -3.7], 6, { animate: false });
 
-  function topOffset() { return document.querySelector('.top').getBoundingClientRect().bottom; }
+  // La tarjeta (buscador + ficha) puede estar arriba o, en el móvil, movida abajo: el mapa útil es el espacio libre
+  function lowCard() { return !window.matchMedia('(min-width: 760px)').matches && document.querySelector('.top').getBoundingClientRect().top > window.innerHeight / 2; }
+  function topOffset() { return lowCard() ? 0 : document.querySelector('.top').getBoundingClientRect().bottom; }
   // Altura real de la cabecera (cambia con la línea de tramos, sugerencias o avisos): coloca avisos, paneles y zoom
   function syncTop() { document.documentElement.style.setProperty('--top-h', Math.round(topOffset()) + 'px'); }
-  if (window.ResizeObserver) new ResizeObserver(syncTop).observe(document.querySelector('.top'));
+  if (window.ResizeObserver) new ResizeObserver(function () { applyPos(); }).observe(document.querySelector('.top'));
   syncTop();
-  function bottomOffset() { return document.body.classList.contains('sheet-open') ? $('sheet').offsetHeight : 0; }
+  function bottomOffset() { return lowCard() ? window.innerHeight - document.querySelector('.top').getBoundingClientRect().top : 0; }
   // En tablet y PC los paneles flotan a la izquierda, uno debajo del otro: el mapa útil queda a su derecha
   var DESK = window.matchMedia('(min-width: 760px)');
   function panelRight() {
@@ -86,54 +88,84 @@
     return r.left + r.width / 2 < window.innerWidth / 2 ? r.right : 0; // si se ha llevado a la derecha, no se compensa
   }
 
-  // ---------- Ventanas flotantes (tablet y PC): se arrastran por su barra y recuerdan su sitio ----------
-  // Doble clic en la barra: vuelve a su sitio. La ficha, si no se ha movido, va siempre debajo del buscador.
-  var pos = S.readJSON('pos', {});
+  // ---------- Tarjeta flotante: una sola caja (buscador + ficha) que se mueve ----------
+  // Se mueve manteniendo pulsada una parte negra de la caja y arrastrando (ratón: pulsar y arrastrar; táctil: mantener
+  // medio segundo). En el móvil solo sube y baja; en tablet y PC se coloca donde quieras. Recuerda su sitio.
+  // Doble clic en una parte negra: vuelve a su sitio.
+  var pos = S.readJSON('card', {});
   if (!pos || typeof pos !== 'object') pos = {};
   function validPos(p) { return Array.isArray(p) && p.length === 2 && isFinite(p[0]) && isFinite(p[1]); }
-  function clampPos(p, n) {
-    // siempre entera dentro de la pantalla (si cabe)
-    var w = n.offsetWidth || 400, h = n.offsetHeight || 60;
-    return [Math.round(Math.max(0, Math.min(window.innerWidth - w, p[0]))), Math.round(Math.max(0, Math.min(window.innerHeight - h, p[1])))];
-  }
+  function clampX(x, n) { return Math.round(Math.max(0, Math.min(window.innerWidth - (n.offsetWidth || 400), x))); }
+  function clampY(y, n) { return Math.round(Math.max(0, Math.min(window.innerHeight - (n.offsetHeight || 60), y))); }
   function applyPos() {
-    var top = document.querySelector('.top');
-    [['top', top], ['sheet', $('sheet')]].forEach(function (pair) {
-      var n = pair[1], p = pos[pair[0]];
-      if (DESK.matches && validPos(p)) { p = clampPos(p, n); n.style.left = p[0] + 'px'; n.style.top = p[1] + 'px'; n.classList.add('moved'); }
-      else { n.style.left = n.style.top = ''; n.classList.remove('moved'); }
-    });
+    var top = document.querySelector('.top'), p = DESK.matches ? pos.d : pos.m;
+    if (DESK.matches && validPos(p)) { top.style.left = clampX(p[0], top) + 'px'; top.style.top = clampY(p[1], top) + 'px'; }
+    else if (!DESK.matches && typeof p === 'number' && isFinite(p)) { top.style.left = ''; top.style.top = clampY(p, top) + 'px'; }
+    else { top.style.left = top.style.top = ''; }
     document.documentElement.style.setProperty('--top-x', (DESK.matches ? Math.round(top.getBoundingClientRect().left) : 0) + 'px');
     syncTop();
   }
-  function draggable(key, node, handle) {
-    var start = null;
-    handle.addEventListener('pointerdown', function (e) {
-      if (!DESK.matches || e.button !== 0 || (e.target.closest && e.target.closest('button, input, a'))) return;
-      var r = node.getBoundingClientRect();
-      start = [e.clientX - r.left, e.clientY - r.top];
-      try { handle.setPointerCapture(e.pointerId); } catch (err) { /* */ }
-      node.classList.add('dragging');
-      e.preventDefault();
-    });
-    handle.addEventListener('pointermove', function (e) {
-      if (!start) return;
-      pos[key] = clampPos([e.clientX - start[0], e.clientY - start[1]], node);
+  (function () {
+    var node = document.querySelector('.top'), start = null, timer = null, active = false, armed = false;
+    var SKIP = 'button, input, a, select, textarea, label, .chip, .nl';
+    function ok(e) { return !(e.target.closest && e.target.closest(SKIP)); }
+    function cancel() { clearTimeout(timer); timer = null; }
+    function move(cx, cy) {
+      var y = clampY(cy - start[1], node);
+      if (DESK.matches) { pos.d = [clampX(cx - start[0], node), y]; } else { pos.m = y; }
       applyPos();
-    });
-    function end() {
-      if (!start) return;
-      start = null;
-      node.classList.remove('dragging');
-      S.writeJSON('pos', pos);
-      renderMarkers();
     }
-    handle.addEventListener('pointerup', end);
-    handle.addEventListener('pointercancel', end);
-    handle.addEventListener('dblclick', function () { delete pos[key]; S.writeJSON('pos', pos); applyPos(); renderMarkers(); });
-  }
-  draggable('top', document.querySelector('.top'), document.querySelector('.bar'));
-  draggable('sheet', $('sheet'), $('sheetGrip'));
+    function begin(cx, cy) {
+      var r = node.getBoundingClientRect();
+      start = [cx - r.left, cy - r.top];
+      active = true;
+      node.classList.add('dragging');
+    }
+    function end() {
+      cancel();
+      node.classList.remove('armed');
+      if (active) { active = false; node.classList.remove('dragging'); S.writeJSON('card', pos); renderMarkers(); }
+      armed = false; start = null;
+    }
+    // Ratón
+    node.addEventListener('mousedown', function (e) {
+      if (e.button !== 0 || !ok(e)) return;
+      var r = node.getBoundingClientRect(), x0 = e.clientX, y0 = e.clientY;
+      start = [x0 - r.left, y0 - r.top]; armed = true;
+      function mm(ev) {
+        if (!active && Math.abs(ev.clientX - x0) + Math.abs(ev.clientY - y0) > 4) begin(x0, y0);
+        if (active) { move(ev.clientX, ev.clientY); ev.preventDefault(); }
+      }
+      function mu() { document.removeEventListener('mousemove', mm); document.removeEventListener('mouseup', mu); end(); }
+      document.addEventListener('mousemove', mm);
+      document.addEventListener('mouseup', mu);
+    });
+    // Táctil: mantener pulsado medio segundo sin mover el dedo y luego arrastrar
+    node.addEventListener('touchstart', function (e) {
+      cancel();
+      if (e.touches.length !== 1 || !ok(e)) return;
+      var t = e.touches[0], x0 = t.clientX, y0 = t.clientY;
+      timer = setTimeout(function () {
+        armed = true; begin(x0, y0); node.classList.add('armed');
+      }, 450);
+      node._t0 = [x0, y0];
+    }, { passive: true });
+    node.addEventListener('touchmove', function (e) {
+      var t = e.touches[0];
+      if (!active) {
+        if (node._t0 && t && Math.abs(t.clientX - node._t0[0]) + Math.abs(t.clientY - node._t0[1]) > 8) cancel();
+        return;
+      }
+      move(t.clientX, t.clientY);
+      e.preventDefault();
+    }, { passive: false });
+    node.addEventListener('touchend', end, { passive: true });
+    node.addEventListener('touchcancel', end, { passive: true });
+    node.addEventListener('dblclick', function (e) {
+      if (!ok(e)) return;
+      delete pos.d; delete pos.m; S.writeJSON('card', pos); applyPos(); renderMarkers();
+    });
+  })();
   if (DESK.addEventListener) DESK.addEventListener('change', applyPos); else if (DESK.addListener) DESK.addListener(applyPos);
   window.addEventListener('resize', applyPos);
   applyPos();
@@ -909,8 +941,6 @@
     var sheet = $('sheet');
     sheet.hidden = false;
     document.body.classList.add('sheet-open');
-    document.documentElement.style.setProperty('--sheet-h', sheet.offsetHeight + 'px');
-    if (DESK.matches && pos.sheet) applyPos(); // la ficha cambia de alto: que no quede cortada
     if (r.me) { if (targetMarker) { map.removeLayer(targetMarker); targetMarker = null; } } else setTarget(r.lat, r.lon);
     drawAlternatives();
     if (!keepView) focusPoint(r.lat, r.lon, Math.max(map.getZoom(), 16));
