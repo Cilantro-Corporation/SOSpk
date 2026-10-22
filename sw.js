@@ -1,8 +1,8 @@
-/* km. España — service worker: la app funciona sin conexión tras la primera visita.
+/* SOSpk — service worker: la app funciona sin conexión tras la primera visita.
    Las provincias descargadas las guarda la propia app en la caché "kmes-provincias" (aquí no se tocan).
    Una versión nueva se instala y se activa sola; la app se recarga cuando es seguro (al volver a ella). */
 'use strict';
-var CACHE = 'kmes-app-v1.2.2';
+var CACHE = 'kmes-app-v1.2.3';
 var KEEP = [CACHE, 'kmes-provincias'];
 var SHELL = [
   './', 'index.html', 'manifest.webmanifest',
@@ -10,7 +10,7 @@ var SHELL = [
   'data/index.json', 'data/borders.json',
   'vendor/leaflet/leaflet.js', 'vendor/leaflet/leaflet.css',
   'vendor/fonts/oswald-500.woff2', 'vendor/fonts/oswald-700.woff2',
-  'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'icons/favicon-32.png',
+  'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'icons/favicon-32.png', 'icons/logo.png', 'icons/logo-credits.png',
 ];
 
 self.addEventListener('install', function (e) {

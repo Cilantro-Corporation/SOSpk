@@ -1,4 +1,4 @@
-/* km. España — almacenamiento de provincias (sin conexión) y preferencias */
+/* SOSpk — almacenamiento de provincias (sin conexión) y preferencias */
 (function (root) {
   'use strict';
 

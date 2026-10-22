@@ -1,4 +1,4 @@
-/* km. España — lector de coordenadas en varios formatos (sin red: nunca visita los enlaces) */
+/* SOSpk — lector de coordenadas en varios formatos (sin red: nunca visita los enlaces) */
 (function (root) {
   'use strict';
 

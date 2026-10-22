@@ -6,13 +6,13 @@
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="format-detection" content="telephone=no">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>km. España</title>
-  <meta name="description" content="Buscador de puntos kilométricos de las carreteras de España">
+  <title>SOSpk</title>
+  <meta name="description" content="SOSpk: buscador de puntos kilométricos de las carreteras">
   <meta name="theme-color" content="#0B0B0B">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="km. España">
+  <meta name="apple-mobile-web-app-title" content="SOSpk">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/favicon-32.png" sizes="32x32">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -25,7 +25,7 @@
   <div class="top">
 
     <form class="search" id="searchForm" autocomplete="off" novalidate>
-      <div class="brand" aria-hidden="true"><span class="b-km">km.</span></div>
+      <div class="brand"><img class="brand-logo" src="icons/logo.png" alt="SOSpk"></div>
       <div class="field f-road">
         <input id="road" type="text" placeholder="CARRETERA / LUGAR / COORD" aria-label="Carretera, municipio, paraje, enlace de Maps o coordenadas" autocapitalize="characters" spellcheck="false" enterkeyhint="next" maxlength="2000">
         <button type="button" class="clear" id="clearRoad" aria-label="Borrar" hidden>×</button>
@@ -45,7 +45,7 @@
       <div class="info" id="info" hidden></div>
     </form>
     <div class="update" id="update" role="status" hidden>
-      <a class="up-main" id="updateLink" href="https://github.com/Cilantro-Corporation/km-espana/releases/latest/download/km-espana.apk" target="_blank" rel="noopener noreferrer">
+      <a class="up-main" id="updateLink" href="https://github.com/Cilantro-Corporation/SOSpk/releases/latest/download/SOSpk.apk" target="_blank" rel="noopener noreferrer">
         <span id="updateText">Nueva versión</span><b class="up-act">Actualizar</b>
       </a>
       <button type="button" class="up-close" id="updateClose" aria-label="Cerrar aviso">×</button>
@@ -149,7 +149,7 @@
           <div class="look-row col"><span>Color de la app</span><div class="fe-cols" id="lookColor" role="radiogroup" aria-label="Color de la app"></div></div>
         </div>
         <p class="set-help"><b>Consejo:</b> pulsa cualquier punto del mapa para ver sus coordenadas, el PK más cercano e ir hasta allí; mantenlo pulsado para ver los PK cercanos y guardarlo como favorito. En el buscador puedes escribir una carretera, un municipio, un pueblo o un paraje, o pegar coordenadas o un enlace de Google Maps o WhatsApp.</p>
-        <a class="apk-link" id="apkLink" href="https://github.com/Cilantro-Corporation/km-espana/releases/latest/download/km-espana.apk" rel="noopener noreferrer">Descargar app para Android (APK)</a>
+        <a class="apk-link" id="apkLink" href="https://github.com/Cilantro-Corporation/SOSpk/releases/latest/download/SOSpk.apk" rel="noopener noreferrer">Descargar app para Android (APK)</a>
       </details>
 
       <details class="sec">
@@ -167,7 +167,8 @@
       <details class="sec">
         <summary>Créditos</summary>
         <div class="credits">
-          <div class="cr-app"><span class="b-km">km.</span> España <small id="appVersion"></small></div>
+          <img class="cr-logo" src="icons/logo-credits.png" alt="Logo de SOSpk" width="112" height="112">
+          <div class="cr-app">SOSpk <small id="appVersion"></small></div>
           <div class="cr-by">Created by CIL</div>
           <div class="cr-corp">Cilantro Corporation</div>
         </div>

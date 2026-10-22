@@ -1,10 +1,10 @@
-/* km. España — interfaz */
+/* SOSpk — interfaz */
 (function () {
   'use strict';
 
   // No se permite abrir la app incrustada dentro de otra web (evita engaños tipo "clickjacking")
   if (window.top !== window.self) {
-    document.body.textContent = 'Abre km. España directamente en el navegador.';
+    document.body.textContent = 'Abre SOSpk directamente en el navegador.';
     return;
   }
 

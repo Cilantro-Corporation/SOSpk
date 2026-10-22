@@ -1,4 +1,4 @@
-/* km. España — núcleo de cálculo (sin dependencias, usable en navegador y en Node para tests) */
+/* SOSpk — núcleo de cálculo (sin dependencias, usable en navegador y en Node para tests) */
 (function (root) {
   'use strict';
 

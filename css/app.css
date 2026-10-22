@@ -42,7 +42,7 @@ button svg, .act svg, .icon-btn svg { width: 22px; height: 22px; fill: currentCo
   background: rgba(11,11,11,.75); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
 }
 .brand { display: flex; align-items: center; font-family: var(--head); line-height: 1; flex: none; padding-left: 3px; }
-.b-km { color: var(--lime); font-weight: 700; font-size: 20px; letter-spacing: -0.5px; }
+.brand-logo { display: block; height: calc(34px * var(--box)); width: auto; }
 
 .icon-btn { width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--panel); color: var(--lime); display: grid; place-items: center; }
 .icon-btn:active { background: var(--panel-2); }
@@ -50,7 +50,7 @@ button svg, .act svg, .icon-btn svg { width: 22px; height: 22px; fill: currentCo
 .search .icon-btn { width: calc(28px * var(--box)); height: calc(32px * var(--box)); background: transparent; flex: none; }
 .search .icon-btn svg { width: 20px; height: 20px; }
 
-.search { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 4px 2px 4px 6px; }
+.search { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 2px 2px 3px 6px; }
 .f-road { flex: 1 1 0; min-width: 0; }
 .f-km { flex: none; width: calc(50px * var(--box)); }
 .field { position: relative; }
@@ -111,7 +111,7 @@ button svg, .act svg, .icon-btn svg { width: 22px; height: 22px; fill: currentCo
 
 /* ---------- Ficha de resultado (compacta) ---------- */
 /* La ficha va dentro de la misma tarjeta que el buscador (una sola caja) */
-.sheet { padding: 3px 5px 5px; border-top: 1px solid var(--line); }
+.sheet { padding: 2px 5px 5px; border-top: 1px solid var(--line); }
 .res { display: flex; align-items: center; gap: 6px; margin: 0 0 3px 2px; min-height: calc(30px * var(--box)); }
 .res-road {
   font-family: var(--head); font-weight: 700; font-size: 15px; padding: 1px 6px; border-radius: 5px; color: #fff; background: var(--muted); white-space: nowrap; flex: none;
@@ -248,6 +248,7 @@ button svg, .act svg, .icon-btn svg { width: 22px; height: 22px; fill: currentCo
 .opt input { width: 22px; height: 22px; accent-color: var(--lime); flex: none; margin-top: 1px; }
 .apk-link { display: block; text-align: center; margin: 12px 0; padding: 12px; border-radius: 12px; background: var(--panel); color: var(--lime); text-decoration: none; font-family: var(--head); font-size: 15px; letter-spacing: 1px; text-transform: uppercase; }
 .credits { background: var(--panel); border-radius: 12px; padding: 16px; text-align: center; line-height: 1.5; }
+.cr-logo { display: block; width: 112px; height: 112px; margin: 0 auto 6px; }
 .cr-app { font-family: var(--head); font-weight: 700; font-size: 22px; }
 .cr-app small { font-family: var(--body); font-weight: 400; font-size: 13px; color: var(--muted); }
 .cr-by { margin-top: 8px; font-size: 15px; }
