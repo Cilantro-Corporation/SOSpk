@@ -57,7 +57,8 @@
   // El modo de pruebas (siete toques en la versión, en Configuración) activa el marco para poder probar lo gratis y lo
   // Premium. Cuando haya compras reales, simPremium se sustituye por el estado de la suscripción y se quita el modo de pruebas.
   var PRE = CFG.premium;
-  var devMode = S.readJSON('dev', false) === true;
+  var TESTERS = PRE.testers === true; // versión para probadores: casilla visible para probar Premium
+  var devMode = TESTERS || S.readJSON('dev', false) === true;
   var simPremium = S.readJSON('prem', false) === true;
   function framework() { return !!(PRE.enforced || devMode); }
   function isPremium() { return !framework() || simPremium; }
@@ -82,6 +83,7 @@
     if (PRE.checkoutUrl) { openLink(PRE.checkoutUrl); return; }
     toast('La suscripción estará disponible en Google Play');
   });
+  $('testPrem').addEventListener('change', function () { simPremium = $('testPrem').checked; S.writeJSON('prem', simPremium); premiumChanged(); renderPremium(); toast(simPremium ? 'Premium de prueba activado' : 'Premium de prueba desactivado'); });
   $('whatGo').addEventListener('click', function () { $('settings').hidden = true; showPremium(''); });
   $('premiumClose').addEventListener('click', function () { $('premiumPanel').hidden = true; });
   // Al cambiar de plan se vuelve a pintar lo que depende de él
@@ -101,7 +103,9 @@
     $('legendPrem').hidden = !fw;
     $('creditsPrem').hidden = !fw;
     $('planName').textContent = isPremium() ? 'Premium' : 'Gratis';
-    $('devRow').hidden = !devMode;
+    $('devRow').hidden = !devMode || TESTERS;
+    $('testRow').hidden = !TESTERS;
+    $('testPrem').checked = simPremium;
     if (!fw) $('layersPop').hidden = true;
   }
   $('btnLayers').addEventListener('click', function () {
@@ -120,7 +124,7 @@
       taps++;
       clearTimeout(timer);
       timer = setTimeout(function () { taps = 0; }, 3000);
-      if (taps >= 7) { taps = 0; devMode = !devMode; S.writeJSON('dev', devMode); if (!devMode) { simPremium = false; S.writeJSON('prem', false); } premiumChanged(); toast(devMode ? 'Modo de pruebas activado' : 'Modo de pruebas desactivado'); }
+      if (taps >= 7 && !TESTERS) { taps = 0; devMode = !devMode; S.writeJSON('dev', devMode); if (!devMode) { simPremium = false; S.writeJSON('prem', false); } premiumChanged(); toast(devMode ? 'Modo de pruebas activado' : 'Modo de pruebas desactivado'); }
     });
   })();
 

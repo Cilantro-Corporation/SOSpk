@@ -405,3 +405,4 @@ body.drawing .sheet { display: none; }
 .lg-al.y { background: #F2D600; }
 .lg-al.o { background: #FF9F1C; }
 .lg-al.r { background: #FF4B3E; }
+.test-row { display: flex; align-items: center; gap: 8px; } .test-row input { width: 22px; height: 22px; accent-color: #C6F400; }
