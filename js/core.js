@@ -114,6 +114,106 @@
     return hits.slice(0, limit || 8).map(function (h) { return h.e; });
   }
 
+  // ---------- Cámaras de tráfico (Premium): validación y búsqueda ----------
+  // { v, code, r: [[lat·1e5, lon·1e5, nombre, carretera, km|null, enlace, fuente], ...] }
+  function validCamaras(d, code) {
+    if (!d || typeof d !== 'object' || d.code !== code || !/^\d{8,12}$/.test(String(d.v)) || !Array.isArray(d.r) || d.r.length > 5000) return false;
+    for (var i = 0; i < d.r.length; i++) {
+      var x = d.r[i];
+      if (!Array.isArray(x) || !isFinite(x[0]) || !isFinite(x[1]) || Math.abs(x[0]) > 9000000 || Math.abs(x[1]) > 18000000 ||
+        typeof x[2] !== 'string' || x[2].length > 100 || typeof x[3] !== 'string' || x[3].length > 20 || !(x[4] === null || isFinite(x[4])) ||
+        typeof x[5] !== 'string' || x[5].length > 400 || !/^https?:\/\//.test(x[5]) || !(x[6] >= 0 && x[6] < 30)) return false;
+    }
+    return true;
+  }
+  function camaraEntries(d) {
+    return d.r.map(function (x) { return { lat: x[0] / 1e5, lon: x[1] / 1e5, name: x[2], road: x[3], km: x[4], url: x[5], src: x[6], prov: d.code }; });
+  }
+  // La cámara más cercana a un punto (metros) dentro de maxM; null si no hay
+  function nearestCamara(list, lat, lon, maxM) {
+    var best = null, dl = maxM / 111000 + 0.002;
+    for (var i = 0; i < list.length; i++) {
+      var c = list[i];
+      if (Math.abs(c.lat - lat) > dl || Math.abs(c.lon - lon) > dl * 1.5) continue;
+      var d = distance([lat, lon], [c.lat, c.lon]);
+      if (d <= maxM && (!best || d < best.d)) best = { cam: c, d: d };
+    }
+    return best;
+  }
+
+  // ---------- Zonas y rutas (Premium): perímetro y área sobre la esfera ----------
+  function pathLength(pts, closed) {
+    var L = 0;
+    for (var i = 1; i < pts.length; i++) L += distance(pts[i - 1], pts[i]);
+    if (closed && pts.length > 2) L += distance(pts[pts.length - 1], pts[0]);
+    return L;
+  }
+  // Área en m² de un polígono (lat, lon) con la fórmula del exceso esférico por tramos (error despreciable para zonas de hasta cientos de km)
+  function polygonArea(pts) {
+    var n = pts.length;
+    if (n < 3) return 0;
+    var s = 0;
+    for (var i = 0; i < n; i++) {
+      var a = pts[i], b = pts[(i + 1) % n];
+      s += (b[1] - a[1]) * RAD * (2 + Math.sin(a[0] * RAD) + Math.sin(b[0] * RAD));
+    }
+    return Math.abs(s * R * R / 2);
+  }
+  function formatLength(m) {
+    return m < 1000 ? Math.round(m) + ' m' : (m < 10000 ? (Math.round(m / 10) / 100) : (Math.round(m / 100) / 10)).toString().replace('.', ',') + ' km';
+  }
+  function formatArea(m2) {
+    if (m2 < 10000) return Math.round(m2).toLocaleString('es-ES') + ' m²';
+    if (m2 < 1e6) return (Math.round(m2 / 100) / 100).toString().replace('.', ',') + ' ha (' + Math.round(m2).toLocaleString('es-ES') + ' m²)';
+    return (m2 < 1e7 ? Math.round(m2 / 1e4) / 100 : Math.round(m2 / 1e5) / 10).toString().replace('.', ',') + ' km²';
+  }
+
+  // ---------- Avisos meteorológicos vigentes (Meteoalarm / AEMET) ----------
+  // Las zonas de aviso de España (EMMA_ID ES070-ES251) van en bloques consecutivos por provincia, en orden alfabético.
+  // Las zonas costeras (ES840-ES890, «Costa - …») tienen la provincia de la zona terrestre del mismo nombre.
+  var ZONE_BLOCKS = [['AL', 70, 73], ['CA', 74, 77], ['CO', 78, 80], ['GR', 81, 84], ['H', 85, 87], ['J', 88, 91], ['MA', 92, 95], ['SE', 96, 98], ['HU', 99, 101], ['TE', 102, 104],
+    ['Z', 105, 107], ['O', 108, 112], ['PM', 113, 119], ['GC', 120, 124], ['TF', 125, 132], ['S', 133, 136], ['AV', 137, 139], ['BU', 140, 144], ['LE', 145, 147], ['P', 148, 149],
+    ['SA', 150, 152], ['SG', 153, 154], ['SO', 155, 157], ['VA', 158, 158], ['ZA', 159, 160], ['AB', 161, 163], ['CR', 164, 167], ['CU', 168, 170], ['GU', 171, 173], ['TO', 174, 177],
+    ['B', 178, 181], ['GI', 182, 185], ['L', 186, 188], ['T', 189, 193], ['BA', 194, 197], ['CC', 198, 201], ['C', 202, 205], ['LU', 206, 209], ['OR', 210, 214], ['PO', 215, 217],
+    ['M', 218, 220], ['MU', 221, 225], ['NA', 226, 229], ['VI', 230, 232], ['SS', 233, 234], ['BI', 235, 236], ['LO', 237, 238], ['A', 239, 241], ['CS', 242, 245], ['V', 246, 249],
+    ['CE', 250, 250], ['ML', 251, 251]];
+  var COAST_PROV = {"ES840":"SS","ES841":"BI","ES842":"S","ES843":"O","ES844":"O","ES845":"LU","ES846":"C","ES847":"C","ES848":"C","ES849":"PO","ES850":"PO","ES851":"H","ES852":"CA","ES853":"CA","ES854":"MA","ES855":"MA","ES856":"GR","ES857":"AL","ES858":"AL","ES859":"MU","ES860":"MU","ES861":"A","ES862":"A","ES863":"V","ES864":"V","ES865":"CS","ES866":"CS","ES867":"T","ES868":"T","ES869":"B","ES870":"GI","ES871":"CE","ES872":"ML","ES873":"PM","ES874":"PM","ES875":"PM","ES876":"PM","ES877":"PM","ES878":"PM","ES879":"TF","ES880":"TF","ES881":"TF","ES882":"TF","ES883":"TF","ES884":"TF","ES885":"TF","ES886":"GC","ES887":"GC","ES888":"GC","ES889":"GC","ES890":"GI"};
+  function zoneProvince(id) {
+    if (COAST_PROV[id]) return COAST_PROV[id];
+    var n = +String(id).replace(/^ES/, '');
+    if (!(n >= 70 && n <= 251)) return null;
+    for (var i = 0; i < ZONE_BLOCKS.length; i++) if (n >= ZONE_BLOCKS[i][1] && n <= ZONE_BLOCKS[i][2]) return ZONE_BLOCKS[i][0];
+    return null;
+  }
+  var AVISO_TIPOS = [[/thunderstorm/i, 'Tormentas'], [/rain/i, 'Lluvias'], [/snow/i, 'Nevadas'], [/ice|freez/i, 'Hielo'], [/wind/i, 'Viento'], [/fog/i, 'Nieblas'],
+    [/high.?temp|heat/i, 'Temperaturas máximas'], [/low.?temp|cold/i, 'Temperaturas mínimas'], [/coastal/i, 'Fenómenos costeros'], [/forest|fire/i, 'Riesgo de incendios'],
+    [/avalanche/i, 'Aludes'], [/flood/i, 'Inundaciones']];
+  var AVISO_NIVELES = { yellow: ['Amarillo', 1], orange: ['Naranja', 2], red: ['Rojo', 3] };
+  var unxml = function (s) { return s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, '&'); };
+  // Entradas del feed Atom de Meteoalarm para España; solo las vigentes en «now» (inicio ≤ ahora ≤ fin)
+  function parseAvisos(xml, now) {
+    var out = [], seen = {};
+    String(xml).split('<entry>').slice(1).forEach(function (e) {
+      var g = function (re) { var m = re.exec(e); return m ? unxml(m[1].trim()) : ''; };
+      var id = g(/<cap:geocode>[\s\S]*?<value>([^<]+)<\/value>/), event = g(/<cap:event>([^<]+)</), title = g(/<title>([^<]+)</), area = g(/<cap:areaDesc>([^<]+)</);
+      var onset = Date.parse(g(/<cap:onset>([^<]+)</) || g(/<cap:effective>([^<]+)</)), exp = Date.parse(g(/<cap:expires>([^<]+)</));
+      if (!id || !isFinite(onset) || !isFinite(exp) || now < onset || now > exp) return;
+      var lv = /\b(yellow|orange|red)\b/i.exec(title), sev = g(/<cap:severity>([^<]+)</);
+      var level = lv ? lv[1].toLowerCase() : sev === 'Extreme' ? 'red' : sev === 'Severe' ? 'orange' : sev === 'Moderate' ? 'yellow' : '';
+      if (!level) return;
+      var tipo = 'Aviso';
+      for (var i = 0; i < AVISO_TIPOS.length; i++) if (AVISO_TIPOS[i][0].test(event)) { tipo = AVISO_TIPOS[i][1]; break; }
+      var coast = /^ES8/.test(id) || /^Costa - /.test(area);
+      var prov = zoneProvince(id);
+      var key = id + '|' + tipo + '|' + level;
+      if (seen[key]) return;
+      seen[key] = 1;
+      out.push({ id: id, zone: area, prov: prov, coast: coast, tipo: tipo, level: level, nivel: AVISO_NIVELES[level][0], rank: AVISO_NIVELES[level][1],
+        onset: onset, expires: exp, link: 'https://meteoalarm.org?geocode=EMMA_ID:' + id });
+    });
+    return out;
+  }
+
   // ---------- Validación de un archivo de provincia descargado ----------
   function validProvince(d, code) {
     if (!d || typeof d !== 'object' || d.code !== code || !d.roads || typeof d.roads !== 'object' || !Array.isArray(d.segs)) return false;
@@ -574,5 +674,14 @@
     validMunicipios: validMunicipios,
     placeEntries: placeEntries,
     searchPlaces: searchPlaces,
+    validCamaras: validCamaras,
+    camaraEntries: camaraEntries,
+    nearestCamara: nearestCamara,
+    pathLength: pathLength,
+    polygonArea: polygonArea,
+    formatLength: formatLength,
+    formatArea: formatArea,
+    parseAvisos: parseAvisos,
+    zoneProvince: zoneProvince,
   };
 })(typeof window !== 'undefined' ? window : globalThis);

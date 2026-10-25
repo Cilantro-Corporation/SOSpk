@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://www.ign.es; font-src 'self'; connect-src 'self' https://cilantro-corporation.github.io; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://www.ign.es https://maps.effis.emergency.copernicus.eu; font-src 'self'; connect-src 'self' https://cilantro-corporation.github.io; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="format-detection" content="telephone=no">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -90,6 +90,9 @@
   </div>
 
   <div class="map-ctrls">
+    <button class="icon-btn" id="btnLayers" type="button" aria-label="Capas Premium" hidden>
+      <svg viewBox="0 0 24 24"><path d="M4 4h6.5v6.5H4zM13.5 4H20v6.5h-6.5zM4 13.5h6.5V20H4zM13.5 13.5H20V20h-6.5z"/></svg>
+    </button>
     <button class="icon-btn" id="btnLayer" type="button" aria-label="Cambiar mapa / satélite">
       <svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5zM3 13l9 5 9-5M3 17.5l9 5 9-5" fill="none" stroke-width="2" stroke-linejoin="round"/></svg>
     </button>
@@ -122,12 +125,97 @@
     </div>
   </section>
 
+  <div class="layers-pop" id="layersPop" hidden role="dialog" aria-label="Capas">
+    <div class="lp-head"><b>Capas</b><button class="mini" id="layersClose" type="button" aria-label="Cerrar">×</button></div>
+    <div id="layersList"></div>
+    <p class="lp-note">Cámaras, avisos e incendios solo funcionan en las provincias con los parajes descargados y necesitan cobertura. SOSpk solo facilita el buscador y el enlace; los datos son de quien los publica.</p>
+  </div>
+
+  <button class="alertchip" id="alertChip" type="button" hidden aria-label="Avisos meteorológicos"></button>
+
+  <section class="panel alerts" id="alertPanel" hidden aria-label="Avisos meteorológicos">
+    <div class="panel-head">
+      <h2>Avisos meteorológicos</h2>
+      <button class="mini" id="alertClose" type="button" aria-label="Cerrar">×</button>
+    </div>
+    <div class="set-scroll">
+      <div id="alertList"></div>
+      <p class="set-help">Avisos vigentes de AEMET (vía Meteoalarm) en tus provincias con paquete. Son responsabilidad de quien los publica; SOSpk solo te facilita el enlace.</p>
+    </div>
+  </section>
+
+  <section class="panel zones" id="zonesPanel" hidden aria-label="Zonas y sectores">
+    <div class="panel-head">
+      <h2>Zonas y sectores</h2>
+      <button class="mini" id="zonesClose" type="button" aria-label="Cerrar">×</button>
+    </div>
+    <div class="set-scroll">
+      <div id="zonesList"></div>
+      <button class="prem-go" id="zonesNew" type="button">+ Nueva zona</button>
+    </div>
+  </section>
+
+  <section class="panel zones" id="zoneEdit" hidden aria-label="Editar zona">
+    <div class="panel-head">
+      <h2>Zona</h2>
+      <button class="mini" id="zoneEditClose" type="button" aria-label="Cerrar">×</button>
+    </div>
+    <div class="set-scroll">
+      <div id="zoneEditBody"></div>
+      <button class="fe-save" id="zoneSave" type="button">Guardar</button>
+      <button class="pp-b zone-del" id="zoneDel" type="button">Borrar zona</button>
+    </div>
+  </section>
+
+  <div class="drawbar" id="drawBar" hidden>
+    <div class="draw-info" id="drawInfo"></div>
+    <div class="draw-btns">
+      <button type="button" id="drawUndo">Deshacer</button>
+      <button type="button" id="drawRoute">Terminar ruta</button>
+      <button type="button" id="drawClose" class="lime">Cerrar zona</button>
+      <button type="button" id="drawCancel">Cancelar</button>
+    </div>
+  </div>
+
+  <section class="panel premium" id="premiumPanel" hidden aria-label="SOSpk Premium">
+    <div class="panel-head">
+      <h2>SOSpk Premium</h2>
+      <button class="mini" id="premiumClose" type="button" aria-label="Cerrar">×</button>
+    </div>
+    <div class="set-scroll">
+      <p class="prem-reason" id="premReason" hidden></p>
+      <ul class="prem-list">
+        <li><span>📍</span><div><b>Municipios, pueblos y parajes</b><small>Búscalos en la misma casilla que las carreteras. Al descargar los parajes de una provincia se incluye lo siguiente.</small></div></li>
+        <li><span>📷</span><div><b>Cámaras de tráfico</b><small>Un icono en el mapa que abre la cámara en su web oficial; en la ficha, la más cercana al punto.</small></div></li>
+        <li><span>⛈️</span><div><b>Avisos meteorológicos</b><small>Solo los vigentes, con el tipo de aviso y el enlace a la fuente.</small></div></li>
+        <li><span>🔥</span><div><b>Incendios activos</b><small>Focos de calor detectados hoy por satélite, sin histórico.</small></div></li>
+        <li><span>⬡</span><div><b>Zonas y sectores</b><small>Dibuja una zona o una ruta, ponle nombre y color, y mide su perímetro y área.</small></div></li>
+        <li><span>⭐</span><div><b>Hasta 50 favoritos</b><small>Con más colores e iconos (gratis: 5 favoritos).</small></div></li>
+      </ul>
+      <div class="prem-price" id="premPrice"></div>
+      <button class="prem-go" id="premiumGo" type="button">Probar 10 días gratis</button>
+      <p class="set-help">La suscripción se gestiona desde Google Play y se renueva sola; puedes cancelarla cuando quieras. Las cámaras, los avisos y los incendios necesitan conexión. SOSpk solo te facilita el buscador y el enlace: las imágenes, los datos y los avisos son responsabilidad de la DGT, AEMET, EFFIS o la entidad que los publica. SOSpk no es un servicio oficial ni llama a emergencias.</p>
+    </div>
+  </section>
+
   <section class="panel settings" id="settings" hidden aria-label="Configuración">
     <div class="panel-head">
       <h2>Configuración</h2>
       <button class="mini" id="settingsClose" type="button" aria-label="Cerrar">×</button>
     </div>
     <div class="set-scroll">
+      <details class="sec">
+        <summary>SOSpk, ¿qué es?</summary>
+        <p class="set-help">SOSpk localiza puntos kilométricos de las carreteras de España y te lleva hasta ellos. Escribe la carretera y el km, o toca el mapa, y te damos las coordenadas, el PK más cercano y el enlace a Google Maps. Sin anuncios, sin cuentas, y funciona sin cobertura. Pensada para quienes trabajan en carretera: bomberos, emergencias, protección civil y asistencia en carretera.</p>
+        <div id="whatPrem" hidden>
+          <p class="set-help"><b>Gratis:</b> buscador de PK, mapa, tu ubicación con el PK más cercano, 5 favoritos, 5 colores y los iconos básicos.<br><b>Premium:</b> municipios, pueblos y parajes, cámaras de tráfico, avisos meteorológicos, incendios activos, zonas y sectores, hasta 50 favoritos y más colores e iconos.</p>
+          <p class="set-help"><b>¿Qué es SOSpk Premium?</b> Una suscripción para quien necesita más en carretera: al descargar los parajes de una provincia añade en ella las cámaras de tráfico (con enlace a la web oficial), los avisos meteorológicos vigentes y los focos de incendio de hoy, y te deja dibujar zonas y sectores. <b>0,99 € al mes o 4,99 € al año, con 10 días de prueba gratis</b>; se cobra por Google Play y se cancela cuando quieras. Cámaras, avisos e incendios necesitan cobertura; el buscador de PK sigue funcionando sin ella.</p>
+          <button type="button" class="prem-go" id="whatGo">Hacerme Premium</button>
+          <div class="plan-row">Tu plan: <b id="planName">Gratis</b> <button type="button" class="pp-b" id="planBtn">Ver Premium</button></div>
+          <div class="plan-row" id="devRow" hidden>Modo de pruebas activo <button type="button" class="pp-b" id="devOff">Salir</button></div>
+        </div>
+      </details>
+
       <details class="sec">
         <summary>Provincias <small id="provCount"></small></summary>
         <div class="conn" id="conn"></div>
@@ -161,6 +249,14 @@
           <span class="pk pk-R"><span class="pk-s">8</span></span><span>Autonómica</span>
           <span class="pk pk-P"><span class="pk-s">3</span></span><span>Provincial o local</span>
         </div>
+        <div class="legend" id="legendPrem" hidden>
+          <span class="lg-i">📷</span><span>Cámara de tráfico: tócala para abrirla en la web que la publica</span>
+          <span class="lg-i"><span class="lg-al y" ></span></span><span>Aviso amarillo (riesgo bajo)</span>
+          <span class="lg-i"><span class="lg-al o"></span></span><span>Aviso naranja (riesgo importante)</span>
+          <span class="lg-i"><span class="lg-al r"></span></span><span>Aviso rojo (riesgo extremo)</span>
+          <span class="lg-i">🔥</span><span>Foco de calor detectado hoy por satélite (no es el perímetro del incendio)</span>
+          <span class="lg-i"><span class="lg-zone"></span></span><span>Zona o sector dibujado, con su perímetro y área</span>
+        </div>
         <p class="set-help">De lejos se ven el primer y el último PK de cada carretera en tus provincias y algunos km de autovías y nacionales; al acercar aparecen más, con el nombre de la carretera.</p>
       </details>
 
@@ -173,6 +269,8 @@
           <div class="cr-corp">Cilantropo Lab</div>
         </div>
         <p class="set-help">Datos: hitos kilométricos oficiales del Instituto Geográfico Nacional (IGR Redes de Transporte, CC BY 4.0), puntos kilométricos de CartoCiudad (IGN · SCNE, CC BY 4.0 scne.es) y trazado de © colaboradores de OpenStreetMap (ODbL) y nombres de lugares del Nomenclátor Geográfico Básico de España (IGN, CC BY 4.0). Mapas: IGN / PNOA. Las posiciones entre hitos (≈) son una estimación. <span id="dataDate"></span></p>
+        <p class="set-help" id="creditsPrem" hidden>Cámaras: DGT, vía el Punto de Acceso Nacional del Ministerio de Transportes (Powered by MITRAMS); Servei Català de Trànsit; Gobierno Vasco (CC BY 4.0); ayuntamientos de Madrid, Valencia y Málaga (CC BY 4.0); Vitoria-Gasteiz. Avisos: AEMET, vía Meteoalarm (CC BY 4.0). Incendios: EFFIS, Copernicus EMS.</p>
+        <p class="set-help"><b>Descargo de responsabilidad:</b> SOSpk solo te facilita el buscador y el enlace. Los puntos kilométricos, las imágenes de las cámaras, los datos y los avisos son responsabilidad del IGN, la DGT, AEMET, EFFIS o la entidad que los publica, y pueden tener errores o retrasos. SOSpk no es un servicio oficial, no sustituye a la señalización ni a los servicios de emergencias y no llama a emergencias.</p>
         <p class="set-help">Aviso: la información es orientativa. Los PK y las posiciones calculadas (≈) pueden contener errores y no sustituyen a la señalización de la carretera ni a la información de los servicios oficiales. No se garantiza su exactitud ni se asume responsabilidad por su uso.</p>
       </details>
     </div>
