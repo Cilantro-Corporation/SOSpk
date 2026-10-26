@@ -102,6 +102,8 @@
     $('whatPrem').hidden = !fw;
     $('legendPrem').hidden = !fw;
     $('creditsPrem').hidden = !fw;
+    $('optPkgRow').hidden = !fw;
+    $('secSectores').hidden = !fw;
     $('planName').textContent = isPremium() ? 'Premium' : 'Gratis';
     $('devRow').hidden = !devMode || TESTERS;
     $('testRow').hidden = !TESTERS;
@@ -557,6 +559,7 @@
     if (!isPremium()) return Promise.resolve(); // municipios, pueblos y parajes son Premium: en gratis ni se descargan
     var jobs = [loadPlaces('lugares', code).catch(function () { return null; })];
     if (parajesOn.indexOf(code) >= 0) jobs.push(loadPlaces('parajes', code).catch(function () { return null; }));
+    else if (autoPkgOn()) jobs.push(autoPackage(code)); // con Premium, la provincia trae todo: municipios, parajes y cámaras
     return Promise.all(jobs).then(function () { if (document.activeElement === roadInput) renderSuggest(); });
   }
   function dropProvincePlaces(code) {
@@ -573,6 +576,29 @@
     if (typeof syncPackage === 'function') { syncPackage(); renderCams(); loadAvisos(false); }
   }
   var parajesState = {}; // code -> 'loading' | 'error'
+  // Con el marco Premium el «paquete» de una provincia (parajes + cámaras) se baja solo con ella; en Opciones se puede apagar
+  var pkgAuto = S.readJSON('pkgauto', true) !== false;
+  function autoPkgOn() { return framework() && isPremium() && pkgAuto; }
+  function pkgSize(code) {
+    return (placesMeta && placesMeta.sizes[code] ? placesMeta.sizes[code][1] : 0) + (camMeta && camMeta.sizes[code] ? camMeta.sizes[code][1] : 0);
+  }
+  function autoPackage(code) {
+    if (parajesState[code] === 'loading' || parajesOn.indexOf(code) >= 0) return Promise.resolve();
+    parajesState[code] = 'loading';
+    renderSettingsList();
+    return Promise.all([
+      loadPlacesMeta().then(function (m) { return m && m.sizes[code] ? loadPlaces('parajes', code) : null; }),
+      loadCams(code).catch(function () { return null; }),
+    ]).then(function () {
+      delete parajesState[code];
+      setParajes(code, true);
+      renderSettingsList();
+      if (document.activeElement === roadInput) renderSuggest();
+    }, function () {
+      parajesState[code] = 'error';
+      renderSettingsList();
+    });
+  }
   function toggleParajes(code) {
     if (!isPremium()) { showPremium('Los parajes son una función Premium.'); return; }
     if (parajesOn.indexOf(code) >= 0) {
@@ -960,12 +986,13 @@
     clear(box); clear(msg);
     box.hidden = msg.hidden = true;
     if (!r.coord) return;
-    var list = r.me && r.near.length ? r.near.slice(1) : r.near;
+    var list = r.me && r.near.length ? r.near.slice(1) : r.near, seenR = {}, two = [];
+    list.forEach(function (n) { if (!seenR[n.road] && two.length < 2) { seenR[n.road] = 1; two.push(n); } }); // solo dos carreteras distintas
     if (r.me && r.near.length) box.appendChild(el('div', { class: 'nl-ll', text: '📍 ' + fmtLL(r.lat, r.lon) }));
-    list.forEach(function (n) {
+    two.forEach(function (n) {
       box.appendChild(el('button', { type: 'button', class: 'nl', title: 'Ver este PK', onclick: function () { openNear(n); } }, [
-        el('span', { class: 'dot ty-' + C.typeOf(n.road) }), el('b', { text: n.road }), ' km ' + K.formatKm(round1(n.km)) + ' ≈',
-        el('span', { class: 'nl-d', text: 'a ' + K.formatDist(n.d) }),
+        el('span', { class: 'dot ty-' + C.typeOf(n.road) }), el('span', { class: 'nl-p' }, [el('b', { text: n.road }), '/' + K.formatKm(round1(n.km)) + ' ≈']),
+        el('span', { class: 'nl-d', text: K.formatDist(n.d) }),
       ]));
     });
     var cc = camChip(r.lat, r.lon);
@@ -1084,10 +1111,15 @@
 
   // ---------- Favoritos y recientes ----------
   // Los favoritos pueden llevar nombre (n), color (col) e icono (ic); se guardan solo en este dispositivo
-  var FAV_COLORS = ['#C6F400', '#FF4B3E', '#FF9F1C', '#F2D600', '#17A04A', '#2F6BFF', '#A259FF', '#F2F2F2'];
-  var FAV_ICONS = [['⛰️', 'Montaña'], ['🌲', 'Bosque'], ['💧', 'Fuente'], ['🏕️', 'Campamento'], ['🌾', 'Campo'],
-    ['🚗', 'Coche'], ['🚚', 'Camión'], ['🚑', 'Ambulancia'], ['🚒', 'Bomberos'],
-    ['🏠', 'Casa'], ['🏭', 'Nave o fábrica'], ['⛪', 'Iglesia o ermita'], ['🏰', 'Castillo'], ['⛽', 'Gasolinera']];
+  // Los 5 primeros son los de la versión básica: lima de la app, rojo, blanco, verde y azul
+  var FAV_COLORS = ['#C6F400', '#FF4B3E', '#F2F2F2', '#17A04A', '#2F6BFF', '#FF9F1C', '#F2D600', '#A259FF', '#FF5FA2', '#00C2D1', '#B5651D', '#9AA0A6', '#FFD6A5', '#7CFFB2'];
+  var ACC_COLORS = ['#C6F400', '#FF4B3E', '#FF9F1C', '#F2D600', '#17A04A', '#2F6BFF', '#A259FF', '#F2F2F2']; // colores de la app
+  // La estrella es el icono por defecto; con ella, los 5 primeros son los de la versión básica (bomberos, coche, montaña, casa)
+  var FAV_ICONS = [['🚒', 'Bomberos'], ['🚗', 'Coche'], ['⛰️', 'Montaña'], ['🏠', 'Casa'],
+    ['🚑', 'Ambulancia'], ['🚓', 'Policía'], ['🚁', 'Helicóptero'], ['🚚', 'Camión'], ['🚜', 'Tractor'], ['🏍️', 'Moto'], ['🚧', 'Obras'], ['⚠️', 'Peligro'],
+    ['🔥', 'Fuego'], ['🧯', 'Extintor'], ['💧', 'Fuente'], ['🌲', 'Bosque'], ['🏕️', 'Campamento'], ['🌾', 'Campo'], ['🐾', 'Fauna'], ['🌉', 'Puente'],
+    ['🏭', 'Nave o fábrica'], ['⛪', 'Iglesia o ermita'], ['🏰', 'Castillo'], ['⛽', 'Gasolinera'], ['🏥', 'Hospital'], ['🅿️', 'Aparcamiento'],
+    ['🍽️', 'Restaurante'], ['🛏️', 'Alojamiento'], ['🔧', 'Taller'], ['🚩', 'Bandera'], ['⛔', 'Prohibido'], ['📍', 'Punto']];
   var ICON_OK = FAV_ICONS.map(function (x) { return x[0]; });
   function compact(r) {
     if (!r.coord) return { road: r.road, km: r.km, dir: r.dir || 0 };
@@ -1106,7 +1138,55 @@
     if (typeof x.n === 'string' && x.n.trim()) o.n = x.n.trim().slice(0, 40);
     if (FAV_COLORS.indexOf(x.col) >= 0) o.col = x.col;
     if (ICON_OK.indexOf(x.ic) >= 0) o.ic = x.ic;
+    if (typeof x.u === 'string' && x.u.trim()) o.u = x.u.trim().slice(0, 300);
+    if (x.im === 1) o.im = 1;
     return o;
+  }
+  // Enlace o texto de un favorito (Premium): si parece un enlace web se abre; si no, se muestra como nota
+  function favUrl(s) {
+    s = String(s || '').trim();
+    if (/^www\./i.test(s)) s = 'https://' + s;
+    return /^https?:\/\/[^\s]+$/i.test(s) ? s : null;
+  }
+  function urlHost(u) { var m = /^https?:\/\/([^\/?#]+)/i.exec(u); return m ? m[1].replace(/^www\./i, '') : u; }
+  // Las imágenes de los favoritos se guardan reducidas, solo en este dispositivo (nunca se envían a ningún sitio)
+  var IMG_CACHE = 'kmes-favimg';
+  var hasCaches = typeof caches !== 'undefined';
+  function imgKey(key) { return new URL('kmes-favimg/' + encodeURIComponent(key), location.href).href; }
+  function putFavImg(key, dataUrl) {
+    if (!hasCaches) return Promise.resolve();
+    return caches.open(IMG_CACHE).then(function (c) { return c.put(imgKey(key), new Response(dataUrl, { headers: { 'Content-Type': 'text/plain' } })); }).catch(function () { toast('No hay espacio para guardar la imagen'); });
+  }
+  function getFavImg(key) {
+    if (!hasCaches) return Promise.resolve(null);
+    return caches.open(IMG_CACHE).then(function (c) { return c.match(imgKey(key)); }).then(function (r) { return r ? r.text() : null; })
+      .then(function (t) { return t && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(t) ? t : null; }).catch(function () { return null; });
+  }
+  function delFavImg(key) {
+    if (!hasCaches) return Promise.resolve();
+    return caches.open(IMG_CACHE).then(function (c) { return c.delete(imgKey(key)); }).catch(function () { /* */ });
+  }
+  // Foto elegida -> JPEG de hasta 900 px
+  function shrinkImage(file) {
+    return new Promise(function (resolve, reject) {
+      if (!file || !/^image\//.test(file.type) || file.size > 25 * 1048576) { reject(new Error('imagen no válida')); return; }
+      var rd = new FileReader();
+      rd.onerror = function () { reject(new Error('lectura')); };
+      rd.onload = function () {
+        var img = new Image();
+        img.onerror = function () { reject(new Error('imagen no válida')); };
+        img.onload = function () {
+          var s = Math.min(1, 900 / Math.max(img.width, img.height)), cv = document.createElement('canvas');
+          cv.width = Math.max(1, Math.round(img.width * s)); cv.height = Math.max(1, Math.round(img.height * s));
+          cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+          var out = cv.toDataURL('image/jpeg', 0.72);
+          if (out.length > 600000) out = cv.toDataURL('image/jpeg', 0.5);
+          resolve(out);
+        };
+        img.src = rd.result;
+      };
+      rd.readAsDataURL(file);
+    });
   }
   function itemKey(x) { return x.c ? 'c|' + x.lat + '|' + x.lon : x.road + '|' + x.km + '|' + x.dir; }
   function readList(k) { var v = S.readJSON(k, []); return Array.isArray(v) ? v.filter(validItem).slice(0, 50).map(cleanItem) : []; }
@@ -1124,11 +1204,37 @@
     var f = current && favOf(compact(current));
     $('resFav').classList.toggle('on', !!f);
     $('resFav').setAttribute('aria-pressed', f ? 'true' : 'false');
-    $('resFav').setAttribute('aria-label', f ? 'Editar favorito' : 'Guardar en favoritos');
+    $('resFav').setAttribute('aria-label', f ? 'Editar favorito' : 'Añadir a favoritos');
     var sub = $('resSub'), old = sub.querySelector('.fav-n');
     if (old) sub.removeChild(old);
     if (f && f.n && f.n !== current.place) sub.insertBefore(el('b', { class: 'fav-n', text: (f.ic || '★') + ' ' + f.n + ' · ' }), sub.firstChild);
+    renderFavInfo(f);
   }
+  function renderFavInfo(f) {
+    var box = $('favInfo');
+    clear(box);
+    box.hidden = true;
+    if (!f || !isPremium() || !framework() || (!f.u && !f.im)) return;
+    var link = f.u ? favUrl(f.u) : null;
+    if (f.u) {
+      box.appendChild(link
+        ? el('a', { class: 'fav-link', href: link, target: '_blank', rel: 'noopener noreferrer', text: '🔗 ' + urlHost(link) })
+        : el('div', { class: 'fav-note', text: f.u }));
+      box.hidden = false;
+    }
+    if (f.im) {
+      var key = itemKey(f);
+      getFavImg(key).then(function (d) {
+        if (!d || !current || itemKey(compact(current)) !== key) return;
+        var img = el('img', { class: 'fav-img', alt: 'Imagen del favorito' });
+        img.src = d;
+        img.addEventListener('click', function () { $('imgViewImg').src = d; $('imgView').hidden = false; });
+        box.appendChild(img);
+        box.hidden = false;
+      });
+    }
+  }
+  $('imgView').addEventListener('click', function () { $('imgView').hidden = true; $('imgViewImg').removeAttribute('src'); });
   function favsChanged() {
     if (current) renderFav();
     renderFavMarkers();
@@ -1144,6 +1250,7 @@
   }
   function removeFav(item) {
     var k = itemKey(item);
+    delFavImg(k);
     S.writeJSON('fav', readList('fav').filter(function (x) { return itemKey(x) !== k; }));
     favsChanged();
   }
@@ -1155,14 +1262,18 @@
       if (!isPremium() && nFav >= PRE.freeFavs) { showPremium('Con la versión gratuita puedes guardar ' + PRE.freeFavs + ' favoritos.'); return; }
       if (nFav >= PRE.maxFavs) { toast('Máximo ' + PRE.maxFavs + ' favoritos'); return; }
       saveFav(item); toast('Guardado en favoritos'); f = favOf(item);
+      editFav(f, true);
+      return;
     }
-    editFav(f);
+    editFav(f, false);
   }
   $('resFav').addEventListener('click', function () { if (current) toggleFav(compact(current)); });
 
   // Editor de favorito
-  var editing = null;
-  function editFav(x) {
+  var editing = null, editingNew = false, editingImg;
+  function editFav(x, isNew) {
+    if (isNew !== undefined) editingNew = isNew;
+    $('favEditTitle').textContent = editingNew ? 'Añadir favorito' : 'Editar favorito';
     editing = cleanItem(x);
     var box = $('favEditBody');
     clear(box);
@@ -1185,13 +1296,38 @@
     box.appendChild(el('div', { class: 'fe-t', text: 'Icono' }));
     var ics = el('div', { class: 'fe-ics', role: 'radiogroup', 'aria-label': 'Icono' });
     [['', 'Estrella']].concat(FAV_ICONS).forEach(function (ic, i) {
-      var lock = !isPremium() && i > PRE.freeIcons;
+      var lock = !isPremium() && i >= PRE.freeIcons;
       var b = el('button', { type: 'button', class: 'fe-ic' + (lock ? ' lock' : ''), role: 'radio', title: ic[1], 'aria-label': ic[1] + (lock ? ' (Premium)' : ''), text: ic[0] || '★',
         onclick: function () { if (lock) { showPremium('Más iconos es una función Premium.'); return; } if (ic[0]) editing.ic = ic[0]; else delete editing.ic; mark(); } });
       b.dataset.v = ic[0];
       ics.appendChild(b);
     });
     box.appendChild(ics);
+    // Enlace o texto e imagen: Premium
+    var prem = isPremium();
+    box.appendChild(el('div', { class: 'fe-t', text: prem ? 'Texto / enlace URL' : '🔒 Texto / enlace URL · Premium' }));
+    var lnk = el('input', { class: 'fe-name' + (prem ? '' : ' lock'), id: 'favLink', type: 'text', maxlength: '300', placeholder: prem ? 'Una nota o un enlace (https://…)' : 'Función Premium', 'aria-label': 'Texto o enlace del favorito', spellcheck: 'false', autocapitalize: 'none' });
+    lnk.value = editing.u || '';
+    if (!prem) { lnk.readOnly = true; lnk.addEventListener('click', function () { showPremium('El enlace y la imagen de un favorito son Premium.'); }); }
+    box.appendChild(lnk);
+    box.appendChild(el('div', { class: 'fe-t', text: prem ? 'Imagen' : '🔒 Imagen · Premium' }));
+    editingImg = undefined;
+    var pic = el('div', { class: 'fe-pic' + (prem ? '' : ' lock') });
+    var thumb = el('img', { class: 'fe-thumb', alt: '' }), pbtn = el('button', { type: 'button', class: 'pp-b', text: '📷 Elegir imagen' }), prm = el('button', { type: 'button', class: 'pp-b del', text: 'Quitar' });
+    var file = el('input', { type: 'file', accept: 'image/*', class: 'fe-file', 'aria-label': 'Elegir imagen' });
+    thumb.hidden = true; prm.hidden = true;
+    function showPic(d) { thumb.hidden = !d; prm.hidden = !d; if (d) thumb.src = d; else thumb.removeAttribute('src'); pbtn.textContent = d ? '📷 Cambiar' : '📷 Elegir imagen'; }
+    if (editing.im) getFavImg(itemKey(editing)).then(function (d) { if (editingImg === undefined) showPic(d); });
+    pbtn.addEventListener('click', function () { if (!prem) { showPremium('El enlace y la imagen de un favorito son Premium.'); return; } file.click(); });
+    prm.addEventListener('click', function () { editingImg = null; showPic(null); });
+    file.addEventListener('change', function () {
+      var fl = file.files && file.files[0];
+      if (!fl) return;
+      shrinkImage(fl).then(function (d) { editingImg = d; showPic(d); }, function () { toast('No se pudo usar esa imagen'); });
+      file.value = '';
+    });
+    pic.appendChild(thumb); pic.appendChild(pbtn); pic.appendChild(prm); pic.appendChild(file);
+    box.appendChild(pic);
     function mark() {
       var col = editing.col || FAV_COLORS[0];
       Array.prototype.forEach.call(cols.children, function (b) { var on = b.dataset.v === col; b.classList.toggle('on', on); b.setAttribute('aria-checked', on ? 'true' : 'false'); });
@@ -1210,9 +1346,17 @@
     if (!editing) return;
     var n = $('favName').value.trim();
     if (n) editing.n = n; else delete editing.n;
-    saveFav(editing);
+    var job = Promise.resolve();
+    if (isPremium()) {
+      var u = $('favLink').value.trim().slice(0, 300);
+      if (u) editing.u = u; else delete editing.u;
+      var k = itemKey(editing);
+      if (editingImg) { editing.im = 1; job = putFavImg(k, editingImg); }
+      else if (editingImg === null) { delete editing.im; job = delFavImg(k); }
+    }
+    var item = editing;
     closeEdit();
-    toast('Favorito guardado');
+    job.then(function () { saveFav(item); toast('Favorito guardado'); });
   });
   $('favDel').addEventListener('click', function () {
     if (!editing) return;
@@ -1305,24 +1449,65 @@
   var stored = [];
   function fmtSize(b) { return b > 1048576 ? (b / 1048576).toFixed(1).replace('.', ',') + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB'; }
   var pinnedProvs = [];
+  // Una sola línea por provincia: lo que trae el paquete de parajes
+  function parTxt(code) {
+    if (!framework()) return '⛰️ Parajes, cerros, fuentes, ermitas…';
+    var n = camCount(code);
+    return '⛰️ Parajes · 📷 Cámaras' + (n ? ' (' + n + ')' : '') + ' · ⛈️ Meteo · 🔥 Incendios';
+  }
+  // Comunidades enteras: se bajan una a una (sin avisos por provincia) y se avisa al final
+  var commBusy = {}, commAsk = {};
+  function communityProvs(name) { return index.provs.filter(function (p) { return p.community === name; }); }
+  function downloadCommunity(name) {
+    var list = communityProvs(name).filter(function (p) { return selected.indexOf(p.code) < 0; });
+    if (!list.length || commBusy[name]) return;
+    if (navigator.onLine === false) { toast('Sin conexión: no se puede descargar'); return; }
+    commBusy[name] = true;
+    renderSettingsList();
+    var i = 0, ok = 0;
+    (function next() {
+      if (i >= list.length) { delete commBusy[name]; rebuild(); renderSettingsList(); toast(name + ': ' + ok + (ok === 1 ? ' provincia lista' : ' provincias listas')); return; }
+      var p = list[i++];
+      toast('Descargando ' + p.name + ' (' + i + '/' + list.length + ')…', 20000);
+      addProvince(p.code, { quiet: true }).then(function (good) { if (good) ok++; next(); });
+    })();
+  }
+  function removeCommunity(name) {
+    if (!commAsk[name]) { commAsk[name] = setTimeout(function () { delete commAsk[name]; renderSettingsList(); }, 4000); renderSettingsList(); return; }
+    clearTimeout(commAsk[name]); delete commAsk[name];
+    communityProvs(name).forEach(function (p) { if (selected.indexOf(p.code) >= 0) removeProvince(p.code); });
+    renderSettingsList();
+    toast(name + ' borrada del dispositivo');
+  }
+  function commHeader(name) {
+    var kids = [el('span', { text: name })];
+    var all = communityProvs(name), miss = all.filter(function (p) { return selected.indexOf(p.code) < 0; });
+    if (all.length > 1) {
+      if (commBusy[name]) kids.push(el('span', { class: 'comm-b busy', text: 'Descargando…' }));
+      else if (miss.length) kids.push(el('button', { type: 'button', class: 'comm-b', onclick: function () { downloadCommunity(name); },
+        text: 'Descargar todas · ' + fmtSize(miss.reduce(function (s, p) { return s + p.size; }, 0)) }));
+      else kids.push(el('button', { type: 'button', class: 'comm-b del' + (commAsk[name] ? ' ask' : ''), onclick: function () { removeCommunity(name); }, text: commAsk[name] ? '¿Seguro? Pulsa otra vez' : 'Quitar todas' }));
+    }
+    return el('div', { class: 'comm' }, kids);
+  }
   function renderSettingsList() {
     if (!index || $('settings').hidden) return;
-    var box = $('provList'), f = K.key($('provFilter').value);
-    clear(box);
+    var boxM = $('provMine'), boxR = $('provList'), f = K.key($('provFilter').value);
+    var sc = boxR.closest('.set-scroll'), top = sc ? sc.scrollTop : 0; // al marcar una provincia la lista no debe volver arriba
+    clear(boxM); clear(boxR);
     // Tus provincias, fijas arriba para marcarlas o desmarcarlas sin buscarlas (al desmarcar no se mueven hasta
-    // que se vuelve a abrir la configuración)
-    selected.forEach(function (c) { if (pinnedProvs.indexOf(c) < 0) pinnedProvs.push(c); });
+    // que se vuelve a abrir la configuración); debajo, el buscador y el resto por comunidades
     var mine = index.provs.filter(function (p) { return pinnedProvs.indexOf(p.code) >= 0; });
     var rest = index.provs.filter(function (p) { return pinnedProvs.indexOf(p.code) < 0; });
     var lastComm = null;
     mine.map(function (p) { return [p, 'Tus provincias']; }).concat(rest.map(function (p) { return [p, p.community]; })).forEach(function (pair) {
-      var p = pair[0];
+      var p = pair[0], isMine = pair[1] === 'Tus provincias', box = isMine ? boxM : boxR;
       if (f && K.key(p.name + ' ' + p.community).indexOf(f) < 0) return;
-      if (pair[1] !== lastComm) { lastComm = pair[1]; box.appendChild(el('div', { class: 'comm' + (pair[1] === 'Tus provincias' ? ' mine' : ''), text: pair[1] })); }
+      if (pair[1] !== lastComm) { lastComm = pair[1]; box.appendChild(isMine ? el('div', { class: 'comm mine', text: pair[1] }) : commHeader(pair[1])); }
       var on = selected.indexOf(p.code) >= 0;
       var st = provState[p.code];
       var status = st === 'loading' ? ['Descargando…', ''] : st === 'error' ? ['Error · reintentar', 'err'] :
-        provData[p.code] ? ['✓ ' + fmtSize(p.size), 'ok'] : [fmtSize(p.size), ''];
+        provData[p.code] ? ['✓ ' + fmtSize(p.size + (framework() && parajesOn.indexOf(p.code) >= 0 ? pkgSize(p.code) : 0)), 'ok'] : [fmtSize(p.size), ''];
       var cb = el('input', { type: 'checkbox', 'aria-label': p.name });
       cb.checked = on;
       cb.addEventListener('change', function () {
@@ -1330,33 +1515,35 @@
         else removeProvince(p.code);
       });
       box.appendChild(el('label', { class: 'prov' }, [cb, el('span', { class: 'pn', text: p.name }), el('span', { class: 'ps ' + status[1], text: status[0] })]));
-      // Parajes de la provincia: descarga opcional (para buscarlos por su nombre)
-      var psize = on && placesMeta && placesMeta.sizes[p.code] && placesMeta.sizes[p.code][1];
-      if (on && !isPremium()) {
-        box.appendChild(el('div', { class: 'prov-par' }, [
-          el('span', { class: 'pp-t', text: '⛰️ Parajes, cerros, fuentes, ermitas…' }),
-          el('button', { type: 'button', class: 'pp-b', text: '🔒 Premium', onclick: function () { showPremium('Los parajes son una función Premium.'); } }),
-        ]));
-      } else if (psize) {
-        var pon = parajesOn.indexOf(p.code) >= 0, pst = parajesState[p.code];
-        box.appendChild(el('div', { class: 'prov-par' }, [
-          el('span', { class: 'pp-t', text: '⛰️ Parajes, cerros, fuentes, ermitas…' }),
-          el('button', { type: 'button', class: 'pp-b pp-par' + (pon ? ' on' : '') + (pst === 'error' ? ' err' : ''), 'aria-label': (pon ? 'Borrar' : 'Descargar') + ' parajes de ' + p.name,
-            text: pst === 'loading' ? 'Descargando…' : pon ? '✓ ' + fmtSize(psize) + ' · Borrar' : (pst === 'error' ? 'Reintentar ' : 'Descargar ') + fmtSize(psize),
-            onclick: function () { toggleParajes(p.code); } }),
-        ]));
+      if (!on) return;
+      if (framework()) {
+        // Una sola línea con lo que incluye la provincia; con Premium se baja sola
+        var inst = parajesOn.indexOf(p.code) >= 0, pst = parajesState[p.code], sz = pkgSize(p.code), tail;
+        if (!isPremium()) tail = el('button', { type: 'button', class: 'pp-b pp-lock', text: '🔒 Premium', onclick: function () { showPremium('Los municipios, parajes, cámaras y avisos son Premium.'); } });
+        else if (pst === 'loading') tail = el('span', { class: 'pp-s', text: 'Descargando…' });
+        else if (inst) tail = null; // ya incluido: el tamaño total va en la línea de la provincia
+        else tail = el('button', { type: 'button', class: 'pp-b pp-par' + (pst === 'error' ? ' err' : ''), 'aria-label': 'Descargar el paquete de ' + p.name,
+          text: (pst === 'error' ? 'Reintentar ' : 'Descargar ') + fmtSize(sz), onclick: function () { if (pst === 'error') delete parajesState[p.code]; autoPackage(p.code); } });
+        box.appendChild(el('div', { class: 'prov-par' + (isPremium() ? '' : ' locked') + (inst && isPremium() ? ' inst' : '') }, [el('span', { class: 'pp-t', text: parTxt(p.code) }), tail]));
+        return;
       }
-      if (on && framework()) {
-        var nc = camCount(p.code), inc = parajesOn.indexOf(p.code) >= 0 && isPremium();
-        box.appendChild(el('div', { class: 'prov-inc' + (inc ? ' on' : '') }, [
-          el('span', { text: '📷 Cámaras viales' + (nc ? ' (' + nc + ' en ' + p.name + ')' : '') + ' · ⛈️ Avisos meteorológicos · 🔥 Incendios activos' }),
-          el('small', { text: inc ? 'Incluido con los parajes de esta provincia' : 'Se activan al descargar los parajes (Premium)' }),
+      // Sin marco Premium (versión pública actual): los parajes son una descarga opcional
+      var psize = placesMeta && placesMeta.sizes[p.code] && placesMeta.sizes[p.code][1];
+      if (psize) {
+        var pon = parajesOn.indexOf(p.code) >= 0, pst2 = parajesState[p.code];
+        box.appendChild(el('div', { class: 'prov-par' }, [
+          el('span', { class: 'pp-t', text: parTxt(p.code) }),
+          el('button', { type: 'button', class: 'pp-b pp-par' + (pon ? ' on' : '') + (pst2 === 'error' ? ' err' : ''), 'aria-label': (pon ? 'Borrar' : 'Descargar') + ' parajes de ' + p.name,
+            text: pst2 === 'loading' ? 'Descargando…' : pon ? '✓ ' + fmtSize(psize) + ' · Borrar' : (pst2 === 'error' ? 'Reintentar ' : 'Descargar ') + fmtSize(psize),
+            onclick: function () { toggleParajes(p.code); } }),
         ]));
       }
     });
     var total = selected.reduce(function (s, c) { return s + (provByCode[c] ? provByCode[c].size : 0); }, 0);
     $('provCount').textContent = selected.length + ' elegidas · ' + fmtSize(total) +
       (selected.length ? ' · ' + selected.map(function (c) { return provByCode[c].name; }).join(', ') : '');
+    renderZonasList();
+    if (sc) sc.scrollTop = top;
   }
   function renderConn() {
     var on = navigator.onLine !== false;
@@ -1373,6 +1560,12 @@
   $('settingsClose').addEventListener('click', function () { $('settings').hidden = true; });
   $('provFilter').addEventListener('input', renderSettingsList);
   var autoProv = S.readJSON('auto', true) !== false;
+  $('optPkg').checked = pkgAuto;
+  $('optPkg').addEventListener('change', function () {
+    pkgAuto = $('optPkg').checked; S.writeJSON('pkgauto', pkgAuto);
+    if (pkgAuto) selected.forEach(function (c) { if (provData[c]) loadProvincePlaces(c); });
+    renderSettingsList();
+  });
   $('optAuto').checked = autoProv;
   $('optAuto').addEventListener('change', function () { autoProv = $('optAuto').checked; S.writeJSON('auto', autoProv); });
   $('appVersion').textContent = 'versión ' + CFG.version;
@@ -1391,7 +1584,7 @@
     return '#' + [16, 8, 0].map(function (s) { return ('0' + Math.round(((n >> s) & 255) * 0.82).toString(16)).slice(-2); }).join('');
   }
   function applyLook() {
-    var acc = FAV_COLORS.indexOf(look.acc) >= 0 ? look.acc : FAV_COLORS[0], st = document.documentElement.style;
+    var acc = ACC_COLORS.indexOf(look.acc) >= 0 ? look.acc : ACC_COLORS[0], st = document.documentElement.style;
     accent = acc;
     st.setProperty('--lime', acc);
     st.setProperty('--lime-dim', dim(acc));
@@ -1415,7 +1608,7 @@
     segs($('lookFont'), FONT_SIZES, 'font');
     var box = $('lookColor');
     clear(box);
-    FAV_COLORS.forEach(function (c, i) {
+    ACC_COLORS.forEach(function (c, i) {
       var on = accent === c;
       var b = el('button', { type: 'button', class: 'fe-col' + (on ? ' on' : ''), role: 'radio', 'aria-checked': on ? 'true' : 'false', 'aria-label': 'Color ' + (i + 1),
         onclick: function () { look.acc = c; S.writeJSON('look', look); applyLook(); } });
@@ -1428,9 +1621,9 @@
   // ---------- Capas Premium: cámaras, avisos meteorológicos, incendios activos y zonas ----------
   // SOSpk solo facilita el buscador y el enlace: no copia ni muestra imágenes ni datos ajenos. Todo viene en el «paquete» de la provincia
   // (el mismo que los parajes): solo las provincias con parajes descargados tienen cámaras, avisos e incendios.
-  var layerOn = S.readJSON('capas', {});
-  if (!layerOn || typeof layerOn !== 'object') layerOn = {};
-  function lyrOn(k) { return isPremium() && layerOn[k] === true; }
+  var layerOn = S.readJSON('capas', null);
+  if (!layerOn || typeof layerOn !== 'object') layerOn = { cam: true, avi: true, inc: true, zon: true }; // con Premium, todo activado hasta que lo apagues
+  function lyrOn(k) { return isPremium() && layerOn[k] !== false; }
   function pkgProvs() { return selected.filter(function (c) { return parajesOn.indexOf(c) >= 0; }); }
   function provName(c) { return provByCode[c] ? provByCode[c].name : c; }
   function openLink(url) {
@@ -1509,11 +1702,11 @@
   map.on('moveend', renderCams);
   // Cámara más cercana a un punto, para la ficha
   function camChip(lat, lon) {
-    if (!lyrOn('cam')) return null;
-    var best = K.nearestCamara(allCams(), lat, lon, 3000);
+    if (!isPremium() || !framework()) return null;
+    var best = K.nearestCamara(allCams(), lat, lon, 5000);
     if (!best) return null;
     return el('button', { type: 'button', class: 'nl cam', title: 'Abrir la cámara: ' + best.cam.name, onclick: function () { openLink(best.cam.url); } }, [
-      el('span', { text: '📷' }), el('b', { text: 'Cámara' }), el('span', { class: 'nl-d', text: 'a ' + K.formatDist(best.d) + ' · abrir' }),
+      el('span', { text: '📷' }), el('b', { text: 'Cámara' }), el('span', { class: 'nl-d', text: K.formatDist(best.d) }),
     ]);
   }
 
@@ -1622,7 +1815,7 @@
   }
   function renderZonas() {
     zonesLayer.clearLayers();
-    if (!isPremium()) return;
+    if (!isPremium() || layerOn.zon === false) return;
     readZonas().forEach(function (z) {
       var shape = z.closed
         ? L.polygon(z.pts, { color: z.col, weight: 2.5, opacity: 0.95, fillColor: z.fil, fillOpacity: 0.1, interactive: false })
@@ -1633,7 +1826,7 @@
   }
   var drawing = null, drawLayer = L.layerGroup().addTo(map);
   function startDraw() {
-    $('zonesPanel').hidden = true;
+    $('settings').hidden = true;
     closeSheet();
     drawing = { pts: [] };
     $('drawBar').hidden = false;
@@ -1664,40 +1857,36 @@
   function finishDraw(closed) {
     if (!drawing) return;
     var list = readZonas();
-    if (list.length >= ZMAX) { toast('Máximo ' + ZMAX + ' zonas: borra alguna'); return; }
+    if (list.length >= ZMAX) { toast('Máximo ' + ZMAX + ' sectores: borra alguno'); return; }
     var z = cleanZona({ id: Date.now().toString(36), n: '', closed: closed, pts: drawing.pts, col: FAV_COLORS[0], fil: FAV_COLORS[0] });
-    z.n = (closed ? 'Zona ' : 'Ruta ') + (list.length + 1);
+    z.n = (closed ? 'Sector ' : 'Ruta ') + (list.length + 1);
     list.push(z);
     writeZonas(list);
     endDraw();
-    renderZonas();
+    renderZonas(); renderZonasList();
     editZona(z.id);
   }
   $('drawClose').addEventListener('click', function () { finishDraw(true); });
   $('drawRoute').addEventListener('click', function () { finishDraw(false); });
-  // Lista de zonas
-  function openZonas() {
-    $('layersPop').hidden = true;
-    renderZonasList();
-    $('zonesPanel').hidden = false;
-  }
+  // Lista de sectores (en Configuración)
   function renderZonasList() {
     var box = $('zonesList'), list = readZonas();
     clear(box);
-    if (!list.length) box.appendChild(el('p', { class: 'set-help', text: 'Aún no tienes zonas. Pulsa «Nueva zona», toca el mapa punto a punto y ciérrala sobre el primer punto para obtener un sector con perímetro y área.' }));
+    $('secSectores').hidden = !framework();
+    if (!isPremium()) { box.appendChild(el('p', { class: 'set-help', text: 'Los sectores son una función Premium.' })); return; }
+    if (!list.length) box.appendChild(el('p', { class: 'set-help', text: 'Aún no tienes sectores. Pulsa «Nuevo sector» y toca el mapa punto a punto.' }));
     list.forEach(function (z) {
       var dot = el('span', { class: 'zl-dot' });
       dot.style.background = z.closed ? z.fil : z.col; dot.style.borderColor = z.col;
       box.appendChild(el('div', { class: 'zl' }, [
-        el('button', { type: 'button', class: 'zl-open', onclick: function () { $('zonesPanel').hidden = true; map.fitBounds(L.latLngBounds(z.pts).pad(0.3), { animate: false, maxZoom: 16 }); } }, [
-          dot, el('span', { class: 'zl-t' }, [el('b', { text: z.n || (z.closed ? 'Zona' : 'Ruta') }), el('small', { text: zonaInfo(z) })]),
+        el('button', { type: 'button', class: 'zl-open', onclick: function () { $('settings').hidden = true; map.fitBounds(L.latLngBounds(z.pts).pad(0.3), { animate: false, maxZoom: 16 }); } }, [
+          dot, el('span', { class: 'zl-t' }, [el('b', { text: z.n || (z.closed ? 'Sector' : 'Ruta') }), el('small', { text: zonaInfo(z) })]),
         ]),
-        el('button', { type: 'button', class: 'del', 'aria-label': 'Editar', title: 'Editar', text: '✎', onclick: function () { $('zonesPanel').hidden = true; editZona(z.id); } }),
+        el('button', { type: 'button', class: 'del', 'aria-label': 'Editar', title: 'Editar', text: '✎', onclick: function () { $('settings').hidden = true; editZona(z.id); } }),
       ]));
     });
   }
-  $('zonesClose').addEventListener('click', function () { $('zonesPanel').hidden = true; });
-  $('zonesNew').addEventListener('click', startDraw);
+  $('zonesNew').addEventListener('click', function () { if (!isPremium()) { showPremium('Los sectores son una función Premium.'); return; } startDraw(); });
   // Editor de zona: nombre, color del contorno y color del interior (muy tenue)
   var editingZ = null;
   function editZona(id) {
@@ -1741,23 +1930,23 @@
     list.forEach(function (z, i) { if (z.id === editingZ.id) { editingZ.n = $('zoneName').value.trim().slice(0, 40); list[i] = cleanZona(editingZ); } });
     writeZonas(list);
     closeZoneEdit();
-    renderZonas();
-    toast('Zona guardada');
+    renderZonas(); renderZonasList();
+    toast('Sector guardado');
   });
   $('zoneDel').addEventListener('click', function () {
     if (!editingZ) return;
     var id = editingZ.id;
     writeZonas(readZonas().filter(function (z) { return z.id !== id; }));
     closeZoneEdit();
-    renderZonas();
-    toast('Zona borrada');
+    renderZonas(); renderZonasList();
+    toast('Sector borrado');
   });
 
   // --- Panel «Capas» ---
-  var LAYERS = [['cam', '📷', 'Cámaras de tráfico'], ['avi', '⛈️', 'Avisos meteorológicos'], ['inc', '🔥', 'Incendios activos'], ['zon', '⬡', 'Zonas y sectores']];
+  var LAYERS = [['cam', '📷', 'Cámaras de tráfico'], ['avi', '⛈️', 'Avisos meteorológicos'], ['inc', '🔥', 'Incendios activos'], ['zon', '⬡', 'Sectores']];
   function layerNote(k) {
-    if (k === 'zon') return readZonas().length ? readZonas().length + (readZonas().length === 1 ? ' zona' : ' zonas') : 'Dibujar';
-    if (!pkgProvs().length) return 'Descarga los parajes de una provincia';
+    if (k === 'zon') return layerOn.zon === false ? 'Ocultos' : readZonas().length + (readZonas().length === 1 ? ' sector' : ' sectores');
+    if (!pkgProvs().length) return 'Descarga una provincia';
     if (!layerOn[k]) return 'Apagada';
     if (k === 'cam') return allCams().length + ' cámaras';
     if (k === 'avi') return avisosState === 'error' ? 'Sin conexión' : avisosState === 'loading' ? 'Consultando…' : avisosState === 'ok' ? (myAvisos().length ? myAvisos().length + ' vigentes' : 'Sin avisos vigentes') : '';
@@ -1768,7 +1957,7 @@
     if (!box) return;
     clear(box);
     LAYERS.forEach(function (l) {
-      var prem = isPremium(), on = prem && (l[0] === 'zon' || layerOn[l[0]] === true);
+      var prem = isPremium(), on = prem && layerOn[l[0]] !== false;
       box.appendChild(el('button', { type: 'button', class: 'lyr' + (prem ? (on ? ' on' : '') : ' lock'), 'aria-label': l[2] + (prem ? (on ? ' (activada)' : ' (apagada)') : ' (Premium)'),
         onclick: function () { toggleLayer(l[0], l[2]); } }, [
         el('span', { class: 'lyr-i', text: l[1] }), el('span', { class: 'lyr-t', text: l[2] }),
@@ -1778,14 +1967,14 @@
   }
   function toggleLayer(k, title) {
     if (!isPremium()) { showPremium(title + ' es una función Premium.'); return; }
-    if (k === 'zon') { openZonas(); return; }
-    if (!pkgProvs().length && !layerOn[k]) toast('Descarga los parajes de una provincia en Configuración para activar esta capa');
-    layerOn[k] = !layerOn[k];
+    if (k !== 'zon' && !pkgProvs().length && layerOn[k] === false) toast('Descarga una provincia en Configuración para ver esta capa');
+    layerOn[k] = layerOn[k] === false;
     S.writeJSON('capas', layerOn);
     applyLayers();
     renderLayers();
   }
   function applyLayers() {
+    renderZonas();
     renderCams();
     applyFire();
     loadAvisos(false);
