@@ -466,3 +466,10 @@ body.drawing .sheet { display: none; }
 @media (prefers-reduced-motion: reduce) { .livepin.lp-eva { animation: none; } }
 /* Avisos y balizas V16: justo bajo la tarjeta de arriba (o en el borde superior si la tarjeta está abajo) */
 .chips { top: calc(var(--top-h, 0px) + 6px); }
+.hotpin { display: grid; place-items: center; width: 24px; height: 24px; margin: -12px 0 0 -12px; border-radius: 50%; background: #0B0B0B; border: 2px solid #FF4B3E; font-size: 13px; line-height: 1; box-sizing: border-box; }
+.hotpin.hp1 { border-color: #FF9F1C; }
+.hotpin.hp2 { border-color: #F2D600; opacity: .85; }
+.windpin { display: flex; flex-direction: column; align-items: center; width: 34px; margin: -17px 0 0 -17px; color: #fff; font-family: var(--head); font-size: 11px; line-height: 1; text-shadow: 0 0 3px #0B0B0B, 0 0 3px #0B0B0B; }
+.windpin .wp-a { display: block; font-size: 22px; color: #6BD0FF; filter: drop-shadow(0 0 2px #0B0B0B); }
+.windpin.mid .wp-a { color: #FFB000; }
+.windpin.hi .wp-a { color: #FF4B3E; }

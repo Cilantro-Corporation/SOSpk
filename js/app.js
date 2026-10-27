@@ -418,13 +418,13 @@
     function place(m, label, big) {
       var pt = map.latLngToContainerPoint([m.lat, m.lon]);
       var w = label.length * (big ? 7.4 : 6.6) + (m.type === 'R' ? 16 : 10), h = m.type === 'A' ? (big ? 27 : 23) : (big ? 22 : 19);
-      var r = [pt.x - w / 2 - 6, pt.y - h / 2 - 5, pt.x + w / 2 + 6, pt.y + h / 2 + 5];
+      var pd = dm(), r = [pt.x - w / 2 - 6 * pd, pt.y - h / 2 - 5 * pd, pt.x + w / 2 + 6 * pd, pt.y + h / 2 + 5 * pd];
       if (r[0] < 0 || r[2] > size.x || r[1] < 0 || r[3] > size.y) return false; // solo etiquetas enteras
       if (blocked.some(function (br) { return overlaps(r, br); }) || !free(r)) return false;
       take(r);
       return true;
     }
-    for (var j = 0; j < cand.length && n < MAX_PK; j++) {
+    for (var j = 0, maxPk = Math.round(MAX_PK / dm()); j < cand.length && n < maxPk; j++) {
       var m = allMarkers[cand[j][3]], big = bigSign(m), label = labelOf(m), full = m.road + '·' + K.formatKm(m.km);
       var wantName = !big && z >= 11 && (!named[m.road] || z >= 14 || (z >= 12.5 && m.km % 10 === 0));
       if (wantName && place(m, full, false)) label = full;
@@ -1602,6 +1602,7 @@
   // ---------- Apariencia: tamaño de las cajas, tamaño de letra y color de la app (los 8 de los favoritos) ----------
   var LOOK_SIZES = [['s', 'Pequeño', 0.9], ['m', 'Normal', 1], ['l', 'Grande', 1.15]];
   var FONT_SIZES = [['s', 'Pequeña', 0.9], ['m', 'Normal', 1], ['l', 'Grande', 1.15], ['xl', 'Muy grande', 1.3]];
+  var DENS = [['h', 'Alta', 1], ['m', 'Media', 1.8], ['l', 'Baja', 2.8]];
   var look = S.readJSON('look', {});
   if (!look || typeof look !== 'object') look = {};
   function lookVal(list, k) { return (list.filter(function (x) { return x[0] === k; })[0] || list[1])[2]; }
@@ -1620,16 +1621,22 @@
     syncTop();
     fitRoad();
     renderLook();
+    if (densReady && densSeen !== look.dens) { densSeen = look.dens; redrawData(); }
   }
+  // Cantidad de datos en pantalla: cuánto se separan los PK y los iconos (alta = como siempre; media y baja despejan el mapa)
+  var densReady = false, densSeen = look.dens;
+  function dm() { return lookVal(DENS, look.dens || 'h'); }
+  function redrawData() { renderMarkers(); renderCams(); renderLive(); renderAgua(); renderHot(); renderWind(); }
   function segs(box, list, key) {
     clear(box);
     list.forEach(function (x) {
-      var on = (look[key] || 'm') === x[0];
+      var on = (look[key] || (key === 'dens' ? 'h' : 'm')) === x[0];
       box.appendChild(el('button', { type: 'button', class: 'segbtn' + (on ? ' on' : ''), role: 'radio', 'aria-checked': on ? 'true' : 'false', text: x[1],
         onclick: function () { look[key] = x[0]; S.writeJSON('look', look); applyLook(); } }));
     });
   }
   function renderLook() {
+    segs($('lookDens'), DENS, 'dens');
     segs($('lookBox'), LOOK_SIZES, 'box');
     segs($('lookFont'), FONT_SIZES, 'font');
     var box = $('lookColor');
@@ -1649,7 +1656,8 @@
   // (el mismo que los parajes): solo las provincias con parajes descargados tienen cámaras, avisos e incendios.
   var layerOn = S.readJSON('capas', null);
   if (!layerOn || typeof layerOn !== 'object') layerOn = { cam: true, avi: true, inc: true, zon: true }; // con Premium, todo activado hasta que lo apagues
-  function lyrOn(k) { return isPremium() && layerOn[k] !== false; }
+  var OFF_DEFAULT = { vie: true }; // el viento hace consultas a internet al mover el mapa: empieza apagado
+  function lyrOn(k) { return isPremium() && (OFF_DEFAULT[k] ? layerOn[k] === true : layerOn[k] !== false); }
   function pkgProvs() { return selected.filter(function (c) { return parajesOn.indexOf(c) >= 0; }); }
   function provName(c) { return provByCode[c] ? provByCode[c].name : c; }
   function openLink(url) {
@@ -1716,7 +1724,7 @@
     vis.sort(function (x, y) { return K.distance([ctr.lat, ctr.lng], [x.lat, x.lon]) - K.distance([ctr.lat, ctr.lng], [y.lat, y.lon]); });
     var grid = {}, n = 0;
     for (var i = 0; i < vis.length && n < 400; i++) {
-      var c = vis[i], pt = map.latLngToContainerPoint([c.lat, c.lon]), k = Math.floor(pt.x / 32) + ':' + Math.floor(pt.y / 32);
+      var c = vis[i], pt = map.latLngToContainerPoint([c.lat, c.lon]), k = Math.floor(pt.x / (32 * dm())) + ':' + Math.floor(pt.y / (32 * dm()));
       if (grid[k]) continue;
       grid[k] = 1;
       addCamMarker(c);
@@ -1739,8 +1747,13 @@
     ]);
   }
 
-  // --- Incendios activos: focos de calor de hoy (EFFIS, Copernicus), solo sobre las provincias con paquete ---
-  var fireLayer = null;
+  // --- Incendios activos: focos de calor de las últimas 24 h detectados por satélite (NASA FIRMS: VIIRS y MODIS), solo sobre las provincias con paquete ---
+  // En la app Android se leen directamente de la NASA; en la web, de una copia que se actualiza sola cada pocos minutos. Si falla, se usa el mapa de EFFIS (Copernicus).
+  var fireLayer = null, hotLayer = L.layerGroup().addTo(map);
+  var FIRMS_BASE = 'https://firms.modaps.eosdis.nasa.gov/data/active_fire/';
+  var FIRMS_URLS = [FIRMS_BASE + 'noaa-20-viirs-c2/csv/J1_VIIRS_C2_Europe_24h.csv', FIRMS_BASE + 'suomi-npp-viirs-c2/csv/SUOMI_VIIRS_C2_Europe_24h.csv', FIRMS_BASE + 'modis-c6.1/csv/MODIS_C6_1_Europe_24h.csv'];
+  var FIRMS_WEB = 'https://raw.githubusercontent.com/Cilantro-Corporation/SOSpk/live/firms.csv';
+  var hot = [], hotState = 'idle', hotAt = 0;
   function pkgBounds() {
     var b = null;
     pkgProvs().forEach(function (c) {
@@ -1751,14 +1764,129 @@
     });
     return b;
   }
+  function loadHot(force) {
+    if (!lyrOn('inc')) { hotState = 'idle'; return; }
+    if (!force && hotState === 'ok' && Date.now() - hotAt < 240000) return;
+    if (hotState === 'loading') return;
+    hotState = 'loading';
+    var direct = IS_NATIVE || /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+    Promise.all((direct ? FIRMS_URLS : [FIRMS_WEB]).map(function (u) { return liveFetch(u); })).then(function (parts) {
+      hot = K.parseFirms(parts.join('\n'), Date.now());
+      hotState = 'ok'; hotAt = Date.now();
+      applyFire(); renderLayers();
+    }).catch(function () { hotState = 'error'; applyFire(); renderLayers(); });
+  }
+  function mineHot() {
+    var mine = pkgProvs();
+    if (!mine.length || !borders) return [];
+    return hot.filter(function (h) {
+      if (h.pc === undefined) h.pc = borders.provinceAt(h.lat, h.lon) || null;
+      return h.pc && mine.indexOf(h.pc) >= 0;
+    });
+  }
   function applyFire() {
     if (fireLayer) { map.removeLayer(fireLayer); fireLayer = null; }
+    hotLayer.clearLayers();
     if (!lyrOn('inc')) return;
     var b = pkgBounds();
     if (!b) return;
-    fireLayer = L.tileLayer.wms('https://maps.effis.emergency.copernicus.eu/gwis?', { layers: 'all.hs.today', format: 'image/png', transparent: true, version: '1.1.1',
-      bounds: b.pad(0.05), opacity: 0.95, zIndex: 320, attribution: 'Incendios: EFFIS (Copernicus)' }).addTo(map);
+    if (hotState === 'idle') { loadHot(false); return; }
+    if (hotState === 'loading') return;
+    if (hotState === 'error') {
+      fireLayer = L.tileLayer.wms('https://maps.effis.emergency.copernicus.eu/gwis?', { layers: 'all.hs.today', format: 'image/png', transparent: true, version: '1.1.1',
+        bounds: b.pad(0.05), opacity: 0.95, zIndex: 320, attribution: 'Incendios: EFFIS (Copernicus)' }).addTo(map);
+      return;
+    }
+    renderHot();
   }
+  function renderHot() {
+    hotLayer.clearLayers();
+    if (!lyrOn('inc') || hotState !== 'ok') return;
+    var bnd = map.getBounds().pad(0.1), grid = {}, n = 0, z = map.getZoom();
+    mineHot().filter(function (h) { return bnd.contains([h.lat, h.lon]); }).sort(function (x, y) { return y.frp - x.frp; }).forEach(function (h) {
+      if (n >= 600) return;
+      var pt = map.latLngToContainerPoint([h.lat, h.lon]), cell = (z < 9 ? 22 : 12) * dm(), k = Math.floor(pt.x / cell) + ':' + Math.floor(pt.y / cell);
+      if (grid[k]) return;
+      grid[k] = 1; n++;
+      var age = Date.now() - h.t, cls = age < 10800000 ? 0 : age < 43200000 ? 1 : 2;
+      var pin = el('span', { class: 'hotpin hp' + cls, text: '🔥', title: 'Foco de calor ' + ago(h.t) });
+      L.marker([h.lat, h.lon], { icon: L.divIcon({ className: 'pk-icon', html: pin, iconSize: null }), keyboard: false, zIndexOffset: 700 + Math.round(h.frp) })
+        .on('click', function () { openHot(h, cls); }).addTo(hotLayer);
+    });
+  }
+  function openHot(h, cls) {
+    var COL = ['#FF4B3E', '#FF9F1C', '#F2D600'];
+    var show = function (w) {
+      openItems('Foco de calor', [{ badge: '🔥', col: COL[cls], title: 'Foco de calor · satélite ' + h.sat, lat: h.lat, lon: h.lon,
+        lines: ['Detectado ' + ago(h.t), h.frp ? 'Potencia radiativa: ' + h.frp.toFixed(1).replace('.', ',') + ' MW' : '', w ? 'Viento: ' + windText(w) : '', fmtLL(h.lat, h.lon)] }],
+        'Fuente: NASA FIRMS (VIIRS/MODIS). Es un punto de calor visto desde el espacio, no el perímetro ni la confirmación de un incendio: puede ser una quema controlada o un error. SOSpk no es un servicio oficial ni llama a emergencias.');
+    };
+    windAt(h.lat, h.lon).then(show, function () { show(null); });
+  }
+  setInterval(function () { if (document.visibilityState === 'visible' && lyrOn('inc')) loadHot(true); }, 300000);
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && lyrOn('inc')) loadHot(false); });
+  map.on('moveend', renderHot);
+
+  // --- Viento (Open-Meteo): flechas hacia donde sopla, con la velocidad en km/h ---
+  var WIND_URL = 'https://api.open-meteo.com/v1/forecast?current=wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=kmh&timezone=UTC';
+  var windCache = {}, windState = 'idle', windTimer = 0, windLayer = L.layerGroup().addTo(map);
+  var COMPASS = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSO', 'SO', 'OSO', 'O', 'ONO', 'NO', 'NNO'];
+  function windText(w) { return Math.round(w.v) + ' km/h del ' + COMPASS[Math.round(w.dir / 22.5) % 16] + (w.g > w.v + 5 ? ' (rachas de ' + Math.round(w.g) + ')' : ''); }
+  function windSnap(x) { return Math.round(x * 10) / 10; }
+  function windParse(c) {
+    var v = c && +c.wind_speed_10m, d = c && +c.wind_direction_10m, g = c && +c.wind_gusts_10m;
+    return isFinite(v) && isFinite(d) && v >= 0 && v < 400 ? { v: v, dir: ((d % 360) + 360) % 360, g: isFinite(g) ? g : v, t: Date.now() } : null;
+  }
+  function windFetch(pts) { // [[lat, lon], ...] ya ajustados a la rejilla; guarda en la caché
+    var q = WIND_URL + '&latitude=' + pts.map(function (p) { return p[0]; }).join(',') + '&longitude=' + pts.map(function (p) { return p[1]; }).join(',');
+    return fetch(q, { credentials: 'omit' }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function (j) {
+      var rows = Array.isArray(j) ? j : [j];
+      pts.forEach(function (p, i) { var w = rows[i] && windParse(rows[i].current); if (w) windCache[p[0] + ',' + p[1]] = w; });
+    });
+  }
+  function windAt(lat, lon) {
+    var p = [windSnap(lat), windSnap(lon)], k = p[0] + ',' + p[1], c = windCache[k];
+    if (c && Date.now() - c.t < 900000) return Promise.resolve(c);
+    return windFetch([p]).then(function () { if (!windCache[k]) throw new Error('sin datos'); return windCache[k]; });
+  }
+  function windKeys() {
+    var size = map.getSize(), cell = 120 * dm(), pts = [], seen = {}, mine = pkgProvs();
+    if (!borders || !mine.length) return pts;
+    for (var x = cell / 2; x < size.x; x += cell) for (var y = cell / 2 + 70; y < size.y - 40; y += cell) {
+      var ll = map.containerPointToLatLng([x, y]), p = [windSnap(ll.lat), windSnap(ll.lng)], k = p[0] + ',' + p[1], pc = borders.provinceAt(p[0], p[1]);
+      if (seen[k] || !pc || mine.indexOf(pc) < 0) continue;
+      seen[k] = 1; pts.push(p);
+    }
+    return pts.slice(0, 60);
+  }
+  function renderWind() {
+    clearTimeout(windTimer);
+    windLayer.clearLayers();
+    if (!lyrOn('vie')) { windState = 'idle'; return; }
+    windTimer = setTimeout(drawWind, 500);
+  }
+  function drawWind() {
+    windLayer.clearLayers();
+    if (!lyrOn('vie')) return;
+    if (map.getZoom() < 7) return;
+    var pts = windKeys(), need = pts.filter(function (p) { var c = windCache[p[0] + ',' + p[1]]; return !c || Date.now() - c.t > 900000; });
+    var paint = function () {
+      windLayer.clearLayers();
+      windKeys().forEach(function (p) {
+        var w = windCache[p[0] + ',' + p[1]];
+        if (!w) return;
+        var pin = el('span', { class: 'windpin' + (w.v >= 40 ? ' hi' : w.v >= 20 ? ' mid' : ''), title: 'Viento ' + windText(w) }, [el('span', { class: 'wp-a', text: '➤' }), el('span', { class: 'wp-v', text: String(Math.round(w.v)) })]);
+        pin.firstChild.style.transform = 'rotate(' + Math.round(w.dir + 90) + 'deg)'; // la flecha ➤ apunta al este: hacia donde sopla = dirección + 180°
+        L.marker(p, { icon: L.divIcon({ className: 'pk-icon', html: pin, iconSize: null }), keyboard: false, zIndexOffset: 200 })
+          .on('click', function () { toast('Viento ' + windText(w), 4000); }).addTo(windLayer);
+      });
+    };
+    paint();
+    if (!need.length) { if (windState !== 'ok') { windState = 'ok'; renderLayers(); } return; }
+    windFetch(need).then(function () { windState = 'ok'; paint(); renderLayers(); }).catch(function () { windState = 'error'; renderLayers(); });
+  }
+  map.on('moveend', renderWind);
+  setInterval(function () { if (document.visibilityState === 'visible' && lyrOn('vie')) drawWind(); }, 900000);
 
   // --- Avisos meteorológicos vigentes (AEMET vía Meteoalarm): icono de alerta con el tipo y el enlace a la fuente ---
   var AVISOS_URL = 'https://feeds.meteoalarm.org/feeds/meteoalarm-legacy-atom-spain';
@@ -1925,7 +2053,7 @@
       if (n >= 500) return;
       if (s.kind !== 'v16' && s.kind !== 'acc') {
         if (z < 8) return;
-        var pt = map.latLngToContainerPoint([s.lat, s.lon]), k = Math.floor(pt.x / 30) + ':' + Math.floor(pt.y / 30);
+        var pt = map.latLngToContainerPoint([s.lat, s.lon]), k = Math.floor(pt.x / (30 * dm())) + ':' + Math.floor(pt.y / (30 * dm()));
         if (grid[k]) return;
         grid[k] = 1;
       }
@@ -2027,7 +2155,7 @@
     vis.sort(function (x, y) { return K.distance([ctr.lat, ctr.lng], [x.lat, x.lon]) - K.distance([ctr.lat, ctr.lng], [y.lat, y.lon]); });
     var grid = {}, n = 0;
     for (var i = 0; i < vis.length && n < 500; i++) {
-      var a = vis[i], pt = map.latLngToContainerPoint([a.lat, a.lon]), k = Math.floor(pt.x / 24) + ':' + Math.floor(pt.y / 24);
+      var a = vis[i], pt = map.latLngToContainerPoint([a.lat, a.lon]), k = Math.floor(pt.x / (24 * dm())) + ':' + Math.floor(pt.y / (24 * dm()));
       if (grid[k]) continue;
       grid[k] = 1; n++;
       addAguaMarker(a);
@@ -2189,26 +2317,27 @@
   });
 
   // --- Panel «Capas» ---
-  var LAYERS = [['cam', '📷', 'Cámaras de tráfico'], ['v16', '🆘', 'Balizas V16 activas'], ['trf', '🚧', 'Accidentes, cortes y obras'], ['avi', '⛈️', 'Avisos meteorológicos'], ['inc', '🔥', 'Incendios activos'],
+  var LAYERS = [['cam', '📷', 'Cámaras de tráfico'], ['v16', '🆘', 'Balizas V16 activas'], ['trf', '🚧', 'Accidentes, cortes y obras'], ['avi', '⛈️', 'Avisos meteorológicos'], ['inc', '🔥', 'Incendios activos'], ['vie', '🌬️', 'Viento'],
     ['eva', '🚨', 'Vehículos de emergencia aproximándose'], ['vac', '🚛', 'Grúas de auxilio en carretera'], ['agu', '💧', 'Hidrantes y puntos de agua'], ['zon', '⬡', 'Sectores']];
   function layerNote(k) {
     if (k === 'zon') return layerOn.zon === false ? 'Ocultos' : readZonas().length + (readZonas().length === 1 ? ' sector' : ' sectores');
     if ((k === 'eva' || k === 'vac') && !RELAY) return 'Pendiente de acceso a DGT 3.0';
     if (!pkgProvs().length) return 'Descarga una provincia';
-    if (layerOn[k] === false) return 'Apagada';
+    if (!lyrOn(k)) return 'Apagada';
     if (k === 'cam') return allCams().length + ' cámaras';
     if (k === 'eva' || k === 'vac') return dgt30.state === 'error' ? 'Sin conexión' : dgt30.state === 'ok' ? myDgt30(k).length + ' ahora' : '';
     if (k === 'agu') return allAgua().length.toLocaleString('es-ES') + ' puntos';
     if (k === 'v16' || k === 'trf') return sitState === 'error' ? 'Sin conexión' : sitState === 'loading' ? 'Consultando…' : sitState === 'ok' ? (k === 'v16' ? mySits('v16').length + ' activas' : mySits().length + ' incidencias') : '';
     if (k === 'avi') return avisosState === 'error' ? 'Sin conexión' : avisosState === 'loading' ? 'Consultando…' : avisosState === 'ok' ? (myAvisos().length ? myAvisos().length + ' vigentes' : 'Sin avisos vigentes') : '';
-    return 'Focos de hoy';
+    if (k === 'vie') return windState === 'error' ? 'Sin conexión' : 'Flechas de viento';
+    return hotState === 'ok' ? mineHot().length + ' focos de hoy' : hotState === 'error' ? 'Mapa de EFFIS' : hotState === 'loading' ? 'Consultando…' : 'Focos de hoy';
   }
   function renderLayers() {
     var box = $('layersList');
     if (!box) return;
     clear(box);
     LAYERS.forEach(function (l) {
-      var prem = isPremium(), on = prem && layerOn[l[0]] !== false;
+      var prem = isPremium(), on = prem && lyrOn(l[0]);
       box.appendChild(el('button', { type: 'button', class: 'lyr' + (prem ? (on ? ' on' : '') : ' lock'), 'aria-label': l[2] + (prem ? (on ? ' (activada)' : ' (apagada)') : ' (Premium)'),
         onclick: function () { toggleLayer(l[0], l[2]); } }, [
         el('span', { class: 'lyr-i', text: l[1] }), el('span', { class: 'lyr-t', text: l[2] }),
@@ -2227,8 +2356,8 @@
   function toggleLayer(k, title) {
     if (!isPremium()) { showPremium(title + ' es una función Premium.'); return; }
     if ((k === 'eva' || k === 'vac') && !RELAY) { toast('Esta capa estará disponible cuando la DGT conceda el acceso a sus datos (DGT 3.0)', 4500); return; }
-    if (k !== 'zon' && !pkgProvs().length && layerOn[k] === false) toast('Descarga una provincia en Configuración para ver esta capa');
-    layerOn[k] = layerOn[k] === false;
+    if (k !== 'zon' && !pkgProvs().length && !lyrOn(k)) toast('Descarga una provincia en Configuración para ver esta capa');
+    layerOn[k] = !lyrOn(k);
     S.writeJSON('capas', layerOn);
     applyLayers();
     renderLayers();
@@ -2242,6 +2371,7 @@
     loadSits(false);
     renderLive();
     renderAgua();
+    renderWind();
     loadDgt30(false);
     renderDgt30();
   }
@@ -2250,6 +2380,7 @@
   renderZonas();
   loadCamMeta().then(function () { renderSettingsList(); });
   applyLayers();
+  densReady = true;
 
   // ---------- Mapas sin conexión (app Android): el fondo del mapa de tus provincias guardado en el móvil ----------
   // Las teselas del IGN se guardan en el almacén del dispositivo; el mapa las usa primero y solo pide a internet las que faltan.

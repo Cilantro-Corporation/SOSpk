@@ -178,6 +178,28 @@
     newRoadworksLayout: 'Nueva disposición por obras', weightRestrictionInOperation: 'Restricción de peso', infrastructureDamage: 'Daños en la vía' };
   var SIT_CUTS = /^(roadClosed|carriagewayClosures|intermittentShortTermClosures)$/;
   var SIT_OBS = /^(vehicleObstruction|obstruction|environmentalObstruction|infrastructureDamageObstruction)$/;
+  // Focos de calor de satélite (NASA FIRMS: VIIRS y MODIS, últimas 24 h). El texto puede traer varios CSV seguidos, cada uno con su cabecera.
+  function parseFirms(text, now) {
+    var out = {}, cols = null, lines = String(text || '').split(/\r?\n/);
+    for (var i = 0; i < lines.length && i < 60000; i++) {
+      var ln = lines[i];
+      if (ln.slice(0, 8) === 'latitude') { cols = {}; ln.split(',').forEach(function (h, k) { cols[h.trim()] = k; }); continue; }
+      if (!cols || !ln) continue;
+      var f = ln.split(','), lat = +f[cols.latitude], lon = +f[cols.longitude];
+      if (!isFinite(lat) || !isFinite(lon) || lat < 27.4 || lat > 43.95 || lon < -18.5 || lon > 4.6) continue;
+      var d = /^(\d{4})-(\d{2})-(\d{2})$/.exec(f[cols.acq_date] || ''), hm = ('0000' + (f[cols.acq_time] || '')).slice(-4);
+      if (!d) continue;
+      var t = Date.UTC(+d[1], +d[2] - 1, +d[3], +hm.slice(0, 2), +hm.slice(2));
+      if (!isFinite(t) || now - t > 86400000 || t - now > 3600000) continue;
+      var conf = String(f[cols.confidence] || '').toLowerCase(), viirs = cols.bright_ti4 !== undefined;
+      if (viirs ? conf === 'l' || conf === 'low' : !(+conf >= 30)) continue;
+      var key = Math.round(lat * 300) + ':' + Math.round(lon * 300);
+      var fr = +f[cols.frp];
+      if (out[key] && out[key].t >= t) continue;
+      out[key] = { lat: lat, lon: lon, t: t, sat: viirs ? 'VIIRS' : 'MODIS', frp: isFinite(fr) ? fr : 0 };
+    }
+    return Object.keys(out).map(function (k) { return out[k]; }).sort(function (a, b) { return b.t - a.t; }).slice(0, 6000);
+  }
   function parseSituations(xml, now) {
     var out = [], seen = {};
     var recs = String(xml).split('<sit:situationRecord ').slice(1);
@@ -747,6 +769,7 @@
     parseAvisos: parseAvisos,
     zoneProvince: zoneProvince,
     parseSituations: parseSituations,
+    parseFirms: parseFirms,
     validAgua: validAgua,
     aguaEntries: aguaEntries,
   };

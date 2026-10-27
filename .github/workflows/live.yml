@@ -1,4 +1,4 @@
-# Copia los datos en directo (incidencias y balizas V16 de la DGT, avisos de Meteoalarm) a la rama «live»
+# Copia los datos en directo (incidencias y balizas V16 de la DGT, avisos de Meteoalarm, focos de calor de la NASA) a la rama «live»
 # cada pocos minutos para que la web los pueda leer (esos servicios no admiten lecturas desde páginas web).
 # La app Android los lee directamente y no depende de esto.
 name: Datos en directo
@@ -21,12 +21,17 @@ jobs:
           mkdir out prev
           curl -sf --compressed --max-time 60 -o out/situation.xml https://nap.dgt.es/datex2/v3/dgt/SituationPublication/datex2_v37.xml || rm -f out/situation.xml
           curl -sf --compressed --max-time 60 -o out/avisos.xml https://feeds.meteoalarm.org/feeds/meteoalarm-legacy-atom-spain || rm -f out/avisos.xml
+          F=https://firms.modaps.eosdis.nasa.gov/data/active_fire
+          for u in $F/noaa-20-viirs-c2/csv/J1_VIIRS_C2_Europe_24h.csv $F/suomi-npp-viirs-c2/csv/SUOMI_VIIRS_C2_Europe_24h.csv $F/modis-c6.1/csv/MODIS_C6_1_Europe_24h.csv; do
+            curl -sf --max-time 60 "$u" >> out/firms.csv; echo >> out/firms.csv
+          done || true
+          if [ -f out/firms.csv ] && ! grep -q "^latitude" out/firms.csv; then rm -f out/firms.csv; fi
           if [ -f out/situation.xml ] && ! grep -q "situationRecord" out/situation.xml; then rm -f out/situation.xml; fi
           if [ -f out/avisos.xml ] && ! grep -q "<entry>" out/avisos.xml; then rm -f out/avisos.xml; fi
       - name: Completar con lo anterior si alguno falló
         run: |
           git clone -q --depth 1 --branch live "https://github.com/${{ github.repository }}.git" prev || true
-          for f in situation.xml avisos.xml; do
+          for f in situation.xml avisos.xml firms.csv; do
             if [ ! -f "out/$f" ] && [ -f "prev/$f" ]; then cp "prev/$f" "out/$f"; fi
           done
           ls out | grep -q . || { echo "sin datos"; exit 1; }
