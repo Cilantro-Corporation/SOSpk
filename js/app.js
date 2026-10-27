@@ -1598,6 +1598,10 @@
   applyPremiumUi();
   // En el APK el enlace de descarga no existe (lo quita tools/prepare-android.mjs)
   if ($('apkLink')) $('apkLink').hidden = IS_NATIVE || IS_IOS;
+  // iPhone/iPad: la web se instala desde Safari (Compartir → Añadir a pantalla de inicio); se avisa una sola vez
+  var iosStandalone = window.navigator.standalone === true || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+  if ($('iosHint')) $('iosHint').hidden = !IS_IOS || iosStandalone;
+  if (IS_IOS && !iosStandalone && !S.readJSON('iosTip', false)) setTimeout(function () { S.writeJSON('iosTip', true); toast('Instálala: toca Compartir y «Añadir a pantalla de inicio»', 7000); }, 5000);
 
   // ---------- Apariencia: tamaño de las cajas, tamaño de letra y color de la app (los 8 de los favoritos) ----------
   var LOOK_SIZES = [['s', 'Pequeño', 0.9], ['m', 'Normal', 1], ['l', 'Grande', 1.15]];
