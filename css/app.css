@@ -375,7 +375,7 @@ button svg, .act svg, .icon-btn svg { width: 22px; height: 22px; fill: currentCo
 .prov-inc { padding: 4px 2px 9px 34px; border-bottom: 1px solid var(--line); margin-top: -1px; font-size: 12px; color: var(--muted); }
 .prov-inc small { display: block; font-size: 11px; margin-top: 2px; }
 .prov-inc.on { color: var(--lime); }
-.alertchip { position: fixed; left: 50%; transform: translateX(-50%); top: calc(var(--safe-t) + 124px); z-index: 480; display: flex; align-items: center; gap: 8px; max-width: calc(100vw - 24px); padding: 7px 12px; border: 2px solid var(--al, #888); border-radius: 20px; background: #0B0B0B; color: #fff; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.5); }
+.alertchip { position: static; display: flex; align-items: center; gap: 8px; max-width: calc(100vw - 24px); padding: 7px 12px; border: 2px solid var(--al, #888); border-radius: 20px; background: #0B0B0B; color: #fff; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.5); }
 .alertchip[hidden] { display: none; }
 .alertchip.off { border-color: #666; color: #bbb; }
 .al-t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -439,3 +439,30 @@ body.drawing .sheet { display: none; }
 .fe-thumb[hidden], .fe-pic .pp-b[hidden] { display: none; }
 .fe-file { display: none; }
 .fe-name.lock { filter: grayscale(1); }
+
+.chips { position: fixed; left: 50%; transform: translateX(-50%); top: calc(var(--safe-t) + 124px); z-index: 480; display: flex; flex-direction: column; align-items: center; gap: 6px; max-width: calc(100vw - 24px); pointer-events: none; }
+.chips .alertchip { pointer-events: auto; }
+.alertchip.v16 { --al: #FFB000; }
+.livepin { display: grid; place-items: center; min-width: 26px; height: 26px; margin: -13px 0 0 -13px; padding: 0 4px; border-radius: 50%; background: #0B0B0B; border: 2px solid var(--lime); font-size: 14px; line-height: 1; box-sizing: border-box; }
+.livepin.lp-v16 { background: #FFB000; border-color: #0B0B0B; color: #0B0B0B; font-family: var(--head); font-weight: 700; font-size: 11px; min-width: 32px; border-radius: 14px; animation: v16blink 1s ease-in-out infinite; box-shadow: 0 0 0 2px #FFB000; }
+@keyframes v16blink { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+@media (prefers-reduced-motion: reduce) { .livepin.lp-v16 { animation: none; } }
+.aguapin { display: grid; place-items: center; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; background: #0B0B0B; border: 2px solid #2F6BFF; font-size: 12px; line-height: 1; box-sizing: border-box; }
+.live-acts { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+.live-acts .pp-b { text-decoration: none; display: inline-grid; place-items: center; }
+.lyr-sub { display: flex; gap: 6px; flex-wrap: wrap; margin: 4px 0 2px 32px; }
+.subchip { border: 1px solid var(--line); border-radius: 999px; background: var(--panel); color: var(--muted); font-size: 12px; padding: 4px 10px; }
+.subchip.on { color: #0B0B0B; background: var(--lime); border-color: var(--lime); }
+.lg-v16 { background: #FFB000; color: #0B0B0B; font-family: var(--head); font-weight: 700; font-size: 11px; padding: 2px 6px; border-radius: 12px; }
+
+.map-row .pp-s { margin-left: auto; }
+.pp-b.ask { color: #FF4B3E; }
+#mapasBody .segs { margin: 6px 0; align-self: flex-start; }
+.layers-pop { z-index: 600; max-height: calc(100vh - var(--top-h, 120px) - 40px); overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--lime) var(--panel); }
+.lyr-sub { margin-left: 8px; }
+.lyr { min-height: 36px; }
+.livepin.lp-eva { background: #FF4B3E; animation: v16blink .7s ease-in-out infinite; }
+.livepin.lp-vac { background: #FFB000; border-color: #0B0B0B; }
+@media (prefers-reduced-motion: reduce) { .livepin.lp-eva { animation: none; } }
+/* Avisos y balizas V16: justo bajo la tarjeta de arriba (o en el borde superior si la tarjeta está abajo) */
+.chips { top: calc(var(--top-h, 0px) + 6px); }

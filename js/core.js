@@ -168,6 +168,69 @@
     return (m2 < 1e7 ? Math.round(m2 / 1e4) / 100 : Math.round(m2 / 1e5) / 10).toString().replace('.', ',') + ' km²';
   }
 
+  // ---------- Incidencias de tráfico y balizas V16 (DGT, Punto de Acceso Nacional) ----------
+  // Feed DATEX II de situaciones. Cada «situationRecord» activo se reduce a un punto: { id, kind, sub, lat, lon, pts, road, km, mun, prov, dir, start, end }
+  // kind: 'v16' baliza V16 conectada · 'acc' accidente · 'cor' corte · 'obs' obstáculo · 'obr' obras
+  var SIT_SUB = { vehicleStuck: 'Vehículo detenido', objectOnTheRoad: 'Objeto en la calzada', rockfalls: 'Desprendimiento', obstructionOnTheRoad: 'Obstáculo en la vía',
+    flooding: 'Inundación', avalanches: 'Alud', vehicleWithOverwideLoad: 'Carga ancha', spillageOnTheRoad: 'Vertido', vehicleOnFire: 'Vehículo en llamas',
+    accident: 'Accidente', roadworks: 'Obras', roadClosed: 'Carretera cortada', carriagewayClosures: 'Calzada cortada', intermittentShortTermClosures: 'Cortes intermitentes',
+    laneClosures: 'Carril cortado', narrowLanes: 'Carriles estrechos', singleAlternateLineTraffic: 'Tráfico alterno', lanesDeviated: 'Desvío de carriles',
+    newRoadworksLayout: 'Nueva disposición por obras', weightRestrictionInOperation: 'Restricción de peso', infrastructureDamage: 'Daños en la vía' };
+  var SIT_CUTS = /^(roadClosed|carriagewayClosures|intermittentShortTermClosures)$/;
+  var SIT_OBS = /^(vehicleObstruction|obstruction|environmentalObstruction|infrastructureDamageObstruction)$/;
+  function parseSituations(xml, now) {
+    var out = [], seen = {};
+    var recs = String(xml).split('<sit:situationRecord ').slice(1);
+    for (var r = 0; r < recs.length && out.length < 5000; r++) {
+      var e = recs[r], end = e.indexOf('</sit:situationRecord>');
+      if (end > 0) e = e.slice(0, end);
+      var g = function (re) { var m = re.exec(e); return m ? unxml(m[1].trim()) : ''; };
+      if (!/validityStatus>active</.test(e)) continue;
+      var start = Date.parse(g(/<com:overallStartTime>([^<]+)</)), stop = Date.parse(g(/<com:overallEndTime>([^<]+)</));
+      if (isFinite(start) && now < start - 60000) continue;
+      if (isFinite(stop) && now > stop) continue;
+      var ref = g(/<sit:situationRecordCreationReference>([^<]+)</), cause = g(/<sit:causeType>([^<]+)</), mgmt = g(/<sit:roadOrCarriagewayOrLaneManagementType>([^<]+)</);
+      var detail = g(/<sit:detailedCauseType>\s*<sit:\w+Type>([^<]+)</), kind = null;
+      if (/^V16_/.test(ref)) kind = 'v16';
+      else if (cause === 'accident' || /accidentType>/.test(e)) kind = 'acc';
+      else if (SIT_CUTS.test(mgmt)) kind = 'cor';
+      else if (SIT_OBS.test(cause)) kind = 'obs';
+      else if (cause === 'roadMaintenance') kind = 'obr';
+      if (!kind) continue;
+      var pts = [], re = /<loc:latitude>([\d.\-]+)<\/loc:latitude>\s*<loc:longitude>([\d.\-]+)<\/loc:longitude>/g, m;
+      while ((m = re.exec(e)) && pts.length < 4) {
+        var la = +m[1], lo = +m[2];
+        if (isFinite(la) && isFinite(lo) && Math.abs(la) <= 90 && Math.abs(lo) <= 180) pts.push([la, lo]);
+      }
+      if (!pts.length) continue;
+      var id = g(/^[^>]*\bid="(\d+)"/) || ref, km = parseFloat(g(/<lse:kilometerPoint>([^<]+)</));
+      if (seen[id]) continue;
+      seen[id] = 1;
+      var sub = kind === 'v16' ? 'Baliza V16 activa' : kind === 'cor' ? (SIT_SUB[mgmt] || 'Corte') + (detail === 'roadworks' ? ' por obras' : '')
+        : kind === 'obr' ? 'Obras' + (SIT_SUB[mgmt] && mgmt !== 'other' ? ' · ' + SIT_SUB[mgmt].toLowerCase() : '') : SIT_SUB[detail] || SIT_SUB[cause] || 'Incidencia';
+      var mid = pts.length > 1 ? [(pts[0][0] + pts[pts.length - 1][0]) / 2, (pts[0][1] + pts[pts.length - 1][1]) / 2] : pts[0];
+      out.push({ id: id, kind: kind, sub: sub, lat: mid[0], lon: mid[1], pts: pts, road: g(/<loc:roadName>([^<]+)</), km: isFinite(km) ? km : null,
+        mun: g(/<lse:municipality>([^<]+)</), prov: g(/<lse:province>([^<]+)</), dir: g(/<loc:tpegDirection>([^<]+)</),
+        start: isFinite(start) ? start : null, end: isFinite(stop) ? stop : null });
+    }
+    return out;
+  }
+
+  // ---------- Puntos de agua para emergencias (hidrantes, balsas…): datos de OpenStreetMap por provincia ----------
+  // { v, code, r: [[lat·1e5, lon·1e5, tipo, nombre], ...] }   tipo: 0 hidrante · 1 toma de aspiración · 2 depósito · 3 charca contraincendios · 4 balsa o embalse pequeño
+  function validAgua(d, code) {
+    if (!d || typeof d !== 'object' || d.code !== code || !/^\d{8,12}$/.test(String(d.v)) || !Array.isArray(d.r) || d.r.length > 60000) return false;
+    for (var i = 0; i < d.r.length; i++) {
+      var x = d.r[i];
+      if (!Array.isArray(x) || !isFinite(x[0]) || !isFinite(x[1]) || Math.abs(x[0]) > 9000000 || Math.abs(x[1]) > 18000000 || !(x[2] >= 0 && x[2] < 8) ||
+        (x[3] !== undefined && (typeof x[3] !== 'string' || x[3].length > 80))) return false;
+    }
+    return true;
+  }
+  function aguaEntries(d) {
+    return d.r.map(function (x) { return { lat: x[0] / 1e5, lon: x[1] / 1e5, t: x[2], n: x[3] || '', prov: d.code }; });
+  }
+
   // ---------- Avisos meteorológicos vigentes (Meteoalarm / AEMET) ----------
   // Las zonas de aviso de España (EMMA_ID ES070-ES251) van en bloques consecutivos por provincia, en orden alfabético.
   // Las zonas costeras (ES840-ES890, «Costa - …») tienen la provincia de la zona terrestre del mismo nombre.
@@ -683,5 +746,8 @@
     formatArea: formatArea,
     parseAvisos: parseAvisos,
     zoneProvince: zoneProvince,
+    parseSituations: parseSituations,
+    validAgua: validAgua,
+    aguaEntries: aguaEntries,
   };
 })(typeof window !== 'undefined' ? window : globalThis);

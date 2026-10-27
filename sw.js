@@ -2,7 +2,7 @@
    Las provincias descargadas las guarda la propia app en la caché "kmes-provincias" (aquí no se tocan).
    Una versión nueva se instala y se activa sola; la app se recarga cuando es seguro (al volver a ella). */
 'use strict';
-var CACHE = 'kmes-app-v1.2.7';
+var CACHE = 'kmes-app-v1.2.8';
 var KEEP = [CACHE, 'kmes-provincias'];
 var SHELL = [
   './', 'index.html', 'manifest.webmanifest',
@@ -38,7 +38,7 @@ self.addEventListener('fetch', function (e) {
   if (req.method !== 'GET') return;
   var url = new URL(req.url);
   if (url.origin !== self.location.origin) return;        // teselas del mapa: caché normal del navegador
-  if (/\/data\/(prov|lugares|parajes|camaras)\/|\/data\/municipios\.json$/.test(url.pathname)) return; // provincias y topónimos: los gestiona la app
+  if (/\/data\/(prov|lugares|parajes|camaras|agua)\/|\/data\/municipios\.json$/.test(url.pathname)) return; // provincias y topónimos: los gestiona la app
   if (/\/version\.json$/.test(url.pathname)) return;       // comprobación de versión: siempre de la red
   // Índice, límites y versión de los topónimos: primero la red (datos nuevos al momento); sin conexión, la copia guardada
   if (/\/data\/(index|borders|lugares)\.json$/.test(url.pathname)) {

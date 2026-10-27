@@ -93,12 +93,12 @@
   function placesPath(kind, code) { return kind === 'municipios' ? 'data/municipios.json' : 'data/' + kind + '/' + code + '.json'; }
   function parsePlaces(text, kind, code) {
     var d = JSON.parse(text);
-    var ok = kind === 'municipios' ? root.KMCore.validMunicipios(d) : kind === 'camaras' ? root.KMCore.validCamaras(d, code) : root.KMCore.validPlaces(d, code);
+    var ok = kind === 'municipios' ? root.KMCore.validMunicipios(d) : kind === 'camaras' ? root.KMCore.validCamaras(d, code) : kind === 'agua' ? root.KMCore.validAgua(d, code) : root.KMCore.validPlaces(d, code);
     if (!ok) throw new Error('datos no válidos');
     return d;
   }
   function getPlaces(kind, code, version) {
-    if (!/^(municipios|lugares|parajes|camaras)$/.test(kind) || (kind !== 'municipios' && !/^[A-Z]{1,2}$/.test(code))) return Promise.reject(new Error('no válido'));
+    if (!/^(municipios|lugares|parajes|camaras|agua)$/.test(kind) || (kind !== 'municipios' && !/^[A-Z]{1,2}$/.test(code))) return Promise.reject(new Error('no válido'));
     var cached = null;
     var fromCache = !hasCache ? Promise.resolve(null) : caches.open(CACHE).then(function (c) { return c.match(placesKey(kind, code)); })
       .then(function (res) { return res ? res.text() : null; })

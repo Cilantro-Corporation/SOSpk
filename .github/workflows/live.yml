@@ -1,0 +1,41 @@
+# Copia los datos en directo (incidencias y balizas V16 de la DGT, avisos de Meteoalarm) a la rama «live»
+# cada pocos minutos para que la web los pueda leer (esos servicios no admiten lecturas desde páginas web).
+# La app Android los lee directamente y no depende de esto.
+name: Datos en directo
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: live
+  cancel-in-progress: true
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Descargar los datos
+        run: |
+          mkdir out prev
+          curl -sf --compressed --max-time 60 -o out/situation.xml https://nap.dgt.es/datex2/v3/dgt/SituationPublication/datex2_v37.xml || rm -f out/situation.xml
+          curl -sf --compressed --max-time 60 -o out/avisos.xml https://feeds.meteoalarm.org/feeds/meteoalarm-legacy-atom-spain || rm -f out/avisos.xml
+          if [ -f out/situation.xml ] && ! grep -q "situationRecord" out/situation.xml; then rm -f out/situation.xml; fi
+          if [ -f out/avisos.xml ] && ! grep -q "<entry>" out/avisos.xml; then rm -f out/avisos.xml; fi
+      - name: Completar con lo anterior si alguno falló
+        run: |
+          git clone -q --depth 1 --branch live "https://github.com/${{ github.repository }}.git" prev || true
+          for f in situation.xml avisos.xml; do
+            if [ ! -f "out/$f" ] && [ -f "prev/$f" ]; then cp "prev/$f" "out/$f"; fi
+          done
+          ls out | grep -q . || { echo "sin datos"; exit 1; }
+      - name: Publicar en la rama live
+        run: |
+          cd out
+          git init -q -b live
+          git config user.name "SOSpk datos"
+          git config user.email "datos@sospk.invalid"
+          git add -A
+          git commit -q -m "Datos en directo"
+          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" live

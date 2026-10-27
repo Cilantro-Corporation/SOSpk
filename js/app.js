@@ -104,6 +104,7 @@
     $('creditsPrem').hidden = !fw;
     $('optPkgRow').hidden = !fw;
     $('secSectores').hidden = !fw;
+    if (typeof mapOpt !== 'undefined' && mapOpt) renderMapasList();
     $('planName').textContent = isPremium() ? 'Premium' : 'Gratis';
     $('devRow').hidden = !devMode || TESTERS;
     $('testRow').hidden = !TESTERS;
@@ -136,10 +137,33 @@
   map.attributionControl.setPrefix(false); // sin la bandera ni «Leaflet»; se mantiene la atribución de los datos
   var WMTS = 'https://www.ign.es/wmts/{svc}?service=WMTS&request=GetTile&version=1.0.0&layer={layer}&style=default&tilematrixset=GoogleMapsCompatible&format={fmt}&tilematrix={z}&tilerow={y}&tilecol={x}';
   var ATTR = '© <a href="https://www.ign.es" target="_blank" rel="noopener noreferrer">IGN</a> · PK: IGN, CartoCiudad · trazado © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OSM</a>';
-  var baseMap = L.tileLayer(WMTS, { svc: 'ign-base', layer: 'IGNBaseTodo', fmt: 'image/png', maxNativeZoom: 17, maxZoom: 19, attribution: ATTR });
+  // Teselas: primero las guardadas en el móvil (mapas sin conexión); si no están, internet
+  var TILE_CACHE = 'kmes-tiles', hasTileCache = typeof caches !== 'undefined';
+  var tilesAny = (function () { var m = S.readJSON('mapas', null); return !!m && typeof m === 'object' && Object.keys(m).length > 0; })();
+  function tileBlobUrl(url) {
+    if (!tilesAny || !hasTileCache) return Promise.resolve(null);
+    return caches.open(TILE_CACHE).then(function (c) { return c.match(url); }).then(function (r) { return r ? r.blob() : null; })
+      .then(function (b) { return b ? URL.createObjectURL(b) : null; }).catch(function () { return null; });
+  }
+  var OfflineTiles = L.TileLayer.extend({
+    createTile: function (coords, done) {
+      var tile = document.createElement('img'), url = this.getTileUrl(coords);
+      L.DomEvent.on(tile, 'load', L.Util.bind(this._tileOnLoad, this, done, tile));
+      L.DomEvent.on(tile, 'error', L.Util.bind(this._tileOnError, this, done, tile));
+      tile.alt = '';
+      tile.setAttribute('role', 'presentation');
+      if (!tilesAny) { tile.src = url; return tile; }
+      tileBlobUrl(url).then(function (b) {
+        if (b) L.DomEvent.on(tile, 'load', function () { URL.revokeObjectURL(b); });
+        tile.src = b || url;
+      });
+      return tile;
+    },
+  });
+  var baseMap = new OfflineTiles(WMTS, { svc: 'ign-base', layer: 'IGNBaseTodo', fmt: 'image/png', maxNativeZoom: 17, maxZoom: 19, attribution: ATTR });
   var ortho = L.layerGroup([
-    L.tileLayer(WMTS, { svc: 'pnoa-ma', layer: 'OI.OrthoimageCoverage', fmt: 'image/jpeg', maxNativeZoom: 19, maxZoom: 19, attribution: ATTR + ' · PNOA' }),
-    L.tileLayer(WMTS, { svc: 'ign-base', layer: 'IGNBaseOrto', fmt: 'image/png', maxNativeZoom: 17, maxZoom: 19 }),
+    new OfflineTiles(WMTS, { svc: 'pnoa-ma', layer: 'OI.OrthoimageCoverage', fmt: 'image/jpeg', maxNativeZoom: 19, maxZoom: 19, attribution: ATTR + ' · PNOA' }),
+    new OfflineTiles(WMTS, { svc: 'ign-base', layer: 'IGNBaseOrto', fmt: 'image/png', maxNativeZoom: 17, maxZoom: 19 }),
   ]);
   var satellite = S.readJSON('sat', false) === true;
   function applyLayer() {
@@ -580,7 +604,7 @@
   var pkgAuto = S.readJSON('pkgauto', true) !== false;
   function autoPkgOn() { return framework() && isPremium() && pkgAuto; }
   function pkgSize(code) {
-    return (placesMeta && placesMeta.sizes[code] ? placesMeta.sizes[code][1] : 0) + (camMeta && camMeta.sizes[code] ? camMeta.sizes[code][1] : 0);
+    return (placesMeta && placesMeta.sizes[code] ? placesMeta.sizes[code][1] : 0) + (camMeta && camMeta.sizes[code] ? camMeta.sizes[code][1] : 0) + (aguaMeta && aguaMeta.sizes[code] ? aguaMeta.sizes[code][1] : 0);
   }
   function autoPackage(code) {
     if (parajesState[code] === 'loading' || parajesOn.indexOf(code) >= 0) return Promise.resolve();
@@ -589,6 +613,7 @@
     return Promise.all([
       loadPlacesMeta().then(function (m) { return m && m.sizes[code] ? loadPlaces('parajes', code) : null; }),
       loadCams(code).catch(function () { return null; }),
+      loadAgua(code).catch(function () { return null; }),
     ]).then(function () {
       delete parajesState[code];
       setParajes(code, true);
@@ -1453,7 +1478,7 @@
   function parTxt(code) {
     if (!framework()) return '⛰️ Parajes, cerros, fuentes, ermitas…';
     var n = camCount(code);
-    return '⛰️ Parajes · 📷 Cámaras' + (n ? ' (' + n + ')' : '') + ' · ⛈️ Meteo · 🔥 Incendios';
+    return '⛰️ Parajes · 📷 Cámaras' + (n ? ' (' + n + ')' : '') + ' · 💧 Agua · ⛈️ Meteo · 🔥 Incendios';
   }
   // Comunidades enteras: se bajan una a una (sin avisos por provincia) y se avisa al final
   var commBusy = {}, commAsk = {};
@@ -1543,6 +1568,7 @@
     $('provCount').textContent = selected.length + ' elegidas · ' + fmtSize(total) +
       (selected.length ? ' · ' + selected.map(function (c) { return provByCode[c].name; }).join(', ') : '');
     renderZonasList();
+    if (typeof mapOpt !== 'undefined' && mapOpt) renderMapasList();
     if (sc) sc.scrollTop = top;
   }
   function renderConn() {
@@ -1672,8 +1698,11 @@
     if (k === pkgKey) return;
     pkgKey = k;
     Object.keys(camLists).forEach(function (c) { if (pkgProvs().indexOf(c) < 0) dropCams(c); });
+    Object.keys(aguaLists).forEach(function (c) { if (pkgProvs().indexOf(c) < 0) dropAgua(c); });
     applyFire();
     renderAlert();
+    renderLive();
+    renderAgua();
   }
   function renderCams() {
     camLayer.clearLayers();
@@ -1733,6 +1762,7 @@
 
   // --- Avisos meteorológicos vigentes (AEMET vía Meteoalarm): icono de alerta con el tipo y el enlace a la fuente ---
   var AVISOS_URL = 'https://feeds.meteoalarm.org/feeds/meteoalarm-legacy-atom-spain';
+  var AVISOS_WEB = 'https://raw.githubusercontent.com/Cilantro-Corporation/SOSpk/live/avisos.xml'; // copia que se actualiza sola (la web no puede leer el servicio directamente)
   var avisos = [], avisosState = 'idle', avisosAt = 0;
   function liveFetch(url) {
     var http = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.CapacitorHttp;
@@ -1751,7 +1781,7 @@
     if (avisosState === 'loading') return;
     avisosState = 'loading';
     renderAlert();
-    liveFetch(AVISOS_URL).then(function (t) { avisos = K.parseAvisos(t, Date.now()); avisosState = 'ok'; avisosAt = Date.now(); renderAlert(); renderLayers(); })
+    liveFetch(IS_NATIVE || /^(localhost|127.0.0.1)$/.test(location.hostname) ? AVISOS_URL : AVISOS_WEB).then(function (t) { avisos = K.parseAvisos(t, Date.now()); avisosState = 'ok'; avisosAt = Date.now(); renderAlert(); renderLayers(); })
       .catch(function () { avisosState = 'error'; renderAlert(); renderLayers(); });
   }
   var LVCOL = { yellow: '#F2D600', orange: '#FF9F1C', red: '#FF4B3E' };
@@ -1794,6 +1824,222 @@
   }
   document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && lyrOn('avi')) loadAvisos(false); });
   setInterval(function () { if (lyrOn('avi') && document.visibilityState === 'visible') loadAvisos(true); }, 600000);
+
+  // --- Datos en directo de la DGT: balizas V16 activas e incidencias (accidentes, cortes, obras, obstáculos) ---
+  // En la app Android se leen directamente del Punto de Acceso Nacional; en la web, de una copia que se actualiza sola cada pocos minutos.
+  var SIT_URL = 'https://nap.dgt.es/datex2/v3/dgt/SituationPublication/datex2_v37.xml';
+  var SIT_WEB = 'https://raw.githubusercontent.com/Cilantro-Corporation/SOSpk/live/situation.xml';
+  var sits = [], sitState = 'idle', sitAt = 0, sitPub = 0;
+  var SIT_KINDS = { v16: ['V16', 'Baliza V16'], acc: ['🚨', 'Accidente'], cor: ['⛔', 'Corte'], obs: ['⚠️', 'Obstáculo'], obr: ['🚧', 'Obras'] };
+  var SIT_COL = { v16: '#FFB000', acc: '#FF4B3E', cor: '#FF4B3E', obs: '#FF9F1C', obr: '#F2D600' };
+  var trfOn = S.readJSON('trfk', null);
+  if (!trfOn || typeof trfOn !== 'object') trfOn = { acc: true, cor: true, obs: true, obr: true };
+  var liveLayer = L.layerGroup().addTo(map);
+  function sitSource() {
+    var local = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+    return IS_NATIVE || local ? SIT_URL : SIT_WEB;
+  }
+  function loadSits(force) {
+    if (!lyrOn('v16') && !lyrOn('trf')) { sitState = 'idle'; renderLive(); return; }
+    if (!force && sitState === 'ok' && Date.now() - sitAt < 90000) { renderLive(); return; }
+    if (sitState === 'loading') return;
+    sitState = 'loading';
+    renderLive();
+    liveFetch(sitSource()).then(function (t) {
+      var pub = /<com:publicationTime>([^<]+)</.exec(t);
+      sitPub = pub ? Date.parse(pub[1]) : Date.now();
+      sits = K.parseSituations(t, Date.now());
+      sitState = 'ok'; sitAt = Date.now();
+      renderLive(); renderLayers();
+    }).catch(function () { sitState = 'error'; renderLive(); renderLayers(); });
+  }
+  // Solo lo que cae en las provincias con paquete (como cámaras y avisos)
+  function mySits(kind) {
+    var mine = pkgProvs();
+    if (!mine.length || !borders) return [];
+    return sits.filter(function (s) {
+      if (kind ? s.kind !== kind : s.kind === 'v16' || !trfOn[s.kind]) return false;
+      if (s.pc === undefined) s.pc = borders.provinceAt(s.lat, s.lon) || null;
+      return s.pc && mine.indexOf(s.pc) >= 0;
+    });
+  }
+  var DIRS = { northBound: 'norte', southBound: 'sur', eastBound: 'este', westBound: 'oeste', northEastBound: 'noreste', northWestBound: 'noroeste', southEastBound: 'sureste', southWestBound: 'suroeste', inboundTowardsTown: 'hacia la ciudad', outboundFromTown: 'saliendo de la ciudad' };
+  function ago(t) {
+    var m = Math.max(0, Math.round((Date.now() - t) / 60000));
+    return m < 1 ? 'ahora mismo' : m < 60 ? 'hace ' + m + ' min' : m < 1440 ? 'hace ' + Math.floor(m / 60) + ' h ' + (m % 60) + ' min' : 'desde el ' + fmtWhen(t);
+  }
+  function mapsLink(lat, lon) { return 'https://www.google.com/maps/search/?api=1&query=' + lat.toFixed(6) + ',' + lon.toFixed(6); }
+  function sitItem(s) {
+    var k = SIT_KINDS[s.kind];
+    return { badge: k[0], col: SIT_COL[s.kind], title: s.sub, lat: s.lat, lon: s.lon,
+      lines: [(s.road || 'Carretera') + (s.km != null ? ' · km ' + K.formatKm(s.km) : '') + (DIRS[s.dir] ? ' · sentido ' + DIRS[s.dir] : ''), (s.mun || '') + (s.prov && s.prov !== s.mun ? ' (' + s.prov + ')' : ''),
+        s.start ? (s.kind === 'v16' ? 'Activa ' + ago(s.start) : 'Desde ' + (Date.now() - s.start < 86400000 ? ago(s.start) : fmtWhen(s.start))) : ''] };
+  }
+  // Panel genérico de elementos en directo (balizas, incidencias, puntos de agua)
+  function openItems(title, items, note) {
+    $('liveTitle').textContent = title;
+    var box = $('liveList');
+    clear(box);
+    if (!items.length) box.appendChild(el('p', { class: 'set-help', text: 'No hay nada que mostrar ahora en tus provincias.' }));
+    items.slice(0, 60).forEach(function (it) {
+      var pill = el('span', { class: 'al-pill', text: it.badge });
+      pill.style.background = it.col;
+      var lines = it.lines.filter(Boolean).map(function (t) { return el('div', { class: 'al-sub', text: t }); });
+      box.appendChild(el('div', { class: 'al-item' }, [el('div', { class: 'al-row' }, [pill, el('b', { text: it.title })])].concat(lines, [
+        el('div', { class: 'live-acts' }, [
+          el('button', { type: 'button', class: 'pp-b', text: 'Ver en el mapa', onclick: function () { $('livePanel').hidden = true; map.setView([it.lat, it.lon], Math.max(map.getZoom(), 15), { animate: false }); } }),
+          el('a', { class: 'pp-b', href: mapsLink(it.lat, it.lon), target: '_blank', rel: 'noopener noreferrer', text: 'Ir con Google Maps' }),
+        ]),
+      ])));
+    });
+    $('liveNote').textContent = note || '';
+    $('livePanel').hidden = false;
+  }
+  $('liveClose').addEventListener('click', function () { $('livePanel').hidden = true; });
+  function sitNote() {
+    var age = sitPub ? Math.round((Date.now() - sitPub) / 60000) : 0;
+    return 'Fuente: DGT (Punto de Acceso Nacional, «Powered by MITRAMS»).' + (age > 8 ? ' Datos de ' + ago(sitPub) + '.' : '') + ' Son orientativos: SOSpk no es un servicio oficial ni llama a emergencias.';
+  }
+  function sitIcon(s) {
+    var k = SIT_KINDS[s.kind], pin = el('span', { class: 'livepin lp-' + s.kind, text: k[0], title: s.sub + (s.road ? ' · ' + s.road : '') });
+    if (s.kind !== 'v16') pin.style.borderColor = SIT_COL[s.kind];
+    return L.divIcon({ className: 'pk-icon', html: pin, iconSize: null });
+  }
+  function renderLive() {
+    liveLayer.clearLayers();
+    var chip = $('v16Chip');
+    clear(chip);
+    var v = lyrOn('v16') ? mySits('v16') : [];
+    chip.hidden = !(lyrOn('v16') && ((sitState === 'ok' && v.length) || sitState === 'error'));
+    if (!chip.hidden) {
+      chip.className = 'alertchip v16' + (sitState === 'error' ? ' off' : '');
+      chip.appendChild(el('span', { class: 'al-i', text: sitState === 'error' ? '⚠️' : '🆘' }));
+      chip.appendChild(el('span', { class: 'al-t', text: sitState === 'error' ? (navigator.onLine === false ? 'Sin conexión: balizas V16 no disponibles' : 'Balizas V16 no disponibles ahora') : v.length + (v.length === 1 ? ' baliza V16 activa' : ' balizas V16 activas') }));
+    }
+    if (sitState !== 'ok') return;
+    var z = map.getZoom(), b = map.getBounds().pad(0.15), items = [];
+    if (lyrOn('v16')) v.forEach(function (s) { items.push(s); });
+    if (lyrOn('trf')) mySits().forEach(function (s) { items.push(s); });
+    var grid = {}, order = { v16: 0, acc: 1, cor: 2, obs: 3, obr: 4 }, n = 0;
+    items.filter(function (s) { return b.contains([s.lat, s.lon]); }).sort(function (x, y) { return order[x.kind] - order[y.kind]; }).forEach(function (s) {
+      if (n >= 500) return;
+      if (s.kind !== 'v16' && s.kind !== 'acc') {
+        if (z < 8) return;
+        var pt = map.latLngToContainerPoint([s.lat, s.lon]), k = Math.floor(pt.x / 30) + ':' + Math.floor(pt.y / 30);
+        if (grid[k]) return;
+        grid[k] = 1;
+      }
+      n++;
+      if (s.pts.length > 1 && z >= 11 && s.kind !== 'v16') L.polyline(s.pts, { color: SIT_COL[s.kind], weight: 5, opacity: 0.85, interactive: false }).addTo(liveLayer);
+      L.marker([s.lat, s.lon], { icon: sitIcon(s), keyboard: false, zIndexOffset: s.kind === 'v16' ? 900 : s.kind === 'acc' ? 800 : 400 })
+        .on('click', function () { openItems(SIT_KINDS[s.kind][1], [sitItem(s)], sitNote()); }).addTo(liveLayer);
+    });
+  }
+  $('v16Chip').addEventListener('click', function () {
+    if (sitState === 'error') { loadSits(true); return; }
+    openItems('Balizas V16 activas', mySits('v16').sort(function (a, b) { return (b.start || 0) - (a.start || 0); }).map(sitItem), sitNote());
+  });
+  map.on('moveend', renderLive);
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') loadSits(false); });
+  setInterval(function () { if (document.visibilityState === 'visible' && (lyrOn('v16') || lyrOn('trf'))) loadSits(true); }, 120000);
+
+  // --- DGT 3.0: vehículos de emergencia aproximándose y grúas de auxilio en carretera ---
+  // Esos datos solo se entregan a consumidores registrados (con IP fija y certificado), así que la app no puede leerlos sola:
+  // los recoge un pequeño servicio intermedio (tools/dgt30-relay) y lo publica como JSON. Mientras CFG.live.relayUrl esté vacío, las capas avisan de que están pendientes.
+  var RELAY = (CFG.live && CFG.live.relayUrl) || '';
+  var dgt30 = { eva: [], vac: [], at: 0, state: 'idle' };
+  var dgt30Layer = L.layerGroup().addTo(map);
+  function validPts(list) {
+    return Array.isArray(list) ? list.filter(function (p) { return p && isFinite(p.lat) && isFinite(p.lon) && Math.abs(p.lat) <= 90 && Math.abs(p.lon) <= 180 && isFinite(Date.parse(p.ts)); }).slice(0, 1000) : [];
+  }
+  function loadDgt30(force) {
+    if (!RELAY || !(lyrOn('eva') || lyrOn('vac'))) { dgt30.state = 'idle'; renderDgt30(); return; }
+    if (!force && dgt30.state === 'ok' && Date.now() - dgt30.at < 12000) return;
+    if (dgt30.state === 'loading') return;
+    dgt30.state = 'loading';
+    liveFetch(RELAY).then(function (t) {
+      var j = JSON.parse(t);
+      dgt30.eva = validPts(j.eva); dgt30.vac = validPts(j.vac);
+      dgt30.state = 'ok'; dgt30.at = Date.now();
+      renderDgt30(); renderLayers();
+    }).catch(function () { dgt30.state = 'error'; renderDgt30(); renderLayers(); });
+  }
+  function myDgt30(kind) {
+    var mine = pkgProvs();
+    if (!mine.length || !borders || !lyrOn(kind)) return [];
+    return dgt30[kind].filter(function (p) {
+      if (Date.now() - Date.parse(p.ts) > 90000) return false; // solo lo reciente: son posiciones en movimiento
+      var pc = borders.provinceAt(p.lat, p.lon);
+      return pc && mine.indexOf(pc) >= 0;
+    });
+  }
+  function renderDgt30() {
+    dgt30Layer.clearLayers();
+    if (dgt30.state !== 'ok') return;
+    [['eva', '🚨', 'Vehículo de emergencia aproximándose', '#FF4B3E'], ['vac', '🚛', 'Grúa de auxilio en carretera', '#FFB000']].forEach(function (k) {
+      myDgt30(k[0]).forEach(function (p) {
+        var pin = el('span', { class: 'livepin lp-' + k[0], text: k[1], title: k[2] });
+        pin.style.borderColor = k[3];
+        L.marker([p.lat, p.lon], { icon: L.divIcon({ className: 'pk-icon', html: pin, iconSize: null }), keyboard: false, zIndexOffset: 950 })
+          .on('click', function () { openItems(k[2], [{ badge: k[1], col: k[3], title: k[2], lat: p.lat, lon: p.lon, lines: ['Posición ' + ago(Date.parse(p.ts))] }], 'Fuente: DGT 3.0. Posiciones orientativas y anónimas, no son un servicio oficial.'); }).addTo(dgt30Layer);
+      });
+    });
+  }
+  setInterval(function () { if (document.visibilityState === 'visible') loadDgt30(true); }, 15000);
+
+  // --- Puntos de agua para emergencias: hidrantes, tomas, depósitos y balsas (OpenStreetMap, con el paquete de la provincia) ---
+  var aguaMeta = null, aguaMetaP = null, aguaLists = {}, aguaPending = {};
+  var aguaLayer = L.layerGroup().addTo(map);
+  var AGUA_T = [['Hidrante', '#FF4B3E'], ['Toma de aspiración', '#FF9F1C'], ['Depósito de agua', '#2F6BFF'], ['Charca contraincendios', '#00C2D1'], ['Balsa o embalse pequeño', '#00C2D1']];
+  function loadAguaMeta() {
+    if (aguaMetaP) return aguaMetaP;
+    var ok = function (m) { return m && /^\d{8,12}$/.test(String(m.v)) && m.sizes && typeof m.sizes === 'object' ? m : null; };
+    var local = S.loadJSON('data/agua.json').then(ok, function () { return null; });
+    var remote = IS_NATIVE ? S.loadJSON(CFG.remoteBase + 'data/agua.json').then(ok, function () { return null; }) : Promise.resolve(null);
+    aguaMetaP = Promise.all([local, remote]).then(function (r) { aguaMeta = r[1] && (!r[0] || r[1].v > r[0].v) ? r[1] : r[0]; return aguaMeta; });
+    aguaMetaP.then(function (m) { if (!m) aguaMetaP = null; });
+    return aguaMetaP;
+  }
+  function aguaCount(code) { return aguaMeta && aguaMeta.sizes[code] ? aguaMeta.sizes[code][0] : 0; }
+  function loadAgua(code) {
+    if (aguaLists[code]) return Promise.resolve(aguaLists[code]);
+    if (aguaPending[code]) return aguaPending[code];
+    var p = aguaPending[code] = loadAguaMeta().then(function (m) {
+      if (m && !m.sizes[code]) throw new Error('sin datos');
+      return S.getPlaces('agua', code, m && m.v);
+    }).then(function (d) { aguaLists[code] = K.aguaEntries(d); return aguaLists[code]; });
+    p.then(function () { delete aguaPending[code]; renderAgua(); }, function () { delete aguaPending[code]; });
+    return p;
+  }
+  function dropAgua(code) { delete aguaLists[code]; S.removePlaces('agua', code); renderAgua(); }
+  function allAgua() {
+    var out = [];
+    pkgProvs().forEach(function (c) { (aguaLists[c] || []).forEach(function (x) { out.push(x); }); });
+    return out;
+  }
+  function renderAgua() {
+    aguaLayer.clearLayers();
+    if (!lyrOn('agu')) return;
+    pkgProvs().forEach(function (c) { if (!aguaLists[c]) loadAgua(c).catch(function () { /* esa provincia no tiene */ }); });
+    if (map.getZoom() < 12) return;
+    var b = map.getBounds().pad(0.1), ctr = map.getCenter(), vis = [];
+    allAgua().forEach(function (a) { if (b.contains([a.lat, a.lon])) vis.push(a); });
+    vis.sort(function (x, y) { return K.distance([ctr.lat, ctr.lng], [x.lat, x.lon]) - K.distance([ctr.lat, ctr.lng], [y.lat, y.lon]); });
+    var grid = {}, n = 0;
+    for (var i = 0; i < vis.length && n < 500; i++) {
+      var a = vis[i], pt = map.latLngToContainerPoint([a.lat, a.lon]), k = Math.floor(pt.x / 24) + ':' + Math.floor(pt.y / 24);
+      if (grid[k]) continue;
+      grid[k] = 1; n++;
+      addAguaMarker(a);
+    }
+  }
+  function addAguaMarker(a) {
+    var t = AGUA_T[a.t] || AGUA_T[0], pin = el('span', { class: 'aguapin', text: '💧', title: t[0] + (a.n ? ' · ' + a.n : '') });
+    pin.style.borderColor = t[1];
+    L.marker([a.lat, a.lon], { icon: L.divIcon({ className: 'pk-icon', html: pin, iconSize: null }), keyboard: false, zIndexOffset: 300 })
+      .on('click', function () { openItems(t[0], [{ badge: '💧', col: t[1], title: a.n || t[0], lat: a.lat, lon: a.lon, lines: [t[0], fmtLL(a.lat, a.lon)] }], 'Datos: © colaboradores de OpenStreetMap (ODbL). Pueden estar incompletos o desactualizados: compruébalo sobre el terreno.'); }).addTo(aguaLayer);
+  }
+  map.on('moveend', renderAgua);
 
   // --- Zonas y sectores: dibujar punto a punto; si se cierra es un sector (perímetro y área), si no, una ruta ---
   var ZMAX = 30;
@@ -1943,12 +2189,17 @@
   });
 
   // --- Panel «Capas» ---
-  var LAYERS = [['cam', '📷', 'Cámaras de tráfico'], ['avi', '⛈️', 'Avisos meteorológicos'], ['inc', '🔥', 'Incendios activos'], ['zon', '⬡', 'Sectores']];
+  var LAYERS = [['cam', '📷', 'Cámaras de tráfico'], ['v16', '🆘', 'Balizas V16 activas'], ['trf', '🚧', 'Accidentes, cortes y obras'], ['avi', '⛈️', 'Avisos meteorológicos'], ['inc', '🔥', 'Incendios activos'],
+    ['eva', '🚨', 'Vehículos de emergencia aproximándose'], ['vac', '🚛', 'Grúas de auxilio en carretera'], ['agu', '💧', 'Hidrantes y puntos de agua'], ['zon', '⬡', 'Sectores']];
   function layerNote(k) {
     if (k === 'zon') return layerOn.zon === false ? 'Ocultos' : readZonas().length + (readZonas().length === 1 ? ' sector' : ' sectores');
+    if ((k === 'eva' || k === 'vac') && !RELAY) return 'Pendiente de acceso a DGT 3.0';
     if (!pkgProvs().length) return 'Descarga una provincia';
-    if (!layerOn[k]) return 'Apagada';
+    if (layerOn[k] === false) return 'Apagada';
     if (k === 'cam') return allCams().length + ' cámaras';
+    if (k === 'eva' || k === 'vac') return dgt30.state === 'error' ? 'Sin conexión' : dgt30.state === 'ok' ? myDgt30(k).length + ' ahora' : '';
+    if (k === 'agu') return allAgua().length.toLocaleString('es-ES') + ' puntos';
+    if (k === 'v16' || k === 'trf') return sitState === 'error' ? 'Sin conexión' : sitState === 'loading' ? 'Consultando…' : sitState === 'ok' ? (k === 'v16' ? mySits('v16').length + ' activas' : mySits().length + ' incidencias') : '';
     if (k === 'avi') return avisosState === 'error' ? 'Sin conexión' : avisosState === 'loading' ? 'Consultando…' : avisosState === 'ok' ? (myAvisos().length ? myAvisos().length + ' vigentes' : 'Sin avisos vigentes') : '';
     return 'Focos de hoy';
   }
@@ -1963,10 +2214,19 @@
         el('span', { class: 'lyr-i', text: l[1] }), el('span', { class: 'lyr-t', text: l[2] }),
         el('span', { class: 'lyr-s', text: prem ? layerNote(l[0]) : '🔒' }),
       ]));
+      if (l[0] === 'trf' && on) {
+        var sub = el('div', { class: 'lyr-sub' });
+        [['acc', 'Accidentes'], ['cor', 'Cortes'], ['obs', 'Obstáculos'], ['obr', 'Obras']].forEach(function (c) {
+          sub.appendChild(el('button', { type: 'button', class: 'subchip' + (trfOn[c[0]] ? ' on' : ''), text: c[1], 'aria-pressed': trfOn[c[0]] ? 'true' : 'false',
+            onclick: function () { trfOn[c[0]] = !trfOn[c[0]]; S.writeJSON('trfk', trfOn); renderLive(); renderLayers(); } }));
+        });
+        box.appendChild(sub);
+      }
     });
   }
   function toggleLayer(k, title) {
     if (!isPremium()) { showPremium(title + ' es una función Premium.'); return; }
+    if ((k === 'eva' || k === 'vac') && !RELAY) { toast('Esta capa estará disponible cuando la DGT conceda el acceso a sus datos (DGT 3.0)', 4500); return; }
     if (k !== 'zon' && !pkgProvs().length && layerOn[k] === false) toast('Descarga una provincia en Configuración para ver esta capa');
     layerOn[k] = layerOn[k] === false;
     S.writeJSON('capas', layerOn);
@@ -1979,12 +2239,185 @@
     applyFire();
     loadAvisos(false);
     renderAlert();
+    loadSits(false);
+    renderLive();
+    renderAgua();
+    loadDgt30(false);
+    renderDgt30();
   }
 
   map.on('moveend', function () { syncPackage(); });
   renderZonas();
   loadCamMeta().then(function () { renderSettingsList(); });
   applyLayers();
+
+  // ---------- Mapas sin conexión (app Android): el fondo del mapa de tus provincias guardado en el móvil ----------
+  // Las teselas del IGN se guardan en el almacén del dispositivo; el mapa las usa primero y solo pide a internet las que faltan.
+  var MAP_LAYERS = {
+    base: { name: 'Mapa', defs: [{ svc: 'ign-base', layer: 'IGNBaseTodo', fmt: 'image/png', kb: 45 }] },
+    sat: { name: 'Satélite', defs: [{ svc: 'pnoa-ma', layer: 'OI.OrthoimageCoverage', fmt: 'image/jpeg', kb: 15 }, { svc: 'ign-base', layer: 'IGNBaseOrto', fmt: 'image/png', kb: 10 }] },
+  };
+  var MAP_ZOOMS = [[12, 'Básico', 'carreteras y pueblos'], [13, 'Medio', 'calles principales'], [14, 'Detalle', 'calles y caminos']];
+  var mapOpt = S.readJSON('mapopt', null);
+  if (!mapOpt || !MAP_LAYERS[mapOpt.layer] || [12, 13, 14].indexOf(mapOpt.z) < 0) mapOpt = { layer: 'base', z: 13 };
+  var mapStore = S.readJSON('mapas', {});
+  if (!mapStore || typeof mapStore !== 'object' || Array.isArray(mapStore)) mapStore = {};
+  var mapJob = null, mapAsk = null, estMemo = {};
+  function tileUrl(d, z, x, y) { return L.Util.template(WMTS, { svc: d.svc, layer: d.layer, fmt: d.fmt, z: z, x: x, y: y }); }
+  function lon2x(lon, z) { return Math.floor((lon + 180) / 360 * Math.pow(2, z)); }
+  function lat2y(lat, z) { var r = lat * Math.PI / 180; return Math.floor((1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2 * Math.pow(2, z)); }
+  function x2lon(x, z) { return x / Math.pow(2, z) * 360 - 180; }
+  function y2lat(y, z) { var n = Math.PI - 2 * Math.PI * y / Math.pow(2, z); return 180 / Math.PI * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n))); }
+  // Teselas de una provincia, una a una (sin guardar la lista entera): las que tocan la provincia
+  function tileIter(code, minZ, maxZ) {
+    var bb = borders && borders.bbox(code), z = minZ, x, y, x0, x1, y0, y1;
+    function setZ() {
+      x0 = lon2x(bb[1], z); x1 = lon2x(bb[3], z); y0 = lat2y(bb[2], z); y1 = lat2y(bb[0], z); x = x0; y = y0;
+    }
+    // Una tesela cuenta si algún punto de una rejilla de 4×4 dentro de ella cae en la provincia; si el rango es pequeño, entran todas
+    function inside(zz, xx, yy) {
+      if ((x1 - x0 + 1) * (y1 - y0 + 1) <= 6) return true;
+      var w = x2lon(xx, zz), e = x2lon(xx + 1, zz), n = y2lat(yy, zz), s = y2lat(yy + 1, zz);
+      for (var i = 0; i < 4; i++) for (var k = 0; k < 4; k++) {
+        if (borders.provinceAt(n + (s - n) * (i + 0.5) / 4, w + (e - w) * (k + 0.5) / 4) === code) return true;
+      }
+      return false;
+    }
+    if (bb) setZ();
+    return { next: function () {
+      if (!bb) return null;
+      for (;;) {
+        if (y > y1) { z++; if (z > maxZ) return null; setZ(); }
+        var tx = x, ty = y;
+        x++; if (x > x1) { x = x0; y++; }
+        if (inside(z, tx, ty)) return [z, tx, ty];
+      }
+    } };
+  }
+  // Nº de teselas de una provincia hasta un zoom: exacto hasta el 12 y, por encima, 4 veces más en cada nivel
+  function tileCount(code, maxZ) {
+    var k = code + '|' + maxZ;
+    if (estMemo[k]) return estMemo[k];
+    var it = tileIter(code, 6, Math.min(maxZ, 12)), n = 0, t, byZ = {};
+    while ((t = it.next())) { n++; byZ[t[0]] = (byZ[t[0]] || 0) + 1; }
+    for (var z = 13; z <= maxZ; z++) n += (byZ[12] || 0) * Math.pow(4, z - 12);
+    return (estMemo[k] = n);
+  }
+  function mapMB(code, layerKey, z) {
+    var kb = MAP_LAYERS[layerKey].defs.reduce(function (s, d) { return s + d.kb; }, 0);
+    return tileCount(code, z) * kb / 1024;
+  }
+  function fmtMB(mb) { return mb < 1 ? '<1 MB' : mb < 10 ? mb.toFixed(1).replace('.', ',') + ' MB' : Math.round(mb) + ' MB'; }
+  function b64bytes(s) {
+    var bin = atob(s), arr = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    return arr;
+  }
+  function httpTile(url) {
+    var http = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.CapacitorHttp;
+    if (!http) return Promise.reject(new Error('solo en la app'));
+    return http.get({ url: url, responseType: 'blob', connectTimeout: 10000, readTimeout: 20000 }).then(function (r) {
+      if (r.status !== 200 || typeof r.data !== 'string') throw new Error('HTTP ' + r.status);
+      var arr = b64bytes(r.data), ct = (r.headers && (r.headers['Content-Type'] || r.headers['content-type'])) || 'image/png';
+      if (!/^image\//.test(ct)) throw new Error('no es una imagen');
+      return { resp: new Response(new Blob([arr], { type: ct }), { headers: { 'Content-Type': ct } }), size: arr.length };
+    });
+  }
+  var mapSaved = 0;
+  function saveMapStore() { S.writeJSON('mapas', mapStore); tilesAny = Object.keys(mapStore).length > 0; }
+  function startMapDownload(code, layerKey, maxZ) {
+    if (mapJob) { toast('Ya hay una descarga en curso'); return; }
+    if (!IS_NATIVE || !hasTileCache) { toast('Los mapas sin conexión están en la app Android'); return; }
+    var defs = MAP_LAYERS[layerKey].defs, it = tileIter(code, 6, maxZ), est = Math.max(1, tileCount(code, maxZ) * defs.length), n = 0, fails = 0, bytes = 0, key = code + '|' + layerKey;
+    var job = mapJob = { key: key, cancel: false, pct: 0 };
+    tilesAny = true;
+    renderMapasList();
+    var last = 0;
+    function tick() { job.pct = Math.min(99, Math.round(n / est * 100)); if (Date.now() - last > 700) { last = Date.now(); renderMapasList(); } }
+    caches.open(TILE_CACHE).then(function (cache) {
+      function worker() {
+        return new Promise(function (resolve) {
+          (function loop() {
+            if (job.cancel || fails >= 60) { resolve(); return; }
+            var t = it.next();
+            if (!t) { resolve(); return; }
+            Promise.all(defs.map(function (d) {
+              var url = tileUrl(d, t[0], t[1], t[2]);
+              return cache.match(url).then(function (hit) {
+                if (hit) { n++; return; }
+                return httpTile(url).then(function (r) { bytes += r.size; return cache.put(url, r.resp); }).then(function () { n++; fails = 0; }, function () { n++; fails++; });
+              });
+            })).then(function () { tick(); loop(); }, function () { fails++; loop(); });
+          })();
+        });
+      }
+      return Promise.all([worker(), worker(), worker(), worker(), worker(), worker()]);
+    }).then(function () {
+      var ok = !job.cancel && fails < 60;
+      if (ok) { mapStore[key] = { z: maxZ, mb: Math.round(est * defs.reduce(function (s, d) { return s + d.kb; }, 0) / defs.length / 1024) }; saveMapStore(); }
+      mapJob = null;
+      toast(job.cancel ? 'Descarga cancelada: lo ya guardado se conserva' : ok ? provName(code) + ': mapa ' + MAP_LAYERS[layerKey].name.toLowerCase() + ' guardado' : 'La descarga se interrumpió: comprueba la conexión y vuelve a pulsar para seguir', 4000);
+      renderMapasList();
+    }, function () { mapJob = null; toast('No se pudo guardar el mapa (¿poco espacio?)'); renderMapasList(); });
+  }
+  function deleteMap(code, layerKey) {
+    var rec = mapStore[code + '|' + layerKey];
+    if (!rec || mapJob) return;
+    var defs = MAP_LAYERS[layerKey].defs, it = tileIter(code, 6, rec.z);
+    caches.open(TILE_CACHE).then(function (cache) {
+      return new Promise(function (resolve) {
+        (function loop(i) {
+          var t, jobs = [];
+          for (var k = 0; k < 200 && (t = it.next()); k++) defs.forEach(function (d) { jobs.push(cache.delete(tileUrl(d, t[0], t[1], t[2]))); });
+          if (!jobs.length) { resolve(); return; }
+          Promise.all(jobs).then(function () { setTimeout(function () { loop(i + 1); }, 0); });
+        })(0);
+      });
+    }).then(function () {
+      delete mapStore[code + '|' + layerKey];
+      saveMapStore();
+      toast('Mapa de ' + provName(code) + ' borrado del móvil');
+      renderMapasList();
+    });
+  }
+  function segBtns(items, cur, onPick, label) {
+    var row = el('div', { class: 'segs', role: 'radiogroup', 'aria-label': label });
+    items.forEach(function (it) {
+      row.appendChild(el('button', { type: 'button', class: 'segbtn' + (it[0] === cur ? ' on' : ''), role: 'radio', 'aria-checked': it[0] === cur ? 'true' : 'false', text: it[1], onclick: function () { onPick(it[0]); } }));
+    });
+    return row;
+  }
+  function renderMapasList() {
+    var box = $('mapasBody');
+    if (!box) return;
+    $('secMapas').hidden = !framework();
+    clear(box);
+    if (!framework()) return;
+    if (!isPremium()) { box.appendChild(el('p', { class: 'set-help', text: 'Los mapas sin conexión son una función Premium.' })); box.appendChild(el('button', { type: 'button', class: 'pp-b pp-lock', text: '🔒 Premium', onclick: function () { showPremium('Los mapas sin conexión son una función Premium.'); } })); return; }
+    if (!IS_NATIVE) { box.appendChild(el('p', { class: 'set-help', text: 'Los mapas sin conexión están disponibles en la app Android.' })); return; }
+    box.appendChild(el('p', { class: 'set-help', text: 'Guarda en el móvil el fondo del mapa de tus provincias para verlo sin cobertura. Los PK, las carreteras y los pueblos ya funcionan sin conexión; esto añade el mapa de fondo. Cuanto más detalle, más espacio.' }));
+    box.appendChild(segBtns([['base', 'Mapa'], ['sat', 'Satélite']], mapOpt.layer, function (v) { mapOpt.layer = v; S.writeJSON('mapopt', mapOpt); mapAsk = null; renderMapasList(); }, 'Tipo de mapa'));
+    box.appendChild(segBtns(MAP_ZOOMS.map(function (z) { return [z[0], z[1]]; }), mapOpt.z, function (v) { mapOpt.z = v; S.writeJSON('mapopt', mapOpt); mapAsk = null; renderMapasList(); }, 'Nivel de detalle'));
+    var zd = MAP_ZOOMS.filter(function (z) { return z[0] === mapOpt.z; })[0];
+    box.appendChild(el('p', { class: 'set-help', text: zd ? zd[1] + ': ' + zd[2] + '.' : '' }));
+    if (!selected.length) box.appendChild(el('p', { class: 'set-help', text: 'Marca antes alguna provincia en «Provincias».' }));
+    var total = 0;
+    Object.keys(mapStore).forEach(function (k) { total += mapStore[k].mb || 0; });
+    selected.forEach(function (code) {
+      var key = code + '|' + mapOpt.layer, rec = mapStore[key], job = mapJob && mapJob.key === key, mb = mapMB(code, mapOpt.layer, mapOpt.z), tail;
+      if (job) tail = [el('span', { class: 'pp-s', text: mapJob.pct + ' %' }), el('button', { type: 'button', class: 'pp-b del', text: 'Cancelar', onclick: function () { mapJob.cancel = true; } })];
+      else if (rec && rec.z >= mapOpt.z) tail = [el('span', { class: 'pp-s ok', text: '✓ ' + fmtMB(rec.mb) + ' · zoom ' + rec.z }), el('button', { type: 'button', class: 'pp-b del', text: 'Borrar', onclick: function () { deleteMap(code, mapOpt.layer); } })];
+      else tail = [el('button', { type: 'button', class: 'pp-b pp-par' + (mapAsk === key ? ' ask' : ''), text: mapAsk === key ? 'Confirmar ' + fmtMB(mb) : (rec ? 'Ampliar ' : 'Descargar ') + '≈ ' + fmtMB(mb), onclick: function () {
+        if (mb > 120 && mapAsk !== key) { mapAsk = key; renderMapasList(); return; }
+        mapAsk = null;
+        if (navigator.storage && navigator.storage.estimate) navigator.storage.estimate().then(function (e) { if (e && e.quota && e.quota - e.usage < mb * 1.3 * 1048576) toast('Puede que no haya espacio suficiente en el móvil', 4000); });
+        startMapDownload(code, mapOpt.layer, mapOpt.z);
+      } })];
+      box.appendChild(el('div', { class: 'prov-par map-row' }, [el('span', { class: 'pp-t', text: provName(code) })].concat(tail)));
+    });
+    if (total) box.appendChild(el('p', { class: 'set-help', text: 'Guardado en el móvil: unos ' + fmtMB(total) + '.' }));
+    box.appendChild(el('p', { class: 'set-help', text: 'Mapas © IGN (CNIG). Para uso personal dentro de la app.' }));
+  }
 
   // ---------- Ubicación y PK más cercano (en la misma ficha que cualquier punto) ----------
   var watchId = null, meMarker = null, accCircle = null, firstFix = false, autoAsked = {};
