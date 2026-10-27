@@ -2071,50 +2071,6 @@
   document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') loadSits(false); });
   setInterval(function () { if (document.visibilityState === 'visible' && (lyrOn('v16') || lyrOn('trf'))) loadSits(true); }, 120000);
 
-  // --- DGT 3.0: vehículos de emergencia aproximándose y grúas de auxilio en carretera ---
-  // Esos datos solo se entregan a consumidores registrados (con IP fija y certificado), así que la app no puede leerlos sola:
-  // los recoge un pequeño servicio intermedio (tools/dgt30-relay) y lo publica como JSON. Mientras CFG.live.relayUrl esté vacío, las capas avisan de que están pendientes.
-  var RELAY = (CFG.live && CFG.live.relayUrl) || '';
-  var dgt30 = { eva: [], vac: [], at: 0, state: 'idle' };
-  var dgt30Layer = L.layerGroup().addTo(map);
-  function validPts(list) {
-    return Array.isArray(list) ? list.filter(function (p) { return p && isFinite(p.lat) && isFinite(p.lon) && Math.abs(p.lat) <= 90 && Math.abs(p.lon) <= 180 && isFinite(Date.parse(p.ts)); }).slice(0, 1000) : [];
-  }
-  function loadDgt30(force) {
-    if (!RELAY || !(lyrOn('eva') || lyrOn('vac'))) { dgt30.state = 'idle'; renderDgt30(); return; }
-    if (!force && dgt30.state === 'ok' && Date.now() - dgt30.at < 12000) return;
-    if (dgt30.state === 'loading') return;
-    dgt30.state = 'loading';
-    liveFetch(RELAY).then(function (t) {
-      var j = JSON.parse(t);
-      dgt30.eva = validPts(j.eva); dgt30.vac = validPts(j.vac);
-      dgt30.state = 'ok'; dgt30.at = Date.now();
-      renderDgt30(); renderLayers();
-    }).catch(function () { dgt30.state = 'error'; renderDgt30(); renderLayers(); });
-  }
-  function myDgt30(kind) {
-    var mine = pkgProvs();
-    if (!mine.length || !borders || !lyrOn(kind)) return [];
-    return dgt30[kind].filter(function (p) {
-      if (Date.now() - Date.parse(p.ts) > 90000) return false; // solo lo reciente: son posiciones en movimiento
-      var pc = borders.provinceAt(p.lat, p.lon);
-      return pc && mine.indexOf(pc) >= 0;
-    });
-  }
-  function renderDgt30() {
-    dgt30Layer.clearLayers();
-    if (dgt30.state !== 'ok') return;
-    [['eva', '🚨', 'Vehículo de emergencia aproximándose', '#FF4B3E'], ['vac', '🚛', 'Grúa de auxilio en carretera', '#FFB000']].forEach(function (k) {
-      myDgt30(k[0]).forEach(function (p) {
-        var pin = el('span', { class: 'livepin lp-' + k[0], text: k[1], title: k[2] });
-        pin.style.borderColor = k[3];
-        L.marker([p.lat, p.lon], { icon: L.divIcon({ className: 'pk-icon', html: pin, iconSize: null }), keyboard: false, zIndexOffset: 950 })
-          .on('click', function () { openItems(k[2], [{ badge: k[1], col: k[3], title: k[2], lat: p.lat, lon: p.lon, lines: ['Posición ' + ago(Date.parse(p.ts))] }], 'Fuente: DGT 3.0. Posiciones orientativas y anónimas, no son un servicio oficial.'); }).addTo(dgt30Layer);
-      });
-    });
-  }
-  setInterval(function () { if (document.visibilityState === 'visible') loadDgt30(true); }, 15000);
-
   // --- Puntos de agua para emergencias: hidrantes, tomas, depósitos y balsas (OpenStreetMap, con el paquete de la provincia) ---
   var aguaMeta = null, aguaMetaP = null, aguaLists = {}, aguaPending = {};
   var aguaLayer = L.layerGroup().addTo(map);
@@ -2318,14 +2274,12 @@
 
   // --- Panel «Capas» ---
   var LAYERS = [['cam', '📷', 'Cámaras de tráfico'], ['v16', '🆘', 'Balizas V16 activas'], ['trf', '🚧', 'Accidentes, cortes y obras'], ['avi', '⛈️', 'Avisos meteorológicos'], ['inc', '🔥', 'Incendios activos'], ['vie', '🌬️', 'Viento'],
-    ['eva', '🚨', 'Vehículos de emergencia aproximándose'], ['vac', '🚛', 'Grúas de auxilio en carretera'], ['agu', '💧', 'Hidrantes y puntos de agua'], ['zon', '⬡', 'Sectores']];
+    ['agu', '💧', 'Hidrantes y puntos de agua'], ['zon', '⬡', 'Sectores']];
   function layerNote(k) {
     if (k === 'zon') return layerOn.zon === false ? 'Ocultos' : readZonas().length + (readZonas().length === 1 ? ' sector' : ' sectores');
-    if ((k === 'eva' || k === 'vac') && !RELAY) return 'Pendiente de acceso a DGT 3.0';
     if (!pkgProvs().length) return 'Descarga una provincia';
     if (!lyrOn(k)) return 'Apagada';
     if (k === 'cam') return allCams().length + ' cámaras';
-    if (k === 'eva' || k === 'vac') return dgt30.state === 'error' ? 'Sin conexión' : dgt30.state === 'ok' ? myDgt30(k).length + ' ahora' : '';
     if (k === 'agu') return allAgua().length.toLocaleString('es-ES') + ' puntos';
     if (k === 'v16' || k === 'trf') return sitState === 'error' ? 'Sin conexión' : sitState === 'loading' ? 'Consultando…' : sitState === 'ok' ? (k === 'v16' ? mySits('v16').length + ' activas' : mySits().length + ' incidencias') : '';
     if (k === 'avi') return avisosState === 'error' ? 'Sin conexión' : avisosState === 'loading' ? 'Consultando…' : avisosState === 'ok' ? (myAvisos().length ? myAvisos().length + ' vigentes' : 'Sin avisos vigentes') : '';
@@ -2355,7 +2309,6 @@
   }
   function toggleLayer(k, title) {
     if (!isPremium()) { showPremium(title + ' es una función Premium.'); return; }
-    if ((k === 'eva' || k === 'vac') && !RELAY) { toast('Esta capa estará disponible cuando la DGT conceda el acceso a sus datos (DGT 3.0)', 4500); return; }
     if (k !== 'zon' && !pkgProvs().length && !lyrOn(k)) toast('Descarga una provincia en Configuración para ver esta capa');
     layerOn[k] = !lyrOn(k);
     S.writeJSON('capas', layerOn);
@@ -2372,8 +2325,6 @@
     renderLive();
     renderAgua();
     renderWind();
-    loadDgt30(false);
-    renderDgt30();
   }
 
   map.on('moveend', function () { syncPackage(); });

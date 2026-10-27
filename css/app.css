@@ -461,9 +461,6 @@ body.drawing .sheet { display: none; }
 .layers-pop { z-index: 600; max-height: calc(100vh - var(--top-h, 120px) - 40px); overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--lime) var(--panel); }
 .lyr-sub { margin-left: 8px; }
 .lyr { min-height: 36px; }
-.livepin.lp-eva { background: #FF4B3E; animation: v16blink .7s ease-in-out infinite; }
-.livepin.lp-vac { background: #FFB000; border-color: #0B0B0B; }
-@media (prefers-reduced-motion: reduce) { .livepin.lp-eva { animation: none; } }
 /* Avisos y balizas V16: justo bajo la tarjeta de arriba (o en el borde superior si la tarjeta está abajo) */
 .chips { top: calc(var(--top-h, 0px) + 6px); }
 .hotpin { display: grid; place-items: center; width: 24px; height: 24px; margin: -12px 0 0 -12px; border-radius: 50%; background: #0B0B0B; border: 2px solid #FF4B3E; font-size: 13px; line-height: 1; box-sizing: border-box; }
