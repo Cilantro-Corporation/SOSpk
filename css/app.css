@@ -200,7 +200,7 @@ button svg, .act svg, .icon-btn svg { width: 22px; height: 22px; fill: currentCo
 
 .set-scroll { overflow-y: auto; flex: 1; padding-bottom: 20px; }
 /* Apartados plegables (acordeón) */
-.sec { border-bottom: 1px solid var(--line); }
+.sec { border-bottom: 2px solid var(--lime); }
 .sec > summary {
   list-style: none; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 14px 2px; min-height: 48px;
   font-family: var(--head); font-weight: 700; font-size: 17px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--lime);
@@ -208,7 +208,7 @@ button svg, .act svg, .icon-btn svg { width: 22px; height: 22px; fill: currentCo
 .sec > summary::-webkit-details-marker { display: none; }
 .sec > summary::after { content: ''; margin-left: auto; width: 8px; height: 8px; border-right: 2.5px solid var(--lime); border-bottom: 2.5px solid var(--lime); transform: rotate(45deg); transition: transform .15s; flex: none; }
 .sec[open] > summary::after { transform: rotate(-135deg); }
-.sec > summary small { color: var(--muted); font-family: var(--body); font-size: 12px; font-weight: 400; letter-spacing: 0; text-transform: none; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sec > summary small { color: #CFCFCF; font-family: var(--body); font-size: 12px; font-weight: 400; letter-spacing: 0; text-transform: none; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sec[open] { padding-bottom: 14px; }
 
 /* Barra de desplazamiento con el estilo de la app: fina, oscura, pulgar lima, sin flechas */
@@ -217,7 +217,7 @@ button svg, .act svg, .icon-btn svg { width: 22px; height: 22px; fill: currentCo
 .set-scroll::-webkit-scrollbar-track, .list::-webkit-scrollbar-track, .fe-body::-webkit-scrollbar-track { background: var(--panel); border-radius: 3px; }
 .set-scroll::-webkit-scrollbar-thumb, .list::-webkit-scrollbar-thumb, .fe-body::-webkit-scrollbar-thumb { background: var(--lime); border-radius: 3px; }
 .set-scroll::-webkit-scrollbar-button, .list::-webkit-scrollbar-button, .fe-body::-webkit-scrollbar-button { display: none; height: 0; }
-.set-help { color: var(--muted); font-size: 13px; line-height: 1.45; margin: 6px 0 10px; }
+.set-help { color: #CFCFCF; font-size: 13px; line-height: 1.45; margin: 6px 0 10px; }
 .conn { display: flex; align-items: center; gap: 8px; font-size: 14px; padding: 10px 12px; border-radius: 10px; background: var(--panel); }
 .conn::before { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--lime); }
 .conn.off::before { background: var(--danger); }
@@ -228,11 +228,11 @@ button svg, .act svg, .icon-btn svg { width: 22px; height: 22px; fill: currentCo
 .prov { display: flex; align-items: center; gap: 12px; padding: 9px 2px; border-bottom: 1px solid var(--line); cursor: pointer; }
 .prov input { width: 22px; height: 22px; accent-color: var(--lime); flex: none; }
 .prov .pn { flex: 1; font-size: 16px; }
-.prov .ps { font-size: 12px; color: var(--muted); white-space: nowrap; }
+.prov .ps { font-size: 12px; color: #CFCFCF; white-space: nowrap; }
 .prov .ps.ok { color: var(--lime); }
 .prov .ps.err { color: var(--danger); }
 .prov-par { display: flex; align-items: center; gap: 8px; padding: 6px 2px 9px 34px; border-bottom: 1px solid var(--line); margin-top: -1px; }
-.pp-t { flex: 1; font-size: 13px; color: var(--muted); }
+.pp-t { flex: 1; font-size: 13px; color: #CFCFCF; }
 .pp-b { border: 0; border-radius: 999px; background: var(--panel-2); color: var(--lime); font-family: var(--head); font-weight: 700; font-size: 13px; padding: 5px 11px; min-height: 32px; white-space: nowrap; }
 .pp-b.on { background: none; box-shadow: inset 0 0 0 1.5px var(--line); color: var(--muted); }
 /* Parajes: descargados, la marca y los KB en lima; sin descargar o borrados, en gris */
@@ -254,7 +254,7 @@ button svg, .act svg, .icon-btn svg { width: 22px; height: 22px; fill: currentCo
 .credits { background: var(--panel); border-radius: 12px; padding: 16px; text-align: center; line-height: 1.5; }
 .cr-logo { display: block; width: 112px; height: 112px; margin: 0 auto 6px; }
 .cr-app { font-family: var(--head); font-weight: 700; font-size: 22px; }
-.cr-app small { font-family: var(--body); font-weight: 400; font-size: 13px; color: var(--muted); }
+.cr-app small { font-family: var(--body); font-weight: 400; font-size: 13px; color: #CFCFCF; }
 .cr-by { margin-top: 8px; font-size: 15px; }
 .cr-corp { font-family: var(--head); font-size: 17px; letter-spacing: 2px; text-transform: uppercase; color: var(--lime); }
 
