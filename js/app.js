@@ -1907,7 +1907,7 @@
         if (!w) return;
         var pin = el('span', { class: 'windpin' + (w.v >= 40 ? ' hi' : w.v >= 20 ? ' mid' : ''), title: 'Viento ' + windText(w) }, [el('span', { class: 'wp-a', text: '➤' }), el('span', { class: 'wp-v', text: String(Math.round(w.v)) })]);
         pin.firstChild.style.transform = 'rotate(' + Math.round(w.dir + 90) + 'deg)'; // la flecha ➤ apunta al este: hacia donde sopla = dirección + 180°
-        L.marker(p, { icon: L.divIcon({ className: 'pk-icon', html: pin, iconSize: null }), keyboard: false, zIndexOffset: 200 })
+        L.marker(p, { icon: L.divIcon({ className: 'pk-icon', html: pin, iconSize: null }), keyboard: false, zIndexOffset: -1000 })
           .on('click', function () { toast('Viento ' + windText(w), 4000); }).addTo(windLayer);
       });
     };
