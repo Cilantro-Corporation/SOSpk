@@ -462,7 +462,7 @@ body.drawing .sheet { display: none; }
 .lyr-sub { margin-left: 8px; }
 .lyr { min-height: 36px; }
 /* Avisos y balizas V16: justo bajo la tarjeta de arriba (o en el borde superior si la tarjeta está abajo) */
-.chips { top: calc(var(--top-h, 0px) + 6px); }
+.chips { top: var(--chips-top, calc(var(--top-h, 0px) + 6px)); }
 .hotpin { display: grid; place-items: center; width: 24px; height: 24px; margin: -12px 0 0 -12px; border-radius: 50%; background: #0B0B0B; border: 2px solid #FF4B3E; font-size: 13px; line-height: 1; box-sizing: border-box; }
 .hotpin.hp1 { border-color: #FF9F1C; }
 .hotpin.hp2 { border-color: #F2D600; opacity: .85; }
@@ -492,3 +492,10 @@ body.drawing .sheet { display: none; }
 .prem-go.lock { background: var(--panel-2); color: #9a9a9a; filter: grayscale(1); }
 .prem-go.lock::after { content: ' 🔒'; }
 [hidden] { display: none !important; }
+
+.top.float { padding-top: 0; }
+.top.float.atbottom { padding-bottom: var(--safe-b); }
+.fs-s .map-ctrls { bottom: calc(var(--safe-b) + 6px); gap: 3px; }
+.fs-s .map-ctrls .icon-btn { width: 34px; height: 34px; }
+.fs-s .map-ctrls .icon-btn svg { width: 18px; height: 18px; }
+@media (min-width: 760px) { .chips { top: 8px; left: auto; right: 64px; transform: none; align-items: flex-end; } }

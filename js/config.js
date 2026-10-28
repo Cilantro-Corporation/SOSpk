@@ -1,6 +1,6 @@
 /* SOSpk — configuración */
 window.KM_CONFIG = Object.freeze({
-  version: '1.2.12',
+  version: '1.2.13',
   // Donde se publican los datos de cada provincia (la app Android descarga de aquí las que no lleva dentro)
   remoteBase: 'https://cilantro-corporation.github.io/SOSpk/',
   // Provincias cargadas la primera vez
