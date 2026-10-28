@@ -99,6 +99,7 @@
   function applyPremiumUi() {
     var fw = framework();
     $('btnLayers').hidden = !fw;
+    $('btnZoneAdd').hidden = !fw;
     $('whatPrem').hidden = !fw;
     $('legendPrem').hidden = !fw;
     $('creditsPrem').hidden = !fw;
@@ -111,6 +112,7 @@
     $('testPrem').checked = simPremium;
     if (!fw) $('layersPop').hidden = true;
   }
+  $('btnZoneAdd').addEventListener('click', function () { if (!isPremium()) { showPremium('Los sectores son una función PRO.'); return; } $('layersPop').hidden = true; startDraw(); });
   $('btnLayers').addEventListener('click', function () {
     var pop = $('layersPop');
     if (!pop.hidden) { pop.hidden = true; return; }
@@ -1605,10 +1607,11 @@
 
   // ---------- Apariencia: tamaño de las cajas, tamaño de letra y color de la app (los 8 de los favoritos) ----------
   var LOOK_SIZES = [['s', 'Pequeño', 0.9], ['m', 'Normal', 1], ['l', 'Grande', 1.15]];
-  var FONT_SIZES = [['s', 'Pequeña', 0.9], ['m', 'Normal', 1], ['l', 'Grande', 1.15], ['xl', 'Muy grande', 1.3]];
+  var FONT_SIZES = [['s', 'Pequeña', 0.9], ['m', 'Grande', 1], ['xl', 'Muy grande', 1.3]];
   var DENS = [['h', 'Alta', 1], ['m', 'Media', 1.8], ['l', 'Baja', 2.8]];
   var look = S.readJSON('look', {});
   if (!look || typeof look !== 'object') look = {};
+  if (look.font === 'l') look.font = 'm';
   function lookVal(list, k) { return (list.filter(function (x) { return x[0] === k; })[0] || list[1])[2]; }
   function dim(hex) { // el mismo color algo más oscuro (botones pulsados)
     var n = parseInt(hex.slice(1), 16);
@@ -2221,7 +2224,7 @@
     });
   }
   $('zonesNew').addEventListener('click', function () { if (!isPremium()) { showPremium('Los sectores son una función PRO.'); return; } startDraw(); });
-  // Editor de zona: nombre, color del contorno y color del interior (muy tenue)
+  // Editor de zona: nombre, color del contorno y sombra interior
   var editingZ = null;
   function editZona(id) {
     var z = readZonas().filter(function (x) { return x.id === id; })[0];
@@ -2246,7 +2249,7 @@
       return row;
     }
     var r1 = z.closed || true ? swatches('Color del contorno', 'col') : null;
-    var r2 = z.closed ? swatches('Color del interior (muy tenue)', 'fil') : null;
+    var r2 = z.closed ? swatches('Sombra interior', 'fil') : null;
     function mark() {
       [[r1, 'col'], [r2, 'fil']].forEach(function (pair) {
         if (!pair[0]) return;
@@ -2255,6 +2258,7 @@
     }
     mark();
     $('zoneEdit').hidden = false;
+    if (z.pts.length) map.fitBounds(L.latLngBounds(z.pts).pad(0.5), { animate: false, maxZoom: 16, paddingBottomRight: [0, 280] });
   }
   function closeZoneEdit() { $('zoneEdit').hidden = true; editingZ = null; }
   $('zoneEditClose').addEventListener('click', closeZoneEdit);
@@ -2414,6 +2418,7 @@
   function startMapDownload(code, layerKey, maxZ) {
     if (mapJob) { toast('Ya hay una descarga en curso'); return; }
     if (!IS_NATIVE || !hasTileCache) { toast('Los mapas sin conexión están en la app Android'); return; }
+    if (maxZ > 13 && !isPremium()) { showPremium('El detalle alto de los mapas sin conexión es una función PRO.'); return; }
     var defs = MAP_LAYERS[layerKey].defs, it = tileIter(code, 6, maxZ), est = Math.max(1, tileCount(code, maxZ) * defs.length), n = 0, fails = 0, bytes = 0, key = code + '|' + layerKey;
     var job = mapJob = { key: key, cancel: false, pct: 0 };
     tilesAny = true;
@@ -2474,25 +2479,29 @@
     return row;
   }
   function renderMapasList() {
+    var sc = $('mapasBody') && $('mapasBody').closest('.set-scroll'), top = sc ? sc.scrollTop : 0;
+    renderMapasInner();
+    if (sc) sc.scrollTop = top;
+  }
+  function renderMapasInner() {
     var box = $('mapasBody');
     if (!box) return;
     $('secMapas').hidden = !framework();
     clear(box);
     if (!framework()) return;
-    if (!isPremium()) { box.appendChild(el('p', { class: 'set-help', text: 'Los mapas sin conexión son una función PRO.' })); box.appendChild(el('button', { type: 'button', class: 'pp-b pp-lock', text: '🔒 PRO', onclick: function () { showPremium('Los mapas sin conexión son una función PRO.'); } })); return; }
     if (!IS_NATIVE) { box.appendChild(el('p', { class: 'set-help', text: 'Los mapas sin conexión están disponibles en la app Android.' })); return; }
     box.appendChild(el('p', { class: 'set-help', text: 'Guarda en el móvil el fondo del mapa de tus provincias para verlo sin cobertura. Los PK, las carreteras y los pueblos ya funcionan sin conexión; esto añade el mapa de fondo. Cuanto más detalle, más espacio.' }));
-    box.appendChild(el('div', { class: 'map-lbl', text: 'Tipo de mapa' }));
-    box.appendChild(segBtns([['base', 'Mapa'], ['sat', 'Satélite']], mapOpt.layer, function (v) { mapOpt.layer = v; S.writeJSON('mapopt', mapOpt); mapAsk = null; renderMapasList(); }, 'Tipo de mapa'));
-    box.appendChild(el('div', { class: 'map-lbl', text: 'Detalle' }));
+    if (!isPremium() && mapOpt.z > 13) { mapOpt.z = 13; S.writeJSON('mapopt', mapOpt); }
+    var tl = segBtns([['base', 'Topográfico'], ['sat', 'Satélite']], mapOpt.layer, function (v) { mapOpt.layer = v; S.writeJSON('mapopt', mapOpt); mapAsk = null; renderMapasList(); }, 'Tipo de mapa');
+    box.appendChild(el('div', { class: 'map-line' }, [el('span', { class: 'map-lbl', text: 'Tipo de mapa' }), tl]));
     var dsegs = el('div', { class: 'segs', role: 'radiogroup', 'aria-label': 'Nivel de detalle' });
     MAP_ZOOMS.forEach(function (z) {
-      var sum = 0;
+      var sum = 0, lock = z[0] > 13 && !isPremium();
       selected.forEach(function (c) { sum += mapMB(c, mapOpt.layer, z[0]); });
-      dsegs.appendChild(el('button', { type: 'button', class: 'segbtn' + (z[0] === mapOpt.z ? ' on' : ''), role: 'radio', 'aria-checked': z[0] === mapOpt.z ? 'true' : 'false', onclick: function () { mapOpt.z = z[0]; S.writeJSON('mapopt', mapOpt); mapAsk = null; renderMapasList(); } },
-        [el('span', { text: z[1] }), el('small', { text: selected.length ? '≈ ' + fmtMB(sum) : z[2] })]));
+      dsegs.appendChild(el('button', { type: 'button', class: 'segbtn' + (z[0] === mapOpt.z ? ' on' : '') + (lock ? ' lock' : ''), role: 'radio', 'aria-checked': z[0] === mapOpt.z ? 'true' : 'false', text: (lock ? '🔒 ' : '') + z[1] + (selected.length ? ' · ' + fmtMB(sum) : ''),
+        onclick: function () { if (lock) { showPremium('El detalle alto de los mapas sin conexión es una función PRO.'); return; } mapOpt.z = z[0]; S.writeJSON('mapopt', mapOpt); mapAsk = null; renderMapasList(); } }));
     });
-    box.appendChild(dsegs);
+    box.appendChild(el('div', { class: 'map-line' }, [el('span', { class: 'map-lbl', text: 'Detalle' }), dsegs]));
     var zd = MAP_ZOOMS.filter(function (z) { return z[0] === mapOpt.z; })[0];
     box.appendChild(el('p', { class: 'set-help', text: zd ? zd[1] + ': ' + zd[2] + '.' : '' }));
     if (!selected.length) box.appendChild(el('p', { class: 'set-help', text: 'Marca antes alguna provincia en «Provincias».' }));
@@ -2511,7 +2520,6 @@
       box.appendChild(el('div', { class: 'prov-par map-row' }, [el('span', { class: 'pp-t', text: provName(code) })].concat(tail)));
     });
     if (total) box.appendChild(el('p', { class: 'set-help', text: 'Guardado en el móvil: unos ' + fmtMB(total) + '.' }));
-    box.appendChild(el('p', { class: 'set-help', text: 'Mapas © IGN (CNIG). Para uso personal dentro de la app.' }));
   }
 
   // ---------- Ubicación y PK más cercano (en la misma ficha que cualquier punto) ----------

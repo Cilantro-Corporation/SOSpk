@@ -91,6 +91,9 @@
   </div>
 
   <div class="map-ctrls">
+    <button class="icon-btn" id="btnZoneAdd" type="button" aria-label="Añadir sector" hidden>
+      <svg viewBox="0 0 24 24"><path d="M9 3l5.2 3v6M14.2 15.5V18L9 21 3.8 18V6L9 3" fill="none" stroke-width="2" stroke-linejoin="round"/><path d="M18 11v8M14 15h8" fill="none" stroke-width="2.4" stroke-linecap="round"/></svg>
+    </button>
     <button class="icon-btn" id="btnLayers" type="button" aria-label="Capas PRO" hidden>
       <svg viewBox="0 0 24 24"><path d="M4 4h6.5v6.5H4zM13.5 4H20v6.5h-6.5zM4 13.5h6.5V20H4zM13.5 13.5H20V20h-6.5z"/></svg>
     </button>
@@ -196,7 +199,7 @@
         <li><span>⛈️</span><div><b>Avisos meteorológicos</b><small>Solo los vigentes, con el tipo de aviso y el enlace a la fuente.</small></div></li>
         <li><span>🔥</span><div><b>Incendios activos</b><small>Focos de calor detectados hoy por satélite, sin histórico.</small></div></li>
         <li><span>⬡</span><div><b>Sectores</b><small>Dibuja un sector o una ruta, ponle nombre y color, y mide su perímetro y área.</small></div></li>
-        <li><span>🗺️</span><div><b>Mapas sin conexión</b><small>Guarda en el móvil el mapa o el satélite de tus provincias para verlos sin cobertura (app Android).</small></div></li>
+        <li><span>🗺️</span><div><b>Mapas sin conexión de detalle alto</b><small>Detalle alto del mapa y del satélite de tus provincias para verlos sin cobertura (app Android). El detalle medio es gratis.</small></div></li>
         <li><span>⭐</span><div><b>Hasta 50 favoritos</b><small>Con más colores e iconos (gratis: 5 favoritos).</small></div></li>
       </ul>
       <div class="prem-price" id="premPrice"></div>
@@ -215,12 +218,12 @@
       <details class="sec">
         <summary><span>SOS<span class="lc">pk</span>, ¿qué es?</span></summary>
         <p class="set-help">SOSpk localiza puntos kilométricos de las carreteras de España y te lleva hasta ellos. Escribe la carretera y el km, o toca el mapa, y te damos las coordenadas, el PK más cercano, el enlace a Google Maps, copiar las coordenadas y el enlace para WhatsApp.</p>
-        <p class="set-help"><b>Coordenadas:</b> también puedes escribir unas coordenadas, o pegar un enlace de Google Maps, Apple Maps o WhatsApp, en la misma casilla de la carretera. Todos estos formatos son el mismo punto:<br>• Decimales: 40.635833, -3.168639<br>• Con letras: 40.635833 N, 3.168639 W (vale O por oeste)<br>• Grados, minutos y segundos: 40°38'09.0"N 3°10'07.1"W<br>• Grados y minutos decimales: 40°38.150'N 3°10.118'W<br>Vale la coma o el punto decimal.</p>
+        <p class="set-help"><b>Coordenadas:</b> también puedes escribir unas coordenadas, o pegar un enlace de Google Maps, Apple Maps o WhatsApp, en la misma casilla de la carretera. Formatos de coordenadas:<br>• Decimales: 40.635833, -3.168639<br>• Con letras: 40.635833 N, 3.168639 W (vale O por oeste)<br>• Grados, minutos y segundos: 40°38'09.0"N 3°10'07.1"W<br>• Grados y minutos decimales: 40°38.150'N 3°10.118'W<br>Vale la coma o el punto decimal.</p>
         <p class="set-help"><b>Consejo:</b> pulsa cualquier punto del mapa para ver sus coordenadas, el PK más cercano e ir hasta allí; mantenlo pulsado para ver los PK cercanos y guardarlo como favorito. En el buscador puedes escribir una carretera o, con PRO, un municipio, un pueblo o un paraje.</p>
         <p class="set-help">Sin anuncios y sin cobertura. Pensada para quienes trabajan en carretera: bomberos, sanitarios, policías, emergencias, protección civil y asistencia en carretera, o cualquiera que necesite compartir su ubicación exacta.</p>
         <div id="whatPrem" hidden>
-          <p class="set-help"><b>La versión Básica incluye:</b> buscador de puntos kilométricos, mapa, tu ubicación con coordenadas y el PK más cercano, 5 favoritos, 5 colores y 5 iconos.</p>
-          <p class="set-help"><b>La versión PRO añade:</b> municipios, pueblos y parajes en el buscador, cámaras de tráfico, balizas V16 y accidentes, cortes y obras en directo, hidrantes y puntos de agua, avisos meteorológicos, incendios activos, sectores con perímetro y área, mapas sin conexión (app Android), hasta 50 favoritos con enlace e imagen, y más colores e iconos.</p>
+          <p class="set-help"><b>La versión Básica incluye:</b> buscador de puntos kilométricos, mapa, tu ubicación con coordenadas y el PK más cercano, mapas sin conexión con detalle medio (app Android), 5 favoritos, 5 colores y 5 iconos.</p>
+          <p class="set-help"><b>La versión PRO añade:</b> municipios, pueblos y parajes en el buscador, cámaras de tráfico, balizas V16 y accidentes, cortes y obras en directo, hidrantes y puntos de agua, avisos meteorológicos, incendios activos, sectores con perímetro y área, mapas sin conexión con detalle alto (app Android), hasta 50 favoritos con enlace e imagen, y más colores e iconos.</p>
           <p class="set-help"><b>¿Qué es SOSpk PRO?</b> Una suscripción para los profesionales de la carretera, que no se pueden permitir una demora. Al descargar una provincia incluye sus municipios, parajes, cámaras de tráfico (con enlace a la web oficial), balizas V16 y tráfico en directo, puntos de agua para emergencias, avisos meteorológicos vigentes y focos de incendio de hoy. <b>1,99 € al mes o 10,99 € al año, con 10 días de prueba gratis</b>; se cobra por Google Play y se cancela cuando quieras. Cámaras, balizas, tráfico, avisos e incendios necesitan cobertura; el buscador de PK sigue funcionando sin ella.</p>
           <button type="button" class="prem-go" id="whatGo">Hacerme PRO</button>
           <div class="plan-row">Tu plan: <b id="planName">Gratis</b> <button type="button" class="pp-b" id="planBtn">Ver PRO</button></div>
@@ -297,6 +300,7 @@
 
       <details class="sec">
         <summary>Créditos</summary>
+        <p class="set-help">Mapas sin conexión: mapas © IGN (CNIG). Para uso personal dentro de la app.</p>
         <div class="credits">
           <img class="cr-logo" src="icons/logo-credits.png" alt="Logo de SOSpk" width="112" height="112">
           <div class="cr-app">SOSpk <small id="appVersion"></small></div>

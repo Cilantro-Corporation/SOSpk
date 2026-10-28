@@ -473,3 +473,15 @@ body.drawing .sheet { display: none; }
 
 .map-lbl { font-family: var(--head); font-size: 13px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--lime); margin: 10px 0 4px; }
 .segbtn small { display: block; font-family: var(--body); font-weight: 400; font-size: 11px; letter-spacing: 0; opacity: .85; }
+.zl .del { border: 0; background: none; color: var(--lime); font-size: 20px; width: 40px; height: 40px; flex: none; }
+.set-scroll { overflow-x: hidden; }
+.set-help, .prem-list b, .prem-list small, .pp-t { overflow-wrap: anywhere; }
+.map-line { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 8px 0; }
+.map-line .map-lbl { margin: 0; flex: none; }
+.map-line .segs { margin: 0; flex-wrap: wrap; }
+.segbtn.lock { opacity: .7; }
+.look-row { flex-wrap: wrap; }
+.look-row .segs { flex-wrap: wrap; max-width: 100%; border-radius: 18px; }
+.look-row > span { min-width: 0; }
+/* Editor de sectores: hoja baja para que el sector siga a la vista al elegir colores */
+.panel.zones#zoneEdit { top: auto; max-height: 62%; }
