@@ -104,7 +104,7 @@ button svg, .act svg, .icon-btn svg { width: 22px; height: 22px; fill: currentCo
 .up-close { border: 0; background: none; color: var(--bg); font-size: 20px; width: 30px; height: 30px; flex: none; }
 
 /* ---------- Controles del mapa ---------- */
-.map-ctrls { position: fixed; right: 4px; z-index: 450; display: flex; flex-direction: column; gap: 4px; bottom: calc(var(--safe-b) + 18px); }
+.map-ctrls { position: fixed; right: 4px; z-index: 450; display: flex; flex-direction: column; gap: 4px; bottom: var(--ctrl-b, calc(var(--safe-b) + 18px)); }
 .map-ctrls .icon-btn { width: calc(44px * var(--fs)); height: calc(44px * var(--fs)); background: var(--bg); box-shadow: 0 2px 8px rgba(0,0,0,.35); }
 .map-ctrls .icon-btn.on { background: var(--lime); color: var(--bg); }
 
@@ -351,7 +351,7 @@ button svg, .act svg, .icon-btn svg { width: 22px; height: 22px; fill: currentCo
 .prem-go { width: 100%; height: 46px; border: 0; border-radius: 12px; background: var(--lime); color: var(--bg); font-family: var(--head); font-weight: 700; font-size: 17px; letter-spacing: 1px; text-transform: uppercase; }
 .prem-go.on { background: var(--panel-2); color: var(--lime); }
 .plan-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 2px; font-size: 14px; }
-.layers-pop { position: fixed; right: 66px; bottom: calc(var(--safe-b) + 18px); z-index: 460; width: min(290px, calc(100% - 90px)); padding: 8px; border-radius: 12px;
+.layers-pop { position: fixed; right: 66px; bottom: var(--ctrl-b, calc(var(--safe-b) + 18px)); z-index: 460; width: min(290px, calc(100% - 90px)); padding: 8px; border-radius: 12px;
   background: rgba(11,11,11,.9); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: 0 0 0 1.5px var(--lime), 0 6px 20px rgba(0,0,0,.45); }
 .lp-head { display: flex; align-items: center; justify-content: space-between; padding: 0 2px 6px 6px; font-family: var(--head); letter-spacing: 1px; text-transform: uppercase; color: var(--lime); }
 .lp-note { margin: 6px 4px 2px; font-size: 11px; line-height: 1.35; color: var(--muted); }
@@ -466,7 +466,7 @@ body.drawing .sheet { display: none; }
 .hotpin { display: grid; place-items: center; width: 24px; height: 24px; margin: -12px 0 0 -12px; border-radius: 50%; background: #0B0B0B; border: 2px solid #FF4B3E; font-size: 13px; line-height: 1; box-sizing: border-box; }
 .hotpin.hp1 { border-color: #FF9F1C; }
 .hotpin.hp2 { border-color: #F2D600; opacity: .85; }
-.windpin { display: flex; flex-direction: column-reverse; align-items: center; width: 34px; margin: -17px 0 0 -17px; color: #fff; font-family: var(--head); font-size: 11px; line-height: 1; text-shadow: 0 0 3px #0B0B0B, 0 0 3px #0B0B0B; }
+.windpin { position: relative; display: grid; place-items: center; width: 34px; height: 34px; margin: -17px 0 0 -17px; color: #fff; font-family: var(--head); font-size: 11px; line-height: 1; text-shadow: 0 0 3px #0B0B0B, 0 0 3px #0B0B0B; }
 .windpin .wp-a { display: block; font-size: 22px; color: #6BD0FF; filter: drop-shadow(0 0 2px #0B0B0B); }
 .windpin.mid .wp-a { color: #FFB000; }
 .windpin.hi .wp-a { color: #FF4B3E; }
@@ -495,7 +495,10 @@ body.drawing .sheet { display: none; }
 
 .top.float { padding-top: 0; }
 .top.float.atbottom { padding-bottom: var(--safe-b); }
-.fs-s .map-ctrls { bottom: calc(var(--safe-b) + 6px); gap: 3px; }
+.fs-s .map-ctrls { bottom: var(--ctrl-b, calc(var(--safe-b) + 6px)); gap: 3px; }
 .fs-s .map-ctrls .icon-btn { width: 34px; height: 34px; }
 .fs-s .map-ctrls .icon-btn svg { width: 18px; height: 18px; }
 @media (min-width: 760px) { .chips { top: 8px; left: auto; right: 64px; transform: none; align-items: flex-end; } }
+.windpin .wp-a, .windpin .wp-v { grid-area: 1 / 1; }
+.windpin .wp-v { position: relative; z-index: 1; font-size: 12px; font-weight: 700; color: #fff; text-shadow: 0 0 2px #0B0B0B, 0 0 2px #0B0B0B, 0 0 3px #0B0B0B; }
+.windpin .wp-a { font-size: 30px; line-height: 1; opacity: .9; }

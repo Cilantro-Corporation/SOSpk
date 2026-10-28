@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob: https://www.ign.es https://maps.effis.emergency.copernicus.eu; font-src 'self'; connect-src 'self' https://cilantro-corporation.github.io https://raw.githubusercontent.com https://api.met.no; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob: https://www.ign.es https://maps.effis.emergency.copernicus.eu; font-src 'self'; connect-src 'self' https://cilantro-corporation.github.io https://raw.githubusercontent.com https://api.met.no https://maps.effis.emergency.copernicus.eu; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="format-detection" content="telephone=no">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -198,7 +198,7 @@
         <li><span>🚧</span><div><b>Accidentes, cortes y obras</b><small>Accidentes, cortes, obras y obstáculos de la DGT en directo, con carretera, km y enlace a Google Maps.</small></div></li>
         <li><span>💧</span><div><b>Hidrantes y puntos de agua</b><small>Hidrantes, tomas de aspiración, depósitos y balsas para emergencias (OpenStreetMap).</small></div></li>
         <li><span>⛈️</span><div><b>Avisos meteorológicos</b><small>Solo los vigentes, con el nivel (amarillo, naranja o rojo) y el enlace a la fuente. Tipos: tormentas, lluvias, nevadas, hielo, viento, nieblas, temperaturas máximas y mínimas, fenómenos costeros, riesgo de incendios, aludes e inundaciones.</small></div></li>
-        <li><span>🔥</span><div><b>Incendios activos</b><small>Focos de calor detectados hoy por satélite, sin histórico.</small></div></li>
+        <li><span>🔥</span><div><b>Incendios activos</b><small>Focos de calor detectados por satélite y, dibujada en rojo, el área quemada de los últimos 7 días (se actualiza a diario). Toca el área para ver su superficie.</small></div></li>
         <li><span>⬡</span><div><b>Sectores</b><small>Dibuja un sector o una ruta, ponle nombre y color, y mide su perímetro y área.</small></div></li>
         <li class="app-only"><span>🗺️</span><div><b>Descarga de mapas sin conexión con detalle alto</b><small>Guarda en el móvil el mapa topográfico o el satélite de tus provincias con calles y caminos, para verlos sin cobertura (app Android). El detalle medio es gratis.</small></div></li>
         <li><span>⭐</span><div><b>Hasta 50 favoritos</b><small>Con más colores e iconos (gratis: 5 favoritos).</small></div></li>
@@ -292,7 +292,7 @@
           <span class="lg-i"><span class="lg-v16">V16</span></span><span>Baliza V16 activa (parpadea)</span>
           <span class="lg-i">🚨</span><span>Accidente · ⛔ corte · ⚠️ obstáculo · 🚧 obras</span>
           <span class="lg-i">💧</span><span>Hidrante, toma de aspiración, depósito o balsa</span>
-          <span class="lg-i">🔥</span><span>Foco de calor de las últimas 24 h visto por satélite (más rojo = más reciente; no es el perímetro del incendio)</span>
+          <span class="lg-i">🔥</span><span>Foco de calor de las últimas 24 h visto por satélite (más rojo = más reciente). La zona roja es el área quemada de los últimos 7 días</span>
           <span class="lg-i">➤</span><span>Viento: la flecha apunta hacia donde sopla y el número son km/h</span>
           <span class="lg-i"><span class="lg-zone"></span></span><span>Sector o ruta dibujado, con su perímetro y área</span>
         </div>
@@ -310,7 +310,7 @@
           <div class="cr-corp">Cilantropo Lab</div>
         </div>
         <p class="set-help">Datos: hitos kilométricos oficiales del Instituto Geográfico Nacional (IGR Redes de Transporte, CC BY 4.0), puntos kilométricos de CartoCiudad (IGN · SCNE, CC BY 4.0 scne.es) y trazado de © colaboradores de OpenStreetMap (ODbL) y nombres de lugares del Nomenclátor Geográfico Básico de España (IGN, CC BY 4.0). Mapas: IGN / PNOA. Las posiciones entre hitos (≈) son una estimación. <span id="dataDate"></span></p>
-        <p class="set-help" id="creditsPrem" hidden>Cámaras, balizas V16 e incidencias: DGT, vía el Punto de Acceso Nacional del Ministerio de Transportes (Powered by MITRAMS); puntos de agua: © colaboradores de OpenStreetMap (ODbL); focos de calor: NASA FIRMS (VIIRS y MODIS); viento: MET Norway (CC BY 4.0); Servei Català de Trànsit; Gobierno Vasco (CC BY 4.0); ayuntamientos de Madrid, Valencia y Málaga (CC BY 4.0); Vitoria-Gasteiz. Avisos: AEMET, vía Meteoalarm (CC BY 4.0). Incendios: EFFIS, Copernicus EMS.</p>
+        <p class="set-help" id="creditsPrem" hidden>Cámaras, balizas V16 e incidencias: DGT, vía el Punto de Acceso Nacional del Ministerio de Transportes (Powered by MITRAMS); puntos de agua: © colaboradores de OpenStreetMap (ODbL); focos de calor: NASA FIRMS (VIIRS y MODIS); áreas quemadas: EFFIS (Copernicus); viento: MET Norway (CC BY 4.0); Servei Català de Trànsit; Gobierno Vasco (CC BY 4.0); ayuntamientos de Madrid, Valencia y Málaga (CC BY 4.0); Vitoria-Gasteiz. Avisos: AEMET, vía Meteoalarm (CC BY 4.0). Incendios: EFFIS, Copernicus EMS.</p>
         <p class="set-help"><b>Descargo de responsabilidad:</b> SOSpk solo te facilita el buscador y el enlace. Los puntos kilométricos, las imágenes de las cámaras, los datos y los avisos son responsabilidad del IGN, la DGT, AEMET, EFFIS o la entidad que los publica, y pueden tener errores o retrasos. Las imágenes, el mantenimiento y los fallos o interrupciones de las cámaras no son responsabilidad de SOSpk, que solo enlaza a la web de quien las publica. SOSpk no es un servicio oficial, no sustituye a la señalización ni a los servicios de emergencias y no llama a emergencias.</p>
         <p class="set-help">Aviso: la información es orientativa. Los PK y las posiciones calculadas (≈) pueden contener errores y no sustituyen a la señalización de la carretera ni a la información de los servicios oficiales. No se garantiza su exactitud ni se asume responsabilidad por su uso.</p>
       </details>

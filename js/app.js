@@ -186,7 +186,8 @@
   function lowCard() { return !window.matchMedia('(min-width: 760px)').matches && document.querySelector('.top').getBoundingClientRect().top > window.innerHeight / 2; }
   function topOffset() { return lowCard() ? 0 : document.querySelector('.top').getBoundingClientRect().bottom; }
   // Altura real de la cabecera (cambia con la línea de tramos, sugerencias o avisos): coloca avisos, paneles y zoom
-  function syncTop() { var st = document.documentElement.style; st.setProperty('--top-h', Math.round(topOffset()) + 'px'); st.setProperty('--chips-top', lowCard() ? 'calc(var(--safe-t) + 6px)' : Math.round(topOffset()) + 6 + 'px'); }
+  function syncTop() { var st = document.documentElement.style; st.setProperty('--top-h', Math.round(topOffset()) + 'px'); if (lowCard()) st.setProperty('--ctrl-b', Math.round(bottomOffset() + 8) + 'px'); else st.removeProperty('--ctrl-b'); // los botones del mapa suben sobre la caja si está abajo
+    st.setProperty('--chips-top', lowCard() ? 'calc(var(--safe-t) + 6px)' : Math.round(topOffset()) + 6 + 'px'); }
   if (window.ResizeObserver) new ResizeObserver(function () { applyPos(); }).observe(document.querySelector('.top'));
   syncTop();
   function bottomOffset() { return lowCard() ? window.innerHeight - document.querySelector('.top').getBoundingClientRect().top : 0; }
@@ -1777,6 +1778,31 @@
   var FIRMS_URLS = [FIRMS_BASE + 'noaa-20-viirs-c2/csv/J1_VIIRS_C2_Europe_24h.csv', FIRMS_BASE + 'suomi-npp-viirs-c2/csv/SUOMI_VIIRS_C2_Europe_24h.csv', FIRMS_BASE + 'modis-c6.1/csv/MODIS_C6_1_Europe_24h.csv'];
   var FIRMS_WEB = 'https://raw.githubusercontent.com/Cilantro-Corporation/SOSpk/live/firms.csv';
   var hot = [], hotState = 'idle', hotAt = 0;
+  // Superficie quemada de los últimos 7 días (EFFIS, Copernicus; se actualiza a diario): el área afectada, dibujada como en un mapa de incendios
+  var BURN_URL = 'https://maps.effis.emergency.copernicus.eu/effis?service=WFS&version=2.0.0&request=GetFeature&typeNames=ms:modis.ba.poly.week&outputFormat=' + encodeURIComponent('application/json; subtype=geojson') + '&srsName=EPSG:4326';
+  var burn = [], burnState = 'idle', burnAt = 0, burnLayer = L.layerGroup().addTo(map);
+  function loadBurn() {
+    if (!lyrOn('inc') || burnState === 'loading' || (burnState === 'ok' && Date.now() - burnAt < 1800000)) return;
+    burnState = 'loading';
+    fetch(BURN_URL, { credentials: 'omit' }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function (j) {
+      burn = (j && j.features) || []; burnState = 'ok'; burnAt = Date.now(); renderBurn();
+    }).catch(function () { burnState = 'error'; });
+  }
+  function renderBurn() {
+    burnLayer.clearLayers();
+    if (!lyrOn('inc') || burnState !== 'ok' || !borders) return;
+    var mine = pkgProvs();
+    burn.forEach(function (f) {
+      var g = f.geometry, p = f.properties || {}, c = g && g.coordinates && (g.type === 'Polygon' ? g.coordinates[0] && g.coordinates[0][0] : g.coordinates[0] && g.coordinates[0][0] && g.coordinates[0][0][0]);
+      if (!c) return;
+      if (f.pc === undefined) f.pc = borders.provinceAt(c[1], c[0]) || null;
+      if (!f.pc || mine.indexOf(f.pc) < 0) return;
+      var ha = Math.round(+p.AREA_HA) || 0;
+      L.geoJSON(f, { style: { color: '#FF4B3E', weight: 2, fillColor: '#FF4B3E', fillOpacity: 0.28 } })
+        .on('click', function (e) { L.DomEvent.stopPropagation(e); toast('Área quemada' + (p.COMMUNE && p.COMMUNE !== 'N.A.' ? ' en ' + p.COMMUNE : '') + ': ' + String(ha).replace('.', ',') + ' ha · detectada ' + String(p.FIREDATE || '').slice(0, 10).split('-').reverse().join('/') + ' · EFFIS', 6000); })
+        .addTo(burnLayer);
+    });
+  }
   function pkgBounds() {
     var b = null;
     pkgProvs().forEach(function (c) {
@@ -1810,7 +1836,9 @@
   function applyFire() {
     if (fireLayer) { map.removeLayer(fireLayer); fireLayer = null; }
     hotLayer.clearLayers();
+    burnLayer.clearLayers();
     if (!lyrOn('inc')) return;
+    loadBurn(); renderBurn();
     var b = pkgBounds();
     if (!b) return;
     if (hotState === 'idle') { loadHot(false); return; }
