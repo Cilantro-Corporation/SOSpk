@@ -1850,22 +1850,29 @@
   document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && lyrOn('inc')) loadHot(false); });
   map.on('moveend', renderHot);
 
-  // --- Viento (Open-Meteo): flechas hacia donde sopla, con la velocidad en km/h ---
-  var WIND_URL = 'https://api.open-meteo.com/v1/forecast?current=wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=kmh&timezone=UTC';
+  // --- Viento (MET Norway, CC BY 4.0, uso comercial permitido): flechas hacia donde sopla, con la velocidad en km/h ---
+  var WIND_URL = 'https://api.met.no/weatherapi/locationforecast/2.0/compact';
   var windCache = {}, windState = 'idle', windTimer = 0, windLayer = L.layerGroup().addTo(map);
   var COMPASS = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSO', 'SO', 'OSO', 'O', 'ONO', 'NO', 'NNO'];
   function windText(w) { return Math.round(w.v) + ' km/h del ' + COMPASS[Math.round(w.dir / 22.5) % 16] + (w.g > w.v + 5 ? ' (rachas de ' + Math.round(w.g) + ')' : ''); }
   function windSnap(x) { return Math.round(x * 10) / 10; }
-  function windParse(c) {
-    var v = c && +c.wind_speed_10m, d = c && +c.wind_direction_10m, g = c && +c.wind_gusts_10m;
-    return isFinite(v) && isFinite(d) && v >= 0 && v < 400 ? { v: v, dir: ((d % 360) + 360) % 360, g: isFinite(g) ? g : v, t: Date.now() } : null;
+  function windParse(j) { // MET Norway da m/s: se pasa a km/h; esta fuente no da rachas
+    var d0 = j && j.properties && j.properties.timeseries && j.properties.timeseries[0], c = d0 && d0.data && d0.data.instant && d0.data.instant.details;
+    var v = c && +c.wind_speed * 3.6, d = c && +c.wind_from_direction;
+    return isFinite(v) && isFinite(d) && v >= 0 && v < 400 ? { v: v, dir: ((d % 360) + 360) % 360, g: v, t: Date.now() } : null;
   }
-  function windFetch(pts) { // [[lat, lon], ...] ya ajustados a la rejilla; guarda en la caché
-    var q = WIND_URL + '&latitude=' + pts.map(function (p) { return p[0]; }).join(',') + '&longitude=' + pts.map(function (p) { return p[1]; }).join(',');
-    return fetch(q, { credentials: 'omit' }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function (j) {
-      var rows = Array.isArray(j) ? j : [j];
-      pts.forEach(function (p, i) { var w = rows[i] && windParse(rows[i].current); if (w) windCache[p[0] + ',' + p[1]] = w; });
-    });
+  function windFetch(pts) { // [[lat, lon], ...] ya ajustados a la rejilla; una consulta por punto (máx. 6 a la vez); guarda en la caché
+    var queue = pts.slice(), fails = 0, total = pts.length;
+    function one() {
+      var p = queue.shift();
+      if (!p) return Promise.resolve();
+      return fetch(WIND_URL + '?lat=' + p[0] + '&lon=' + p[1], { credentials: 'omit' })
+        .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(function (j) { var w = windParse(j); if (w) windCache[p[0] + ',' + p[1]] = w; else fails++; }, function () { fails++; })
+        .then(one);
+    }
+    var workers = []; for (var i = 0; i < Math.min(6, total); i++) workers.push(one());
+    return Promise.all(workers).then(function () { if (total && fails >= total) throw new Error('sin datos'); });
   }
   function windAt(lat, lon) {
     var p = [windSnap(lat), windSnap(lon)], k = p[0] + ',' + p[1], c = windCache[k];
@@ -1874,13 +1881,14 @@
   }
   function windKeys() {
     var size = map.getSize(), cell = 120 * dm(), pts = [], seen = {}, mine = pkgProvs();
-    if (!borders || !mine.length) return pts;
+    var c = map.getCenter(), mid = [windSnap(c.lat), windSnap(c.lng)];
+    if (map.getZoom() < 7 || !borders || !mine.length) return [mid]; // muy alejado o sin provincias: una flecha en el centro
     for (var x = cell / 2; x < size.x; x += cell) for (var y = cell / 2 + 70; y < size.y - 40; y += cell) {
       var ll = map.containerPointToLatLng([x, y]), p = [windSnap(ll.lat), windSnap(ll.lng)], k = p[0] + ',' + p[1], pc = borders.provinceAt(p[0], p[1]);
       if (seen[k] || !pc || mine.indexOf(pc) < 0) continue;
       seen[k] = 1; pts.push(p);
     }
-    return pts.slice(0, 60);
+    return pts.length ? pts.slice(0, 60) : [mid];
   }
   function renderWind() {
     clearTimeout(windTimer);
@@ -1891,7 +1899,6 @@
   function drawWind() {
     windLayer.clearLayers();
     if (!lyrOn('vie')) return;
-    if (map.getZoom() < 7) return;
     var pts = windKeys(), need = pts.filter(function (p) { var c = windCache[p[0] + ',' + p[1]]; return !c || Date.now() - c.t > 900000; });
     var paint = function () {
       windLayer.clearLayers();
@@ -2565,7 +2572,7 @@
       me = { lat: lat, lon: lon, acc: acc, t: Date.now() };
       if (!meMarker) {
         accCircle = L.circle([lat, lon], { radius: acc, color: '#1A73E8', weight: 1, fillOpacity: 0.1, interactive: false }).addTo(map);
-        meMarker = L.marker([lat, lon], { icon: L.divIcon({ className: 'pk-icon', html: '<span class="me"></span>', iconSize: [18, 18], iconAnchor: [9, 9] }), interactive: false, keyboard: false }).addTo(map);
+        meMarker = L.marker([lat, lon], { icon: L.divIcon({ className: 'pk-icon', html: '<span class="me"></span>', iconSize: [18, 18], iconAnchor: [9, 9] }), interactive: false, keyboard: false, zIndexOffset: 100000 }).addTo(map);
       } else { meMarker.setLatLng([lat, lon]); accCircle.setLatLng([lat, lon]).setRadius(acc); }
       // Con el PK bloqueado la ficha no cambia; si se está viendo otro resultado, solo se actualiza su distancia
       if (!locked) {
