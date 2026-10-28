@@ -104,8 +104,8 @@ button svg, .act svg, .icon-btn svg { width: 22px; height: 22px; fill: currentCo
 .up-close { border: 0; background: none; color: var(--bg); font-size: 20px; width: 30px; height: 30px; flex: none; }
 
 /* ---------- Controles del mapa ---------- */
-.map-ctrls { position: fixed; right: 10px; z-index: 450; display: flex; flex-direction: column; gap: 8px; bottom: calc(var(--safe-b) + 18px); }
-.map-ctrls .icon-btn { width: 44px; height: 44px; background: var(--bg); box-shadow: 0 2px 8px rgba(0,0,0,.35); }
+.map-ctrls { position: fixed; right: 4px; z-index: 450; display: flex; flex-direction: column; gap: 4px; bottom: calc(var(--safe-b) + 18px); }
+.map-ctrls .icon-btn { width: calc(44px * var(--fs)); height: calc(44px * var(--fs)); background: var(--bg); box-shadow: 0 2px 8px rgba(0,0,0,.35); }
 .map-ctrls .icon-btn.on { background: var(--lime); color: var(--bg); }
 
 
@@ -294,7 +294,7 @@ button svg, .act svg, .icon-btn svg { width: 22px; height: 22px; fill: currentCo
 .me { display: block; width: 18px; height: 18px; border-radius: 50%; background: #1A73E8; border: 3px solid #fff; box-shadow: 0 0 0 6px rgba(26,115,232,.25); }
 
 .leaflet-container { font-family: var(--body); }
-.leaflet-control-attribution { font-size: 10px; }
+.leaflet-control-attribution { display: none; } /* la atribución está en Configuración › Créditos */
 .leaflet-top { top: calc(var(--top-h, 110px) + 8px); }
 .leaflet-bar a { background: var(--bg); color: var(--lime); border-color: var(--line); }
 
@@ -316,7 +316,7 @@ button svg, .act svg, .icon-btn svg { width: 22px; height: 22px; fill: currentCo
   .mini { width: calc(36px * var(--box)); height: calc(36px * var(--box)); }
   .act { height: calc(36px * var(--box)); }
   .nl { min-height: calc(32px * var(--box)); }
-  .map-ctrls .icon-btn { width: 52px; height: 52px; }
+  .map-ctrls .icon-btn { width: calc(52px * var(--fs)); height: calc(52px * var(--fs)); }
   .toast { left: calc(50% + 214px); max-width: calc(100% - 450px); }
 }
 /* Pantallas bajas (móvil en horizontal): la ficha no tapa medio mapa */
@@ -479,9 +479,16 @@ body.drawing .sheet { display: none; }
 .map-line { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 8px 0; }
 .map-line .map-lbl { margin: 0; flex: none; }
 .map-line .segs { margin: 0; flex-wrap: wrap; }
-.segbtn.lock { opacity: .7; }
+.segbtn.lock { opacity: .85; filter: grayscale(1); }
 .look-row { flex-wrap: wrap; }
 .look-row .segs { flex-wrap: wrap; max-width: 100%; border-radius: 18px; }
 .look-row > span { min-width: 0; }
 /* Editor de sectores: hoja baja para que el sector siga a la vista al elegir colores */
 .panel.zones#zoneEdit { top: auto; max-height: 62%; }
+.map-ctrls .icon-btn svg { width: calc(22px * var(--fs)); height: calc(22px * var(--fs)); }
+.sec-up { display: flex; align-items: center; justify-content: flex-end; width: 100%; height: 36px; margin-top: 8px; border: 0; background: none; padding: 0 2px; }
+.sec-up::after { content: ''; width: 9px; height: 9px; border-right: 2.5px solid var(--lime); border-bottom: 2.5px solid var(--lime); transform: translateY(2px) rotate(-135deg); }
+
+.prem-go.lock { background: var(--panel-2); color: #9a9a9a; filter: grayscale(1); }
+.prem-go.lock::after { content: ' 🔒'; }
+[hidden] { display: none !important; }

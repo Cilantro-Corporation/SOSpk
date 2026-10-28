@@ -112,6 +112,12 @@
     $('testPrem').checked = simPremium;
     if (!fw) $('layersPop').hidden = true;
   }
+  // Al final de cada desplegable de Configuración, un botón para replegarlo sin volver arriba
+  Array.prototype.forEach.call(document.querySelectorAll('#settings details.sec'), function (d) {
+    d.appendChild(el('button', { type: 'button', class: 'sec-up', 'aria-label': 'Replegar', title: 'Replegar', onclick: function () { d.open = false; d.querySelector('summary').scrollIntoView({ block: 'nearest' }); } }));
+  });
+  // Lo que solo existe en la app Android no se muestra en la web
+  if (!IS_NATIVE) Array.prototype.forEach.call(document.querySelectorAll('.app-only'), function (n) { n.hidden = true; });
   $('btnZoneAdd').addEventListener('click', function () { if (!isPremium()) { showPremium('Los sectores son una función PRO.'); return; } $('layersPop').hidden = true; startDraw(); });
   $('btnLayers').addEventListener('click', function () {
     var pop = $('layersPop');
@@ -2210,7 +2216,8 @@
     var box = $('zonesList'), list = readZonas();
     clear(box);
     $('secSectores').hidden = !framework();
-    if (!isPremium()) { box.appendChild(el('p', { class: 'set-help', text: 'Los sectores son una función PRO.' })); return; }
+    $('zonesNew').classList.toggle('lock', !isPremium());
+    if (!isPremium()) return;
     if (!list.length) box.appendChild(el('p', { class: 'set-help', text: 'Aún no tienes sectores. Pulsa «Nuevo sector» y toca el mapa punto a punto.' }));
     list.forEach(function (z) {
       var dot = el('span', { class: 'zl-dot' });
@@ -2486,7 +2493,7 @@
   function renderMapasInner() {
     var box = $('mapasBody');
     if (!box) return;
-    $('secMapas').hidden = !framework();
+    $('secMapas').hidden = !framework() || !IS_NATIVE;
     clear(box);
     if (!framework()) return;
     if (!IS_NATIVE) { box.appendChild(el('p', { class: 'set-help', text: 'Los mapas sin conexión están disponibles en la app Android.' })); return; }

@@ -192,18 +192,19 @@
     <div class="set-scroll">
       <p class="prem-reason" id="premReason" hidden></p>
       <ul class="prem-list">
-        <li><span>📍</span><div><b>Municipios, pueblos y parajes</b><small>Búscalos en la misma casilla que las carreteras. Al descargar los parajes de una provincia se incluye lo siguiente.</small></div></li>
+        <li><span>⛰️</span><div><b>Municipios, pueblos y parajes</b><small>Búscalos en la misma casilla que las carreteras. Al descargar una provincia se incluye con ella todo esto: sus parajes, cámaras de tráfico, puntos de agua, avisos meteorológicos e incendios activos.</small></div></li>
         <li><span>📷</span><div><b>Cámaras de tráfico</b><small>Un icono en el mapa que abre la cámara en su web oficial; en la ficha, la más cercana al punto.</small></div></li>
-        <li><span>🆘</span><div><b>Balizas V16 y tráfico en directo</b><small>Balizas V16 activas, accidentes, cortes, obras y obstáculos de la DGT, con carretera, km y enlace a Google Maps.</small></div></li>
+        <li><span>🆘</span><div><b>Balizas V16 activas</b><small>Las balizas V16 que están sonando ahora, con carretera, km y enlace a Google Maps.</small></div></li>
+        <li><span>🚧</span><div><b>Accidentes, cortes y obras</b><small>Accidentes, cortes, obras y obstáculos de la DGT en directo, con carretera, km y enlace a Google Maps.</small></div></li>
         <li><span>💧</span><div><b>Hidrantes y puntos de agua</b><small>Hidrantes, tomas de aspiración, depósitos y balsas para emergencias (OpenStreetMap).</small></div></li>
-        <li><span>⛈️</span><div><b>Avisos meteorológicos</b><small>Solo los vigentes, con el tipo de aviso y el enlace a la fuente.</small></div></li>
+        <li><span>⛈️</span><div><b>Avisos meteorológicos</b><small>Solo los vigentes, con el nivel (amarillo, naranja o rojo) y el enlace a la fuente. Tipos: tormentas, lluvias, nevadas, hielo, viento, nieblas, temperaturas máximas y mínimas, fenómenos costeros, riesgo de incendios, aludes e inundaciones.</small></div></li>
         <li><span>🔥</span><div><b>Incendios activos</b><small>Focos de calor detectados hoy por satélite, sin histórico.</small></div></li>
         <li><span>⬡</span><div><b>Sectores</b><small>Dibuja un sector o una ruta, ponle nombre y color, y mide su perímetro y área.</small></div></li>
-        <li><span>🗺️</span><div><b>Mapas sin conexión de detalle alto</b><small>Detalle alto del mapa y del satélite de tus provincias para verlos sin cobertura (app Android). El detalle medio es gratis.</small></div></li>
+        <li class="app-only"><span>🗺️</span><div><b>Descarga de mapas sin conexión con detalle alto</b><small>Guarda en el móvil el mapa topográfico o el satélite de tus provincias con calles y caminos, para verlos sin cobertura (app Android). El detalle medio es gratis.</small></div></li>
         <li><span>⭐</span><div><b>Hasta 50 favoritos</b><small>Con más colores e iconos (gratis: 5 favoritos).</small></div></li>
       </ul>
       <div class="prem-price" id="premPrice"></div>
-      <p class="set-help">El precio de SOSpk PRO se destina al desarrollo y al mantenimiento de la app, pensada como servicio profesional para quienes trabajan en carretera.</p>
+      <p class="set-help">El coste de SOSpk PRO se destina al desarrollo y al mantenimiento de la app, pensada como servicio profesional.</p>
       <button class="prem-go" id="premiumGo" type="button">Probar 10 días gratis</button>
       <p class="set-help">La suscripción se gestiona desde Google Play y se renueva sola; puedes cancelarla cuando quieras. Las cámaras, los avisos y los incendios necesitan conexión. SOSpk solo te facilita el buscador y el enlace: las imágenes, los datos y los avisos son responsabilidad de la DGT, AEMET, EFFIS o la entidad que los publica. SOSpk no es un servicio oficial ni llama a emergencias.</p>
     </div>
@@ -222,8 +223,8 @@
         <p class="set-help"><b>Consejo:</b> pulsa cualquier punto del mapa para ver sus coordenadas, el PK más cercano e ir hasta allí; mantenlo pulsado para ver los PK cercanos y guardarlo como favorito. En el buscador puedes escribir una carretera o, con PRO, un municipio, un pueblo o un paraje.</p>
         <p class="set-help">Sin anuncios y sin cobertura. Pensada para quienes trabajan en carretera: bomberos, sanitarios, policías, emergencias, protección civil y asistencia en carretera, o cualquiera que necesite compartir su ubicación exacta.</p>
         <div id="whatPrem" hidden>
-          <p class="set-help"><b>La versión Básica incluye:</b> buscador de puntos kilométricos, mapa, tu ubicación con coordenadas y el PK más cercano, mapas sin conexión con detalle medio (app Android), 5 favoritos, 5 colores y 5 iconos.</p>
-          <p class="set-help"><b>La versión PRO añade:</b> municipios, pueblos y parajes en el buscador, cámaras de tráfico, balizas V16 y accidentes, cortes y obras en directo, hidrantes y puntos de agua, avisos meteorológicos, incendios activos, sectores con perímetro y área, mapas sin conexión con detalle alto (app Android), hasta 50 favoritos con enlace e imagen, y más colores e iconos.</p>
+          <p class="set-help"><b>La versión Básica incluye:</b> buscador de puntos kilométricos, mapa, tu ubicación con coordenadas y el PK más cercano,<span class="app-only"> mapas sin conexión con detalle medio (app Android),</span> 5 favoritos, 5 colores y 5 iconos.</p>
+          <p class="set-help"><b>La versión PRO añade:</b> municipios, pueblos y parajes en el buscador, cámaras de tráfico, balizas V16 y accidentes, cortes y obras en directo, hidrantes y puntos de agua, avisos meteorológicos, incendios activos, sectores con perímetro y área,<span class="app-only"> mapas sin conexión con detalle alto (app Android),</span> hasta 50 favoritos con enlace e imagen, y más colores e iconos.</p>
           <p class="set-help"><b>¿Qué es SOSpk PRO?</b> Una suscripción para los profesionales de la carretera, que no se pueden permitir una demora. Al descargar una provincia incluye sus municipios, parajes, cámaras de tráfico (con enlace a la web oficial), balizas V16 y tráfico en directo, puntos de agua para emergencias, avisos meteorológicos vigentes y focos de incendio de hoy. <b>1,99 € al mes o 10,99 € al año, con 10 días de prueba gratis</b>; se cobra por Google Play y se cancela cuando quieras. Cámaras, balizas, tráfico, avisos e incendios necesitan cobertura; el buscador de PK sigue funcionando sin ella.</p>
           <button type="button" class="prem-go" id="whatGo">Hacerme PRO</button>
           <div class="plan-row">Tu plan: <b id="planName">Gratis</b> <button type="button" class="pp-b" id="planBtn">Ver PRO</button></div>
@@ -300,6 +301,7 @@
 
       <details class="sec">
         <summary>Créditos</summary>
+        <p class="set-help">Mapa: © <a href="https://www.ign.es" target="_blank" rel="noopener noreferrer">IGN</a> · PK: IGN, CartoCiudad · trazado © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OSM</a>.</p>
         <p class="set-help">Mapas sin conexión: mapas © IGN (CNIG). Para uso personal dentro de la app.</p>
         <div class="credits">
           <img class="cr-logo" src="icons/logo-credits.png" alt="Logo de SOSpk" width="112" height="112">
