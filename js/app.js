@@ -52,12 +52,12 @@
     return v.filter(function (c, i) { return typeof c === 'string' && provByCode[c] && v.indexOf(c) === i; });
   }
 
-  // ---------- Premium (marco preparado; apagado hasta que estén las compras de Google Play) ----------
+  // ---------- PRO (marco preparado; apagado hasta que estén las compras de Google Play) ----------
   // Con PRE.enforced = false y sin modo de pruebas, la app se comporta como siempre: nada bloqueado y sin botón «Capas».
   // El modo de pruebas (siete toques en la versión, en Configuración) activa el marco para poder probar lo gratis y lo
-  // Premium. Cuando haya compras reales, simPremium se sustituye por el estado de la suscripción y se quita el modo de pruebas.
+  // PRO. Cuando haya compras reales, simPremium se sustituye por el estado de la suscripción y se quita el modo de pruebas.
   var PRE = CFG.premium;
-  var TESTERS = PRE.testers === true; // versión para probadores: casilla visible para probar Premium
+  var TESTERS = PRE.testers === true; // versión para probadores: casilla visible para probar PRO
   var devMode = TESTERS || S.readJSON('dev', false) === true;
   var simPremium = S.readJSON('prem', false) === true;
   function framework() { return !!(PRE.enforced || devMode); }
@@ -74,16 +74,16 @@
     r.textContent = premiumReason;
     r.hidden = !premiumReason;
     var on = isPremium();
-    $('premiumGo').textContent = on ? (devMode ? 'Premium de prueba activo: desactivar' : 'Ya eres Premium') : devMode ? 'Activar Premium de prueba' : 'Probar ' + PRE.trialDays + ' días gratis';
+    $('premiumGo').textContent = on ? (devMode ? 'PRO de prueba activo: desactivar' : 'Ya eres PRO') : devMode ? 'Activar PRO de prueba' : 'Probar ' + PRE.trialDays + ' días gratis';
     $('premiumGo').classList.toggle('on', on);
-    $('premPrice').textContent = PRE.priceYear + ' al año · o ' + PRE.priceMonth + ' al mes · ' + PRE.trialDays + ' días de prueba gratis';
+    $('premPrice').textContent = PRE.priceMonth + ' al mes · o ' + PRE.priceYear + ' al año · ' + PRE.trialDays + ' días de prueba gratis';
   }
   $('premiumGo').addEventListener('click', function () {
-    if (devMode) { simPremium = !simPremium; S.writeJSON('prem', simPremium); premiumChanged(); renderPremium(); toast(simPremium ? 'Premium de prueba activado' : 'Premium de prueba desactivado'); return; }
+    if (devMode) { simPremium = !simPremium; S.writeJSON('prem', simPremium); premiumChanged(); renderPremium(); toast(simPremium ? 'PRO de prueba activado' : 'PRO de prueba desactivado'); return; }
     if (PRE.checkoutUrl) { openLink(PRE.checkoutUrl); return; }
     toast('La suscripción estará disponible en Google Play');
   });
-  $('testPrem').addEventListener('change', function () { simPremium = $('testPrem').checked; S.writeJSON('prem', simPremium); premiumChanged(); renderPremium(); toast(simPremium ? 'Premium de prueba activado' : 'Premium de prueba desactivado'); });
+  $('testPrem').addEventListener('change', function () { simPremium = $('testPrem').checked; S.writeJSON('prem', simPremium); premiumChanged(); renderPremium(); toast(simPremium ? 'PRO de prueba activado' : 'PRO de prueba desactivado'); });
   $('whatGo').addEventListener('click', function () { $('settings').hidden = true; showPremium(''); });
   $('premiumClose').addEventListener('click', function () { $('premiumPanel').hidden = true; });
   // Al cambiar de plan se vuelve a pintar lo que depende de él
@@ -105,7 +105,7 @@
     $('optPkgRow').hidden = !fw;
     $('secSectores').hidden = !fw;
     if (typeof mapOpt !== 'undefined' && mapOpt) renderMapasList();
-    $('planName').textContent = isPremium() ? 'Premium' : 'Gratis';
+    $('planName').textContent = isPremium() ? 'PRO' : 'Gratis';
     $('devRow').hidden = !devMode || TESTERS;
     $('testRow').hidden = !TESTERS;
     $('testPrem').checked = simPremium;
@@ -580,10 +580,10 @@
   }
   // Pueblos de las provincias elegidas y sus parajes (si se pidieron); sin aviso si falla (no es imprescindible)
   function loadProvincePlaces(code) {
-    if (!isPremium()) return Promise.resolve(); // municipios, pueblos y parajes son Premium: en gratis ni se descargan
+    if (!isPremium()) return Promise.resolve(); // municipios, pueblos y parajes son PRO: en gratis ni se descargan
     var jobs = [loadPlaces('lugares', code).catch(function () { return null; })];
     if (parajesOn.indexOf(code) >= 0) jobs.push(loadPlaces('parajes', code).catch(function () { return null; }));
-    else if (autoPkgOn()) jobs.push(autoPackage(code)); // con Premium, la provincia trae todo: municipios, parajes y cámaras
+    else if (autoPkgOn()) jobs.push(autoPackage(code)); // con PRO, la provincia trae todo: municipios, parajes y cámaras
     return Promise.all(jobs).then(function () { if (document.activeElement === roadInput) renderSuggest(); });
   }
   function dropProvincePlaces(code) {
@@ -600,7 +600,7 @@
     if (typeof syncPackage === 'function') { syncPackage(); renderCams(); loadAvisos(false); }
   }
   var parajesState = {}; // code -> 'loading' | 'error'
-  // Con el marco Premium el «paquete» de una provincia (parajes + cámaras) se baja solo con ella; en Opciones se puede apagar
+  // Con el marco PRO el «paquete» de una provincia (parajes + cámaras) se baja solo con ella; en Opciones se puede apagar
   var pkgAuto = S.readJSON('pkgauto', true) !== false;
   function autoPkgOn() { return framework() && isPremium() && pkgAuto; }
   function pkgSize(code) {
@@ -625,7 +625,7 @@
     });
   }
   function toggleParajes(code) {
-    if (!isPremium()) { showPremium('Los parajes son una función Premium.'); return; }
+    if (!isPremium()) { showPremium('Los parajes son una función PRO.'); return; }
     if (parajesOn.indexOf(code) >= 0) {
       setParajes(code, false);
       delete placeLists['parajes:' + code];
@@ -755,8 +755,8 @@
     (/\d/.test(val) ? chips.concat(pchips) : pchips.concat(chips)).forEach(function (n) { suggestBox.appendChild(n); });
     // En gratis, una sola sugerencia con candado cuando no hay carreteras que coincidan
     if (!allowed && !selectedRoad && !list.length && /[A-Za-zÀ-ÿ]{3}/.test(val)) {
-      suggestBox.appendChild(el('button', { type: 'button', class: 'chip lockchip', role: 'option', onclick: function () { showPremium('Buscar municipios, pueblos y parajes es una función Premium.'); } }, [
-        el('span', { class: 'pin', text: '🔒' }), el('span', { text: 'Municipios y parajes' }), el('small', { text: 'Premium' }),
+      suggestBox.appendChild(el('button', { type: 'button', class: 'chip lockchip', role: 'option', onclick: function () { showPremium('Buscar municipios, pueblos y parajes es una función PRO.'); } }, [
+        el('span', { class: 'pin', text: '🔒' }), el('span', { text: 'Municipios y parajes' }), el('small', { text: 'PRO' }),
       ]));
     }
     suggestBox.hidden = !suggestBox.firstChild || document.activeElement !== roadInput;
@@ -1167,7 +1167,7 @@
     if (x.im === 1) o.im = 1;
     return o;
   }
-  // Enlace o texto de un favorito (Premium): si parece un enlace web se abre; si no, se muestra como nota
+  // Enlace o texto de un favorito (PRO): si parece un enlace web se abre; si no, se muestra como nota
   function favUrl(s) {
     s = String(s || '').trim();
     if (/^www\./i.test(s)) s = 'https://' + s;
@@ -1311,8 +1311,8 @@
     var cols = el('div', { class: 'fe-cols', role: 'radiogroup', 'aria-label': 'Color' });
     FAV_COLORS.forEach(function (c, i) {
       var lock = !isPremium() && i >= PRE.freeColors;
-      var b = el('button', { type: 'button', class: 'fe-col' + (lock ? ' lock' : ''), role: 'radio', 'aria-label': 'Color ' + (i + 1) + (lock ? ' (Premium)' : ''),
-        onclick: function () { if (lock) { showPremium('Más colores es una función Premium.'); return; } editing.col = c; mark(); } });
+      var b = el('button', { type: 'button', class: 'fe-col' + (lock ? ' lock' : ''), role: 'radio', 'aria-label': 'Color ' + (i + 1) + (lock ? ' (PRO)' : ''),
+        onclick: function () { if (lock) { showPremium('Más colores es una función PRO.'); return; } editing.col = c; mark(); } });
       b.style.background = c;
       b.dataset.v = c;
       cols.appendChild(b);
@@ -1322,20 +1322,20 @@
     var ics = el('div', { class: 'fe-ics', role: 'radiogroup', 'aria-label': 'Icono' });
     [['', 'Estrella']].concat(FAV_ICONS).forEach(function (ic, i) {
       var lock = !isPremium() && i >= PRE.freeIcons;
-      var b = el('button', { type: 'button', class: 'fe-ic' + (lock ? ' lock' : ''), role: 'radio', title: ic[1], 'aria-label': ic[1] + (lock ? ' (Premium)' : ''), text: ic[0] || '★',
-        onclick: function () { if (lock) { showPremium('Más iconos es una función Premium.'); return; } if (ic[0]) editing.ic = ic[0]; else delete editing.ic; mark(); } });
+      var b = el('button', { type: 'button', class: 'fe-ic' + (lock ? ' lock' : ''), role: 'radio', title: ic[1], 'aria-label': ic[1] + (lock ? ' (PRO)' : ''), text: ic[0] || '★',
+        onclick: function () { if (lock) { showPremium('Más iconos es una función PRO.'); return; } if (ic[0]) editing.ic = ic[0]; else delete editing.ic; mark(); } });
       b.dataset.v = ic[0];
       ics.appendChild(b);
     });
     box.appendChild(ics);
-    // Enlace o texto e imagen: Premium
+    // Enlace o texto e imagen: PRO
     var prem = isPremium();
-    box.appendChild(el('div', { class: 'fe-t', text: prem ? 'Texto / enlace URL' : '🔒 Texto / enlace URL · Premium' }));
-    var lnk = el('input', { class: 'fe-name' + (prem ? '' : ' lock'), id: 'favLink', type: 'text', maxlength: '300', placeholder: prem ? 'Una nota o un enlace (https://…)' : 'Función Premium', 'aria-label': 'Texto o enlace del favorito', spellcheck: 'false', autocapitalize: 'none' });
+    box.appendChild(el('div', { class: 'fe-t', text: prem ? 'Texto / enlace URL' : '🔒 Texto / enlace URL · PRO' }));
+    var lnk = el('input', { class: 'fe-name' + (prem ? '' : ' lock'), id: 'favLink', type: 'text', maxlength: '300', placeholder: prem ? 'Una nota o un enlace (https://…)' : 'Función PRO', 'aria-label': 'Texto o enlace del favorito', spellcheck: 'false', autocapitalize: 'none' });
     lnk.value = editing.u || '';
-    if (!prem) { lnk.readOnly = true; lnk.addEventListener('click', function () { showPremium('El enlace y la imagen de un favorito son Premium.'); }); }
+    if (!prem) { lnk.readOnly = true; lnk.addEventListener('click', function () { showPremium('El enlace y la imagen de un favorito son PRO.'); }); }
     box.appendChild(lnk);
-    box.appendChild(el('div', { class: 'fe-t', text: prem ? 'Imagen' : '🔒 Imagen · Premium' }));
+    box.appendChild(el('div', { class: 'fe-t', text: prem ? 'Imagen' : '🔒 Imagen · PRO' }));
     editingImg = undefined;
     var pic = el('div', { class: 'fe-pic' + (prem ? '' : ' lock') });
     var thumb = el('img', { class: 'fe-thumb', alt: '' }), pbtn = el('button', { type: 'button', class: 'pp-b', text: '📷 Elegir imagen' }), prm = el('button', { type: 'button', class: 'pp-b del', text: 'Quitar' });
@@ -1343,7 +1343,7 @@
     thumb.hidden = true; prm.hidden = true;
     function showPic(d) { thumb.hidden = !d; prm.hidden = !d; if (d) thumb.src = d; else thumb.removeAttribute('src'); pbtn.textContent = d ? '📷 Cambiar' : '📷 Elegir imagen'; }
     if (editing.im) getFavImg(itemKey(editing)).then(function (d) { if (editingImg === undefined) showPic(d); });
-    pbtn.addEventListener('click', function () { if (!prem) { showPremium('El enlace y la imagen de un favorito son Premium.'); return; } file.click(); });
+    pbtn.addEventListener('click', function () { if (!prem) { showPremium('El enlace y la imagen de un favorito son PRO.'); return; } file.click(); });
     prm.addEventListener('click', function () { editingImg = null; showPic(null); });
     file.addEventListener('change', function () {
       var fl = file.files && file.files[0];
@@ -1542,9 +1542,9 @@
       box.appendChild(el('label', { class: 'prov' }, [cb, el('span', { class: 'pn', text: p.name }), el('span', { class: 'ps ' + status[1], text: status[0] })]));
       if (!on) return;
       if (framework()) {
-        // Una sola línea con lo que incluye la provincia; con Premium se baja sola
+        // Una sola línea con lo que incluye la provincia; con PRO se baja sola
         var inst = parajesOn.indexOf(p.code) >= 0, pst = parajesState[p.code], sz = pkgSize(p.code), tail;
-        if (!isPremium()) tail = el('button', { type: 'button', class: 'pp-b pp-lock', text: '🔒 Premium', onclick: function () { showPremium('Los municipios, parajes, cámaras y avisos son Premium.'); } });
+        if (!isPremium()) tail = el('button', { type: 'button', class: 'pp-b pp-lock', text: '🔒 PRO', onclick: function () { showPremium('Los municipios, parajes, cámaras y avisos son PRO.'); } });
         else if (pst === 'loading') tail = el('span', { class: 'pp-s', text: 'Descargando…' });
         else if (inst) tail = null; // ya incluido: el tamaño total va en la línea de la provincia
         else tail = el('button', { type: 'button', class: 'pp-b pp-par' + (pst === 'error' ? ' err' : ''), 'aria-label': 'Descargar el paquete de ' + p.name,
@@ -1552,7 +1552,7 @@
         box.appendChild(el('div', { class: 'prov-par' + (isPremium() ? '' : ' locked') + (inst && isPremium() ? ' inst' : '') }, [el('span', { class: 'pp-t', text: parTxt(p.code) }), tail]));
         return;
       }
-      // Sin marco Premium (versión pública actual): los parajes son una descarga opcional
+      // Sin marco PRO (versión pública actual): los parajes son una descarga opcional
       var psize = placesMeta && placesMeta.sizes[p.code] && placesMeta.sizes[p.code][1];
       if (psize) {
         var pon = parajesOn.indexOf(p.code) >= 0, pst2 = parajesState[p.code];
@@ -1655,11 +1655,11 @@
   }
   applyLook();
 
-  // ---------- Capas Premium: cámaras, avisos meteorológicos, incendios activos y zonas ----------
+  // ---------- Capas PRO: cámaras, avisos meteorológicos, incendios activos y zonas ----------
   // SOSpk solo facilita el buscador y el enlace: no copia ni muestra imágenes ni datos ajenos. Todo viene en el «paquete» de la provincia
   // (el mismo que los parajes): solo las provincias con parajes descargados tienen cámaras, avisos e incendios.
   var layerOn = S.readJSON('capas', null);
-  if (!layerOn || typeof layerOn !== 'object') layerOn = { cam: true, avi: true, inc: true, zon: true }; // con Premium, todo activado hasta que lo apagues
+  if (!layerOn || typeof layerOn !== 'object') layerOn = { cam: true, avi: true, inc: true, zon: true }; // con PRO, todo activado hasta que lo apagues
   var OFF_DEFAULT = { vie: true }; // el viento hace consultas a internet al mover el mapa: empieza apagado
   function lyrOn(k) { return isPremium() && (OFF_DEFAULT[k] ? layerOn[k] === true : layerOn[k] !== false); }
   function pkgProvs() { return selected.filter(function (c) { return parajesOn.indexOf(c) >= 0; }); }
@@ -2207,7 +2207,7 @@
     var box = $('zonesList'), list = readZonas();
     clear(box);
     $('secSectores').hidden = !framework();
-    if (!isPremium()) { box.appendChild(el('p', { class: 'set-help', text: 'Los sectores son una función Premium.' })); return; }
+    if (!isPremium()) { box.appendChild(el('p', { class: 'set-help', text: 'Los sectores son una función PRO.' })); return; }
     if (!list.length) box.appendChild(el('p', { class: 'set-help', text: 'Aún no tienes sectores. Pulsa «Nuevo sector» y toca el mapa punto a punto.' }));
     list.forEach(function (z) {
       var dot = el('span', { class: 'zl-dot' });
@@ -2220,7 +2220,7 @@
       ]));
     });
   }
-  $('zonesNew').addEventListener('click', function () { if (!isPremium()) { showPremium('Los sectores son una función Premium.'); return; } startDraw(); });
+  $('zonesNew').addEventListener('click', function () { if (!isPremium()) { showPremium('Los sectores son una función PRO.'); return; } startDraw(); });
   // Editor de zona: nombre, color del contorno y color del interior (muy tenue)
   var editingZ = null;
   function editZona(id) {
@@ -2296,7 +2296,7 @@
     clear(box);
     LAYERS.forEach(function (l) {
       var prem = isPremium(), on = prem && lyrOn(l[0]);
-      box.appendChild(el('button', { type: 'button', class: 'lyr' + (prem ? (on ? ' on' : '') : ' lock'), 'aria-label': l[2] + (prem ? (on ? ' (activada)' : ' (apagada)') : ' (Premium)'),
+      box.appendChild(el('button', { type: 'button', class: 'lyr' + (prem ? (on ? ' on' : '') : ' lock'), 'aria-label': l[2] + (prem ? (on ? ' (activada)' : ' (apagada)') : ' (PRO)'),
         onclick: function () { toggleLayer(l[0], l[2]); } }, [
         el('span', { class: 'lyr-i', text: l[1] }), el('span', { class: 'lyr-t', text: l[2] }),
         el('span', { class: 'lyr-s', text: prem ? layerNote(l[0]) : '🔒' }),
@@ -2312,7 +2312,7 @@
     });
   }
   function toggleLayer(k, title) {
-    if (!isPremium()) { showPremium(title + ' es una función Premium.'); return; }
+    if (!isPremium()) { showPremium(title + ' es una función PRO.'); return; }
     if (k !== 'zon' && !pkgProvs().length && !lyrOn(k)) toast('Descarga una provincia en Configuración para ver esta capa');
     layerOn[k] = !lyrOn(k);
     S.writeJSON('capas', layerOn);
@@ -2343,9 +2343,9 @@
     base: { name: 'Mapa', defs: [{ svc: 'ign-base', layer: 'IGNBaseTodo', fmt: 'image/png', kb: 45 }] },
     sat: { name: 'Satélite', defs: [{ svc: 'pnoa-ma', layer: 'OI.OrthoimageCoverage', fmt: 'image/jpeg', kb: 15 }, { svc: 'ign-base', layer: 'IGNBaseOrto', fmt: 'image/png', kb: 10 }] },
   };
-  var MAP_ZOOMS = [[12, 'Básico', 'carreteras y pueblos'], [13, 'Medio', 'calles principales'], [14, 'Detalle', 'calles y caminos']];
+  var MAP_ZOOMS = [[13, 'Medio', 'calles principales'], [14, 'Alto', 'calles y caminos']];
   var mapOpt = S.readJSON('mapopt', null);
-  if (!mapOpt || !MAP_LAYERS[mapOpt.layer] || [12, 13, 14].indexOf(mapOpt.z) < 0) mapOpt = { layer: 'base', z: 13 };
+  if (!mapOpt || !MAP_LAYERS[mapOpt.layer] || [13, 14].indexOf(mapOpt.z) < 0) mapOpt = { layer: mapOpt && MAP_LAYERS[mapOpt.layer] ? mapOpt.layer : 'base', z: 13 };
   var mapStore = S.readJSON('mapas', {});
   if (!mapStore || typeof mapStore !== 'object' || Array.isArray(mapStore)) mapStore = {};
   var mapJob = null, mapAsk = null, estMemo = {};
@@ -2479,11 +2479,20 @@
     $('secMapas').hidden = !framework();
     clear(box);
     if (!framework()) return;
-    if (!isPremium()) { box.appendChild(el('p', { class: 'set-help', text: 'Los mapas sin conexión son una función Premium.' })); box.appendChild(el('button', { type: 'button', class: 'pp-b pp-lock', text: '🔒 Premium', onclick: function () { showPremium('Los mapas sin conexión son una función Premium.'); } })); return; }
+    if (!isPremium()) { box.appendChild(el('p', { class: 'set-help', text: 'Los mapas sin conexión son una función PRO.' })); box.appendChild(el('button', { type: 'button', class: 'pp-b pp-lock', text: '🔒 PRO', onclick: function () { showPremium('Los mapas sin conexión son una función PRO.'); } })); return; }
     if (!IS_NATIVE) { box.appendChild(el('p', { class: 'set-help', text: 'Los mapas sin conexión están disponibles en la app Android.' })); return; }
     box.appendChild(el('p', { class: 'set-help', text: 'Guarda en el móvil el fondo del mapa de tus provincias para verlo sin cobertura. Los PK, las carreteras y los pueblos ya funcionan sin conexión; esto añade el mapa de fondo. Cuanto más detalle, más espacio.' }));
+    box.appendChild(el('div', { class: 'map-lbl', text: 'Tipo de mapa' }));
     box.appendChild(segBtns([['base', 'Mapa'], ['sat', 'Satélite']], mapOpt.layer, function (v) { mapOpt.layer = v; S.writeJSON('mapopt', mapOpt); mapAsk = null; renderMapasList(); }, 'Tipo de mapa'));
-    box.appendChild(segBtns(MAP_ZOOMS.map(function (z) { return [z[0], z[1]]; }), mapOpt.z, function (v) { mapOpt.z = v; S.writeJSON('mapopt', mapOpt); mapAsk = null; renderMapasList(); }, 'Nivel de detalle'));
+    box.appendChild(el('div', { class: 'map-lbl', text: 'Detalle' }));
+    var dsegs = el('div', { class: 'segs', role: 'radiogroup', 'aria-label': 'Nivel de detalle' });
+    MAP_ZOOMS.forEach(function (z) {
+      var sum = 0;
+      selected.forEach(function (c) { sum += mapMB(c, mapOpt.layer, z[0]); });
+      dsegs.appendChild(el('button', { type: 'button', class: 'segbtn' + (z[0] === mapOpt.z ? ' on' : ''), role: 'radio', 'aria-checked': z[0] === mapOpt.z ? 'true' : 'false', onclick: function () { mapOpt.z = z[0]; S.writeJSON('mapopt', mapOpt); mapAsk = null; renderMapasList(); } },
+        [el('span', { text: z[1] }), el('small', { text: selected.length ? '≈ ' + fmtMB(sum) : z[2] })]));
+    });
+    box.appendChild(dsegs);
     var zd = MAP_ZOOMS.filter(function (z) { return z[0] === mapOpt.z; })[0];
     box.appendChild(el('p', { class: 'set-help', text: zd ? zd[1] + ': ' + zd[2] + '.' : '' }));
     if (!selected.length) box.appendChild(el('p', { class: 'set-help', text: 'Marca antes alguna provincia en «Provincias».' }));

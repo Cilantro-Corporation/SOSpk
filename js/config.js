@@ -7,6 +7,6 @@ window.KM_CONFIG = Object.freeze({
   defaultProvinces: ['GU'],
   // Provincias que van incluidas dentro de la app Android
   bundledProvinces: ['GU'],
-  // Premium: apagado (enforced: false) hasta que estén las compras de Google Play; ver docs/premium/PLAN.md
-  premium: Object.freeze({ enforced: false, priceMonth: '0,99 €', priceYear: '4,99 €', trialDays: 10, checkoutUrl: '', testers: true, freeFavs: 5, maxFavs: 50, freeColors: 5, freeIcons: 5 }),
+  // PRO: apagado (enforced: false) hasta que estén las compras de Google Play; ver docs/premium/PLAN.md
+  premium: Object.freeze({ enforced: false, priceMonth: '1,99 €', priceYear: '10,99 €', trialDays: 10, checkoutUrl: '', testers: true, freeFavs: 5, maxFavs: 50, freeColors: 5, freeIcons: 5 }),
 });
