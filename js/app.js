@@ -106,7 +106,7 @@
     $('optPkgRow').hidden = !fw;
     $('secSectores').hidden = !fw;
     if (typeof mapOpt !== 'undefined' && mapOpt) renderMapasList();
-    $('planName').textContent = isPremium() ? 'PRO' : 'Gratis';
+    if ($('planName')) $('planName').textContent = isPremium() ? 'Premium' : 'Gratis';
     $('devRow').hidden = !devMode || TESTERS;
     $('testRow').hidden = !TESTERS;
     $('testPrem').checked = simPremium;
@@ -126,7 +126,7 @@
     pop.hidden = false;
   });
   $('layersClose').addEventListener('click', function () { $('layersPop').hidden = true; });
-  $('planBtn').addEventListener('click', function () { $('settings').hidden = true; showPremium(''); });
+  if ($('planBtn')) $('planBtn').addEventListener('click', function () { $('settings').hidden = true; showPremium(''); });
   $('devOff').addEventListener('click', function () { devMode = false; S.writeJSON('dev', false); simPremium = false; S.writeJSON('prem', false); premiumChanged(); toast('Modo de pruebas desactivado'); });
   // Siete toques seguidos en la versión: modo de pruebas
   (function () {
@@ -186,7 +186,31 @@
   function lowCard() { return !window.matchMedia('(min-width: 760px)').matches && document.querySelector('.top').getBoundingClientRect().top > window.innerHeight / 2; }
   function topOffset() { return lowCard() ? 0 : document.querySelector('.top').getBoundingClientRect().bottom; }
   // Altura real de la cabecera (cambia con la línea de tramos, sugerencias o avisos): coloca avisos, paneles y zoom
-  function syncTop() { var st = document.documentElement.style; st.setProperty('--top-h', Math.round(topOffset()) + 'px'); if (lowCard()) st.setProperty('--ctrl-b', Math.round(bottomOffset() + 8) + 'px'); else st.removeProperty('--ctrl-b'); // los botones del mapa suben sobre la caja si está abajo
+  // Bandas de seguridad laterales (botones del sistema del móvil en horizontal, muesca de la cámara)
+  var insetProbe = document.createElement('div');
+  insetProbe.style.cssText = 'position:fixed;visibility:hidden;pointer-events:none;padding:0 env(safe-area-inset-right,0px) 0 env(safe-area-inset-left,0px)';
+  document.body.appendChild(insetProbe);
+  function sideInsets() { var cs = getComputedStyle(insetProbe); return { l: parseFloat(cs.paddingLeft) || 0, r: parseFloat(cs.paddingRight) || 0 }; }
+  // Los botones del mapa (capas, ubicación…) suben sobre la caja si esta está abajo o, en pantalla ancha, se ha llevado a la derecha
+  function ctrlLift() {
+    if (lowCard()) return Math.round(bottomOffset() + 8);
+    if (!window.matchMedia('(min-width: 760px)').matches) return 0;
+    var r = document.querySelector('.top').getBoundingClientRect(), si = sideInsets();
+    if (r.right > window.innerWidth - si.r - 76 && r.bottom > window.innerHeight - 170 && r.top > window.innerHeight * 0.3) return Math.round(window.innerHeight - r.top + 8);
+    return 0;
+  }
+  // El zoom (+/−) de tablet y horizontal se aparta si la caja o la columna de botones, subida, le llegan encima
+  function zoomAside() {
+    var st = document.documentElement.style, x = null;
+    if (window.matchMedia('(min-width: 760px)').matches) {
+      var si = sideInsets(), r = document.querySelector('.top').getBoundingClientRect(), c = document.querySelector('.map-ctrls').getBoundingClientRect();
+      if (r.right > window.innerWidth - si.r - 56 && r.top < 120) x = window.innerWidth - r.left + 8;
+      else if (c.top < 120) x = si.r + 52;
+    }
+    if (x == null) st.removeProperty('--zoom-r'); else st.setProperty('--zoom-r', Math.round(x) + 'px');
+  }
+  function syncTop() { var st = document.documentElement.style; st.setProperty('--top-h', Math.round(topOffset()) + 'px'); var lift = ctrlLift(); if (lift) st.setProperty('--ctrl-b', lift + 'px'); else st.removeProperty('--ctrl-b');
+    zoomAside();
     st.setProperty('--chips-top', lowCard() ? 'calc(var(--safe-t) + 6px)' : Math.round(topOffset()) + 6 + 'px'); }
   if (window.ResizeObserver) new ResizeObserver(function () { applyPos(); }).observe(document.querySelector('.top'));
   syncTop();
@@ -206,7 +230,7 @@
   var pos = S.readJSON('card', {});
   if (!pos || typeof pos !== 'object') pos = {};
   function validPos(p) { return Array.isArray(p) && p.length === 2 && isFinite(p[0]) && isFinite(p[1]); }
-  function clampX(x, n) { return Math.round(Math.max(0, Math.min(window.innerWidth - (n.offsetWidth || 400), x))); }
+  function clampX(x, n) { var si = sideInsets(); return Math.round(Math.max(si.l, Math.min(window.innerWidth - si.r - (n.offsetWidth || 400), x))); }
   // Alto de la caja sin las bandas de seguridad (barra de estado arriba / botones del móvil abajo)
   function baseH(n) { var cs = getComputedStyle(n); return (n.offsetHeight || 60) - (n.classList.contains('atbottom') ? parseFloat(cs.paddingBottom) || 0 : 0); }
   function clampY(y, n) { return Math.round(Math.max(0, Math.min(window.innerHeight - baseH(n), y))); }

@@ -1,6 +1,6 @@
 # SOSpk
 
-Buscador de puntos kilométricos de las carreteras de España · Created by CIL · Cilantropo Lab.
+Buscador de puntos kilométricos de las carreteras de España · Created by CIL · CILANTA.
 
 - Web: https://cilantro-corporation.github.io/SOSpk/
 - Android: [descargar APK](https://github.com/Cilantro-Corporation/SOSpk/releases/latest/download/SOSpk.apk)
