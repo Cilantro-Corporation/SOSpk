@@ -179,7 +179,7 @@
     $('btnLayer').classList.toggle('on', satellite);
   }
   applyLayer();
-  if (window.matchMedia('(min-width: 760px)').matches) L.control.zoom({ position: 'topright' }).addTo(map);
+  L.control.zoom({ position: 'topright' }).addTo(map); // en pantalla estrecha (móvil en vertical) la oculta el CSS; así reaparece al girar
   map.setView([40.2, -3.7], 6, { animate: false });
 
   // La tarjeta (buscador + ficha) puede estar arriba o, en el móvil, movida abajo: el mapa útil es el espacio libre
@@ -196,18 +196,25 @@
     if (lowCard()) return Math.round(bottomOffset() + 8);
     if (!window.matchMedia('(min-width: 760px)').matches) return 0;
     var r = document.querySelector('.top').getBoundingClientRect(), si = sideInsets();
-    if (r.right > window.innerWidth - si.r - 76 && r.bottom > window.innerHeight - 170 && r.top > window.innerHeight * 0.3) return Math.round(window.innerHeight - r.top + 8);
+    var colH = (document.querySelector('.map-ctrls').offsetHeight || 190) + 26;
+    if (r.right > window.innerWidth - si.r - 76 && r.bottom > window.innerHeight - colH && r.top > window.innerHeight * 0.3) return Math.round(window.innerHeight - r.top + 8);
     return 0;
   }
   // El zoom (+/−) de tablet y horizontal se aparta si la caja o la columna de botones, subida, le llegan encima
   function zoomAside() {
-    var st = document.documentElement.style, x = null;
+    var st = document.documentElement.style, x = null, dy = null, ct = null;
     if (window.matchMedia('(min-width: 760px)').matches) {
       var si = sideInsets(), r = document.querySelector('.top').getBoundingClientRect(), c = document.querySelector('.map-ctrls').getBoundingClientRect();
-      if (r.right > window.innerWidth - si.r - 56 && r.top < 120) x = window.innerWidth - r.left + 8;
-      else if (c.top < 120) x = si.r + 52;
+      var zc = document.querySelector('.leaflet-top.leaflet-right'), zt = zc ? zc.getBoundingClientRect().top : 4;
+      // Si la caja está arriba y llega al zoom, el zoom baja por debajo de ella
+      if (r.right > window.innerWidth - si.r - 56 && r.top < 120) dy = Math.round(r.bottom + 8 - zt);
+      else if (c.top < 120) x = si.r + 52; // columna de botones subida hasta arriba: el zoom se pone a su lado
+      // Los avisos (arriba a la derecha) bajan por debajo de la caja si esta les cae encima
+      var ch = document.querySelector('.chips'), cr = ch ? ch.getBoundingClientRect() : null;
+      if (cr && cr.width && r.left < cr.right && r.right > cr.left && r.top < 8 + cr.height + 6 && r.bottom > 8) ct = Math.round(r.bottom + 6);
     }
-    if (x == null) st.removeProperty('--zoom-r'); else st.setProperty('--zoom-r', Math.round(x) + 'px');
+    var set = function (k, v) { if (v == null) st.removeProperty(k); else st.setProperty(k, Math.round(v) + 'px'); };
+    set('--zoom-r', x); set('--zoom-dy', dy); set('--chips-top-d', ct);
   }
   function syncTop() { var st = document.documentElement.style; st.setProperty('--top-h', Math.round(topOffset()) + 'px'); var lift = ctrlLift(); if (lift) st.setProperty('--ctrl-b', lift + 'px'); else st.removeProperty('--ctrl-b');
     zoomAside();

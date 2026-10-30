@@ -500,7 +500,7 @@ body.drawing .sheet { display: none; }
 .fs-s .map-ctrls { bottom: var(--ctrl-b, calc(var(--safe-b) + 6px)); gap: 3px; }
 .fs-s .map-ctrls .icon-btn { width: 34px; height: 34px; }
 .fs-s .map-ctrls .icon-btn svg { width: 18px; height: 18px; }
-@media (min-width: 760px) { .chips { top: 8px; left: auto; right: calc(64px + var(--safe-r)); transform: none; align-items: flex-end; } }
+@media (min-width: 760px) { .chips { top: var(--chips-top-d, 8px); left: auto; right: calc(64px + var(--safe-r)); transform: none; align-items: flex-end; } }
 .windpin .wp-a, .windpin .wp-v { grid-area: 1 / 1; }
 .windpin .wp-v { position: relative; z-index: 1; font-size: 12px; font-weight: 700; color: #fff; text-shadow: 0 0 2px #0B0B0B, 0 0 2px #0B0B0B, 0 0 3px #0B0B0B; }
 .windpin .wp-a { font-size: 30px; line-height: 1; opacity: .9; }
@@ -508,3 +508,5 @@ body.drawing .sheet { display: none; }
 .leaflet-right { right: var(--safe-r); }
 .leaflet-left { left: var(--safe-l); }
 .leaflet-top.leaflet-right { right: var(--zoom-r, var(--safe-r)); }
+@media (max-width: 759px) { .leaflet-control-zoom { display: none; } }
+.leaflet-top.leaflet-right .leaflet-control-zoom { margin-top: var(--zoom-dy, 10px); }
