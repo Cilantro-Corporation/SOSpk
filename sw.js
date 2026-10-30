@@ -2,7 +2,7 @@
    Las provincias descargadas las guarda la propia app en la caché "kmes-provincias" (aquí no se tocan).
    Una versión nueva se instala y se activa sola; la app se recarga cuando es seguro (al volver a ella). */
 'use strict';
-var CACHE = 'kmes-app-v1.2.18';
+var CACHE = 'kmes-app-v1.2.19';
 var KEEP = [CACHE, 'kmes-provincias'];
 var SHELL = [
   './', 'index.html', 'manifest.webmanifest',

@@ -186,38 +186,50 @@
   function lowCard() { return !window.matchMedia('(min-width: 760px)').matches && document.querySelector('.top').getBoundingClientRect().top > window.innerHeight / 2; }
   function topOffset() { return lowCard() ? 0 : document.querySelector('.top').getBoundingClientRect().bottom; }
   // Altura real de la cabecera (cambia con la línea de tramos, sugerencias o avisos): coloca avisos, paneles y zoom
-  // Bandas de seguridad laterales (botones del sistema del móvil en horizontal, muesca de la cámara)
+  // Bandas de seguridad (botones del sistema del móvil, muesca de la cámara): nada se coloca debajo
   var insetProbe = document.createElement('div');
-  insetProbe.style.cssText = 'position:fixed;visibility:hidden;pointer-events:none;padding:0 env(safe-area-inset-right,0px) 0 env(safe-area-inset-left,0px)';
+  insetProbe.style.cssText = 'position:fixed;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)';
   document.body.appendChild(insetProbe);
-  function sideInsets() { var cs = getComputedStyle(insetProbe); return { l: parseFloat(cs.paddingLeft) || 0, r: parseFloat(cs.paddingRight) || 0 }; }
-  // Los botones del mapa (capas, ubicación…) suben sobre la caja si esta está abajo o, en pantalla ancha, se ha llevado a la derecha
-  function ctrlLift() {
-    if (lowCard()) return Math.round(bottomOffset() + 8);
-    if (!window.matchMedia('(min-width: 760px)').matches) return 0;
-    var r = document.querySelector('.top').getBoundingClientRect(), si = sideInsets();
-    var colH = (document.querySelector('.map-ctrls').offsetHeight || 190) + 26;
-    if (r.right > window.innerWidth - si.r - 76 && r.bottom > window.innerHeight - colH && r.top > window.innerHeight * 0.3) return Math.round(window.innerHeight - r.top + 8);
-    return 0;
-  }
-  // El zoom (+/−) de tablet y horizontal se aparta si la caja o la columna de botones, subida, le llegan encima
-  function zoomAside() {
-    var st = document.documentElement.style, x = null, dy = null, ct = null;
-    if (window.matchMedia('(min-width: 760px)').matches) {
-      var si = sideInsets(), r = document.querySelector('.top').getBoundingClientRect(), c = document.querySelector('.map-ctrls').getBoundingClientRect();
-      var zc = document.querySelector('.leaflet-top.leaflet-right'), zt = zc ? zc.getBoundingClientRect().top : 4;
-      // Si la caja está arriba y llega al zoom, el zoom baja por debajo de ella
-      if (r.right > window.innerWidth - si.r - 56 && r.top < 120) dy = Math.round(r.bottom + 8 - zt);
-      else if (c.top < 120) x = si.r + 52; // columna de botones subida hasta arriba: el zoom se pone a su lado
-      // Los avisos (arriba a la derecha) bajan por debajo de la caja si esta les cae encima
-      var ch = document.querySelector('.chips'), cr = ch ? ch.getBoundingClientRect() : null;
-      if (cr && cr.width && r.left < cr.right && r.right > cr.left && r.top < 8 + cr.height + 6 && r.bottom > 8) ct = Math.round(r.bottom + 6);
+  function sideInsets() { var cs = getComputedStyle(insetProbe); return { t: parseFloat(cs.paddingTop) || 0, r: parseFloat(cs.paddingRight) || 0, b: parseFloat(cs.paddingBottom) || 0, l: parseFloat(cs.paddingLeft) || 0 }; }
+  // Tres bloques que no se dividen: la caja, los avisos con el zoom (arriba a la derecha) y los botones del mapa (abajo a la derecha).
+  // Si la caja se lleva a la banda derecha, ocupa el hueco de arriba, el del medio o el de abajo y los otros dos bloques le hacen sitio.
+  // Devuelve la altura a la que suben los botones (0 = en su sitio).
+  function blocks() {
+    var st = document.documentElement.style, W = window.innerWidth, H = window.innerHeight, lift = 0, zx = null, dy = null, ct = null;
+    if (lowCard()) lift = Math.round(bottomOffset() + 8);
+    else if (window.matchMedia('(min-width: 760px)').matches) {
+      var si = sideInsets(), node = document.querySelector('.top'), r = node.getBoundingClientRect();
+      var colH = document.querySelector('.map-ctrls').offsetHeight || 190, zc = document.querySelector('.leaflet-top.leaflet-right');
+      var zt = zc ? zc.getBoundingClientRect().top : 4, zel = document.querySelector('.leaflet-control-zoom'), zH = (zel && zel.offsetHeight) || 64;
+      var ch = document.querySelector('.chips'), chH = ch ? ch.offsetHeight : 0, chR = ch ? ch.getBoundingClientRect() : null;
+      var aBot = Math.max(zt + 10 + zH, chH ? 8 + chH : 0) + 6;             // borde inferior del bloque de avisos y zoom en su sitio
+      var bTop = H - si.b - 18 - colH;                                      // borde superior de los botones en su sitio
+      if (r.right > W - si.r - 60) {
+        var cy = (r.top + r.bottom) / 2, slot = cy < H / 3 ? 'top' : cy > H * 2 / 3 ? 'bottom' : 'mid';
+        if (slot === 'mid') {
+          var g0 = aBot + 8, g1 = bTop - 8;
+          if (r.height <= g1 - g0) { var y = Math.max(g0, Math.min(g1 - r.height, r.top)); if (Math.round(y) !== Math.round(r.top)) { node.style.top = Math.round(y) + 'px'; r = node.getBoundingClientRect(); } }
+          else slot = cy < H / 2 ? 'top' : 'bottom';
+        }
+        if (slot === 'top') {
+          dy = r.bottom + 8 - zt; ct = r.bottom + 6;
+          if (r.bottom + 8 + zH + 8 > bTop) zx = si.r + 52;                // sin hueco entre la caja y los botones: el zoom va a su lado
+        } else if (slot === 'bottom') {
+          lift = Math.round(H - r.top + 8);
+          var nt = r.top - 8 - colH;
+          if (nt < si.t + 4) lift = Math.round(H - (si.t + 4 + colH)); else if (nt < aBot) zx = si.r + 52;
+        }
+      } else {
+        // Caja fuera de la banda derecha: solo se aparta si llega al zoom o a los avisos
+        if (r.right > W - si.r - 56 && r.top < 120) dy = r.bottom + 8 - zt;
+        if (chR && chR.width && r.left < chR.right && r.right > chR.left && r.top < 8 + chH + 6 && r.bottom > 8) ct = r.bottom + 6;
+      }
     }
     var set = function (k, v) { if (v == null) st.removeProperty(k); else st.setProperty(k, Math.round(v) + 'px'); };
-    set('--zoom-r', x); set('--zoom-dy', dy); set('--chips-top-d', ct);
+    set('--zoom-r', zx); set('--zoom-dy', dy); set('--chips-top-d', ct);
+    return lift;
   }
-  function syncTop() { var st = document.documentElement.style; st.setProperty('--top-h', Math.round(topOffset()) + 'px'); var lift = ctrlLift(); if (lift) st.setProperty('--ctrl-b', lift + 'px'); else st.removeProperty('--ctrl-b');
-    zoomAside();
+  function syncTop() { var st = document.documentElement.style; st.setProperty('--top-h', Math.round(topOffset()) + 'px'); var lift = blocks(); if (lift) st.setProperty('--ctrl-b', lift + 'px'); else st.removeProperty('--ctrl-b');
     st.setProperty('--chips-top', lowCard() ? 'calc(var(--safe-t) + 6px)' : Math.round(topOffset()) + 6 + 'px'); }
   if (window.ResizeObserver) new ResizeObserver(function () { applyPos(); }).observe(document.querySelector('.top'));
   syncTop();
@@ -240,7 +252,7 @@
   function clampX(x, n) { var si = sideInsets(); return Math.round(Math.max(si.l, Math.min(window.innerWidth - si.r - (n.offsetWidth || 400), x))); }
   // Alto de la caja sin las bandas de seguridad (barra de estado arriba / botones del móvil abajo)
   function baseH(n) { var cs = getComputedStyle(n); return (n.offsetHeight || 60) - (n.classList.contains('atbottom') ? parseFloat(cs.paddingBottom) || 0 : 0); }
-  function clampY(y, n) { return Math.round(Math.max(0, Math.min(window.innerHeight - baseH(n), y))); }
+  function clampY(y, n) { var si = DESK.matches ? sideInsets() : { t: 0, b: 0 }; return Math.round(Math.max(si.t, Math.min(window.innerHeight - baseH(n) - si.b, y))); }
   function applyPos() {
     var top = document.querySelector('.top'), p = DESK.matches ? pos.d : pos.m;
     if (DESK.matches && validPos(p)) { top.style.left = clampX(p[0], top) + 'px'; top.style.top = clampY(p[1], top) + 'px'; }
