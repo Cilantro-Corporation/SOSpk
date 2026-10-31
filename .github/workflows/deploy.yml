@@ -1,0 +1,30 @@
+# Sube la web a LucusHost (sospk.app) cada vez que se publica un cambio en la rama main.
+# Usa los secretos FTP_SERVER, FTP_USERNAME y FTP_PASSWORD guardados en el repositorio.
+name: Desplegar en LucusHost
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+      - name: Subir por FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          port: 21
+          local-dir: ./
+          server-dir: ./
+          exclude: |
+            **/.git/**
+            **/.github/**
+            README.md
