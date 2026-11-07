@@ -1,0 +1,2777 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:cap="urn:oasis:names:tc:emergency:cap:1.2">
+  <link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
+  <link type="application/atom+xml" rel="self" href="https://feeds.meteoalarm.org/feeds/meteoalarm-legacy-atom-spain"/>
+  <link type="text/html" rel="alternate" href="https://meteoalarm.org"/>
+  <rights>Copyright © 2026 MeteoAlarm.Org. Licensed under terms equivalent to CC BY 4.0, with additional requirements for redistributing outlined in our Terms and Conditions.</rights>
+  <generator>MeteoAlarm Producer Server</generator>
+  <logo>https://feeds.meteoalarm.org/images/logo.svg</logo>
+  <author>
+    <name>meteoalarm.org</name>
+    <uri>https://meteoalarm.org</uri>
+    <email>meteoalarm@geosphere.at</email>
+  </author>
+  <id>tag:meteoalarm.org,2021-02-19:ES</id>
+  <title>MeteoAlarm - Alerting Europe for Extreme Weather</title>
+  <updated>2026-11-07T08:35:13.683799Z</updated>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES852</value>
+    </cap:geocode>
+    <link title="Costa - Litoral gaditano" href="https://meteoalarm.org?geocode=EMMA_ID:ES852" hreflang="en"/>
+    <cap:areaDesc>Costa - Litoral gaditano</cap:areaDesc>
+    <cap:event>Moderate coastalevent warning</cap:event>
+    <cap:sent>2026-11-07T08:02:09+00:00</cap:sent>
+    <cap:expires>2026-11-07T22:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-07T07:58:40+00:00</cap:effective>
+    <cap:onset>2026-11-07T20:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261107080209.611103COCO072338529</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/e30af749-88a0-4148-9e46-29e91e7e8255"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-07T08:02:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/e30af749-88a0-4148-9e46-29e91e7e8255?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Coastalevent Warning issued for Spain - Costa - Litoral gaditano</title>
+    <updated>2026-11-07T08:02:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES853</value>
+    </cap:geocode>
+    <link title="Costa - Estrecho" href="https://meteoalarm.org?geocode=EMMA_ID:ES853" hreflang="en"/>
+    <cap:areaDesc>Costa - Estrecho</cap:areaDesc>
+    <cap:event>Moderate coastalevent warning</cap:event>
+    <cap:sent>2026-11-07T08:02:09+00:00</cap:sent>
+    <cap:expires>2026-11-07T22:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-07T07:58:40+00:00</cap:effective>
+    <cap:onset>2026-11-07T20:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261107080209.611104COCO072338529</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/4ae76d1d-6e70-4703-82f9-1738f34617d2"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-07T08:02:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/4ae76d1d-6e70-4703-82f9-1738f34617d2?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Coastalevent Warning issued for Spain - Costa - Estrecho</title>
+    <updated>2026-11-07T08:02:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES126</value>
+    </cap:geocode>
+    <link title="Este de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES126" hreflang="en"/>
+    <cap:areaDesc>Este de La Palma</cap:areaDesc>
+    <cap:event>Moderate wind warning</cap:event>
+    <cap:sent>2026-11-07T07:50:09+00:00</cap:sent>
+    <cap:expires>2026-11-07T20:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-07T07:47:52+00:00</cap:effective>
+    <cap:onset>2026-11-07T12:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Update</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261107075009.659303VIRM072137809</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/d87e0d16-b025-4225-9a26-8a925c0c1b47"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-07T07:50:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/d87e0d16-b025-4225-9a26-8a925c0c1b47?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Wind Warning issued for Spain - Este de La Palma</title>
+    <updated>2026-11-07T07:50:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES129</value>
+    </cap:geocode>
+    <link title="El Hierro" href="https://meteoalarm.org?geocode=EMMA_ID:ES129" hreflang="en"/>
+    <cap:areaDesc>El Hierro</cap:areaDesc>
+    <cap:event>Moderate wind warning</cap:event>
+    <cap:sent>2026-11-07T07:50:09+00:00</cap:sent>
+    <cap:expires>2026-11-07T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-07T07:47:52+00:00</cap:effective>
+    <cap:onset>2026-11-07T21:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261107075009.659501VIRM080037809</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/ce181d3a-2a0f-4e59-9a2d-40f080cd3e1a"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-07T07:50:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/ce181d3a-2a0f-4e59-9a2d-40f080cd3e1a?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Wind Warning issued for Spain - El Hierro</title>
+    <updated>2026-11-07T07:50:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES127</value>
+    </cap:geocode>
+    <link title="Oeste de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES127" hreflang="en"/>
+    <cap:areaDesc>Oeste de La Palma</cap:areaDesc>
+    <cap:event>Moderate wind warning</cap:event>
+    <cap:sent>2026-11-07T07:50:09+00:00</cap:sent>
+    <cap:expires>2026-11-07T20:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-07T07:47:52+00:00</cap:effective>
+    <cap:onset>2026-11-07T12:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Update</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261107075009.659304VIRM072137809</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/a0b7d298-17cf-4d2f-ac92-9650434c00ea"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-07T07:50:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/a0b7d298-17cf-4d2f-ac92-9650434c00ea?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Wind Warning issued for Spain - Oeste de La Palma</title>
+    <updated>2026-11-07T07:50:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES125</value>
+    </cap:geocode>
+    <link title="Cumbres de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES125" hreflang="en"/>
+    <cap:areaDesc>Cumbres de La Palma</cap:areaDesc>
+    <cap:event>Severe wind warning</cap:event>
+    <cap:sent>2026-11-07T07:50:09+00:00</cap:sent>
+    <cap:expires>2026-11-07T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-07T07:47:52+00:00</cap:effective>
+    <cap:onset>2026-11-07T21:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Severe</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261107075009.659302VIRM080037809</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/4f1e0c11-60d6-45b9-821e-194ee5396935"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-07T07:50:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/4f1e0c11-60d6-45b9-821e-194ee5396935?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Orange Wind Warning issued for Spain - Cumbres de La Palma</title>
+    <updated>2026-11-07T07:50:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES130</value>
+    </cap:geocode>
+    <link title="Norte de Tenerife" href="https://meteoalarm.org?geocode=EMMA_ID:ES130" hreflang="en"/>
+    <cap:areaDesc>Norte de Tenerife</cap:areaDesc>
+    <cap:event>Moderate wind warning</cap:event>
+    <cap:sent>2026-11-07T07:50:09+00:00</cap:sent>
+    <cap:expires>2026-11-07T20:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-07T07:47:52+00:00</cap:effective>
+    <cap:onset>2026-11-07T12:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Update</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261107075009.659601VIRM072137809</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/318b3ead-2517-4a6d-9df1-80e0cee1f1b6"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-07T07:50:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/318b3ead-2517-4a6d-9df1-80e0cee1f1b6?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Wind Warning issued for Spain - Norte de Tenerife</title>
+    <updated>2026-11-07T07:50:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES126</value>
+    </cap:geocode>
+    <link title="Este de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES126" hreflang="en"/>
+    <cap:areaDesc>Este de La Palma</cap:areaDesc>
+    <cap:event>Severe wind warning</cap:event>
+    <cap:sent>2026-11-07T07:50:09+00:00</cap:sent>
+    <cap:expires>2026-11-07T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-07T07:47:52+00:00</cap:effective>
+    <cap:onset>2026-11-07T21:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Severe</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261107075009.659303VIRM080037809</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/d64125b9-493b-48a7-8b56-89d39809bfae"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-07T07:50:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/d64125b9-493b-48a7-8b56-89d39809bfae?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Orange Wind Warning issued for Spain - Este de La Palma</title>
+    <updated>2026-11-07T07:50:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES127</value>
+    </cap:geocode>
+    <link title="Oeste de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES127" hreflang="en"/>
+    <cap:areaDesc>Oeste de La Palma</cap:areaDesc>
+    <cap:event>Severe wind warning</cap:event>
+    <cap:sent>2026-11-07T07:50:09+00:00</cap:sent>
+    <cap:expires>2026-11-07T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-07T07:47:52+00:00</cap:effective>
+    <cap:onset>2026-11-07T21:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Severe</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261107075009.659304VIRM080037809</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/8e8f454e-44dd-4d1c-8090-5d369aa371a9"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-07T07:50:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/8e8f454e-44dd-4d1c-8090-5d369aa371a9?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Orange Wind Warning issued for Spain - Oeste de La Palma</title>
+    <updated>2026-11-07T07:50:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES125</value>
+    </cap:geocode>
+    <link title="Cumbres de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES125" hreflang="en"/>
+    <cap:areaDesc>Cumbres de La Palma</cap:areaDesc>
+    <cap:event>Moderate wind warning</cap:event>
+    <cap:sent>2026-11-07T07:50:09+00:00</cap:sent>
+    <cap:expires>2026-11-07T20:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-07T07:47:52+00:00</cap:effective>
+    <cap:onset>2026-11-07T12:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Update</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261107075009.659302VIRM072137809</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/815a7ecc-2489-4fa1-985d-8d5219e61c1c"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-07T07:50:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/815a7ecc-2489-4fa1-985d-8d5219e61c1c?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Wind Warning issued for Spain - Cumbres de La Palma</title>
+    <updated>2026-11-07T07:50:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES128</value>
+    </cap:geocode>
+    <link title="La Gomera" href="https://meteoalarm.org?geocode=EMMA_ID:ES128" hreflang="en"/>
+    <cap:areaDesc>La Gomera</cap:areaDesc>
+    <cap:event>Moderate wind warning</cap:event>
+    <cap:sent>2026-11-07T07:50:09+00:00</cap:sent>
+    <cap:expires>2026-11-07T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-07T07:47:52+00:00</cap:effective>
+    <cap:onset>2026-11-07T21:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261107075009.659401VIRM080037809</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/e3b147ed-2441-453d-b1e0-e28588bdc0a2"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-07T07:50:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/e3b147ed-2441-453d-b1e0-e28588bdc0a2?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Wind Warning issued for Spain - La Gomera</title>
+    <updated>2026-11-07T07:50:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES130</value>
+    </cap:geocode>
+    <link title="Norte de Tenerife" href="https://meteoalarm.org?geocode=EMMA_ID:ES130" hreflang="en"/>
+    <cap:areaDesc>Norte de Tenerife</cap:areaDesc>
+    <cap:event>Severe wind warning</cap:event>
+    <cap:sent>2026-11-07T07:50:09+00:00</cap:sent>
+    <cap:expires>2026-11-07T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-07T07:47:52+00:00</cap:effective>
+    <cap:onset>2026-11-07T21:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Severe</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261107075009.659601VIRM080037809</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/4fb77e88-9f5b-4975-93de-7c5b1c0b3ae2"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-07T07:50:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/4fb77e88-9f5b-4975-93de-7c5b1c0b3ae2?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Orange Wind Warning issued for Spain - Norte de Tenerife</title>
+    <updated>2026-11-07T07:50:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES201</value>
+    </cap:geocode>
+    <link title="Villuercas y Montánchez" href="https://meteoalarm.org?geocode=EMMA_ID:ES201" hreflang="en"/>
+    <cap:areaDesc>Villuercas y Montánchez</cap:areaDesc>
+    <cap:event>Moderate rain warning</cap:event>
+    <cap:sent>2026-11-06T18:02:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T22:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T18:00:09+00:00</cap:effective>
+    <cap:onset>2026-11-08T20:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106180209.701004PRP2082388129</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/0d41baa8-2412-4fe3-ac4c-4afc17ddec57"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T18:02:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/0d41baa8-2412-4fe3-ac4c-4afc17ddec57?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Rain Warning issued for Spain - Villuercas y Montánchez</title>
+    <updated>2026-11-06T18:02:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES096</value>
+    </cap:geocode>
+    <link title="Sierra norte de Sevilla" href="https://meteoalarm.org?geocode=EMMA_ID:ES096" hreflang="en"/>
+    <cap:areaDesc>Sierra norte de Sevilla</cap:areaDesc>
+    <cap:event>Moderate thunderstorm warning</cap:event>
+    <cap:sent>2026-11-06T18:02:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T22:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T18:00:09+00:00</cap:effective>
+    <cap:onset>2026-11-08T20:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106180209.614101TOTO082388129</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/38fe5abc-2e55-4301-bfdc-eb86c52c9a52"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T18:02:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/38fe5abc-2e55-4301-bfdc-eb86c52c9a52?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Thunderstorm Warning issued for Spain - Sierra norte de Sevilla</title>
+    <updated>2026-11-06T18:02:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES198</value>
+    </cap:geocode>
+    <link title="Norte de Cáceres" href="https://meteoalarm.org?geocode=EMMA_ID:ES198" hreflang="en"/>
+    <cap:areaDesc>Norte de Cáceres</cap:areaDesc>
+    <cap:event>Moderate rain warning</cap:event>
+    <cap:sent>2026-11-06T18:02:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T22:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T18:00:09+00:00</cap:effective>
+    <cap:onset>2026-11-08T20:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106180209.701001PRP2082388129</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/1857bf36-603f-42b4-a6a5-a3c99bed2fb8"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T18:02:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/1857bf36-603f-42b4-a6a5-a3c99bed2fb8?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Rain Warning issued for Spain - Norte de Cáceres</title>
+    <updated>2026-11-06T18:02:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES096</value>
+    </cap:geocode>
+    <link title="Sierra norte de Sevilla" href="https://meteoalarm.org?geocode=EMMA_ID:ES096" hreflang="en"/>
+    <cap:areaDesc>Sierra norte de Sevilla</cap:areaDesc>
+    <cap:event>Moderate rain warning</cap:event>
+    <cap:sent>2026-11-06T18:02:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T22:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T18:00:09+00:00</cap:effective>
+    <cap:onset>2026-11-08T20:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106180209.614101PRP1082388129</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/ffd4aaab-4857-4b05-833e-41119c21780f"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T18:02:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/ffd4aaab-4857-4b05-833e-41119c21780f?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Rain Warning issued for Spain - Sierra norte de Sevilla</title>
+    <updated>2026-11-06T18:02:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES174</value>
+    </cap:geocode>
+    <link title="Sierra de San Vicente" href="https://meteoalarm.org?geocode=EMMA_ID:ES174" hreflang="en"/>
+    <cap:areaDesc>Sierra de San Vicente</cap:areaDesc>
+    <cap:event>Moderate rain warning</cap:event>
+    <cap:sent>2026-11-06T18:02:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T22:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T18:00:09+00:00</cap:effective>
+    <cap:onset>2026-11-08T20:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106180209.684501PRP2082388129</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/f18322d1-2d98-4132-9116-98db96ef9dce"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T18:02:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/f18322d1-2d98-4132-9116-98db96ef9dce?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Rain Warning issued for Spain - Sierra de San Vicente</title>
+    <updated>2026-11-06T18:02:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES176</value>
+    </cap:geocode>
+    <link title="Montes de Toledo" href="https://meteoalarm.org?geocode=EMMA_ID:ES176" hreflang="en"/>
+    <cap:areaDesc>Montes de Toledo</cap:areaDesc>
+    <cap:event>Moderate rain warning</cap:event>
+    <cap:sent>2026-11-06T18:02:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T22:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T18:00:09+00:00</cap:effective>
+    <cap:onset>2026-11-08T20:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106180209.684503PRP2082388129</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/af8afa90-f4af-4b70-a02b-4c70ff878c48"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T18:02:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/af8afa90-f4af-4b70-a02b-4c70ff878c48?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Rain Warning issued for Spain - Montes de Toledo</title>
+    <updated>2026-11-06T18:02:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES085</value>
+    </cap:geocode>
+    <link title="Aracena" href="https://meteoalarm.org?geocode=EMMA_ID:ES085" hreflang="en"/>
+    <cap:areaDesc>Aracena</cap:areaDesc>
+    <cap:event>Moderate rain warning</cap:event>
+    <cap:sent>2026-11-06T18:02:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T22:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T18:00:09+00:00</cap:effective>
+    <cap:onset>2026-11-08T20:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106180209.612101PRP2082388129</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/b9950a69-2fb9-48c2-b0db-da93b66772c7"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T18:02:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/b9950a69-2fb9-48c2-b0db-da93b66772c7?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Rain Warning issued for Spain - Aracena</title>
+    <updated>2026-11-06T18:02:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES152</value>
+    </cap:geocode>
+    <link title="Sur de Salamanca" href="https://meteoalarm.org?geocode=EMMA_ID:ES152" hreflang="en"/>
+    <cap:areaDesc>Sur de Salamanca</cap:areaDesc>
+    <cap:event>Moderate rain warning</cap:event>
+    <cap:sent>2026-11-06T18:02:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T22:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T18:00:09+00:00</cap:effective>
+    <cap:onset>2026-11-08T20:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106180209.673703PRP2082388129</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/18856fa6-afaf-4972-b7a6-1bbdaee65ba0"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T18:02:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/18856fa6-afaf-4972-b7a6-1bbdaee65ba0?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Rain Warning issued for Spain - Sur de Salamanca</title>
+    <updated>2026-11-06T18:02:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES096</value>
+    </cap:geocode>
+    <link title="Sierra norte de Sevilla" href="https://meteoalarm.org?geocode=EMMA_ID:ES096" hreflang="en"/>
+    <cap:areaDesc>Sierra norte de Sevilla</cap:areaDesc>
+    <cap:event>Moderate rain warning</cap:event>
+    <cap:sent>2026-11-06T18:02:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T22:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T18:00:09+00:00</cap:effective>
+    <cap:onset>2026-11-08T20:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106180209.614101PRP2082388129</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/dddaddd8-56f9-4859-b057-d31073883a2c"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T18:02:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/dddaddd8-56f9-4859-b057-d31073883a2c?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Rain Warning issued for Spain - Sierra norte de Sevilla</title>
+    <updated>2026-11-06T18:02:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES085</value>
+    </cap:geocode>
+    <link title="Aracena" href="https://meteoalarm.org?geocode=EMMA_ID:ES085" hreflang="en"/>
+    <cap:areaDesc>Aracena</cap:areaDesc>
+    <cap:event>Moderate rain warning</cap:event>
+    <cap:sent>2026-11-06T18:02:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T22:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T18:00:09+00:00</cap:effective>
+    <cap:onset>2026-11-08T20:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106180209.612101PRP1082388129</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/b3c489e7-c8d6-45b1-9f37-5d817a2f6ad5"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T18:02:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/b3c489e7-c8d6-45b1-9f37-5d817a2f6ad5?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Rain Warning issued for Spain - Aracena</title>
+    <updated>2026-11-06T18:02:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES139</value>
+    </cap:geocode>
+    <link title="Sur de Ávila" href="https://meteoalarm.org?geocode=EMMA_ID:ES139" hreflang="en"/>
+    <cap:areaDesc>Sur de Ávila</cap:areaDesc>
+    <cap:event>Moderate rain warning</cap:event>
+    <cap:sent>2026-11-06T18:02:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T22:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T18:00:09+00:00</cap:effective>
+    <cap:onset>2026-11-08T20:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106180209.670503PRP2082388129</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/9bd00dd8-bd85-44a6-b01d-7e3918574a24"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T18:02:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/9bd00dd8-bd85-44a6-b01d-7e3918574a24?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Rain Warning issued for Spain - Sur de Ávila</title>
+    <updated>2026-11-06T18:02:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES151</value>
+    </cap:geocode>
+    <link title="Sistema Central de Salamanca" href="https://meteoalarm.org?geocode=EMMA_ID:ES151" hreflang="en"/>
+    <cap:areaDesc>Sistema Central de Salamanca</cap:areaDesc>
+    <cap:event>Moderate rain warning</cap:event>
+    <cap:sent>2026-11-06T18:02:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T22:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T18:00:09+00:00</cap:effective>
+    <cap:onset>2026-11-08T20:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106180209.673702PRP2082388129</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/76ce9bd6-c6ab-463d-9d31-4bf5a5ca2fc7"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T18:02:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/76ce9bd6-c6ab-463d-9d31-4bf5a5ca2fc7?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Rain Warning issued for Spain - Sistema Central de Salamanca</title>
+    <updated>2026-11-06T18:02:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES085</value>
+    </cap:geocode>
+    <link title="Aracena" href="https://meteoalarm.org?geocode=EMMA_ID:ES085" hreflang="en"/>
+    <cap:areaDesc>Aracena</cap:areaDesc>
+    <cap:event>Moderate thunderstorm warning</cap:event>
+    <cap:sent>2026-11-06T18:02:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T22:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T18:00:09+00:00</cap:effective>
+    <cap:onset>2026-11-08T20:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106180209.612101TOTO082388129</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/24803274-5936-4982-ab58-bf73dcfc99de"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T18:02:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/24803274-5936-4982-ab58-bf73dcfc99de?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Thunderstorm Warning issued for Spain - Aracena</title>
+    <updated>2026-11-06T18:02:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES132</value>
+    </cap:geocode>
+    <link title="Este, sur y oeste de Tenerife" href="https://meteoalarm.org?geocode=EMMA_ID:ES132" hreflang="en"/>
+    <cap:areaDesc>Este, sur y oeste de Tenerife</cap:areaDesc>
+    <cap:event>Moderate wind warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659603VIRM090062089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/5436648c-68e5-4f55-9af6-5ec44b5c720d"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/5436648c-68e5-4f55-9af6-5ec44b5c720d?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Wind Warning issued for Spain - Este, sur y oeste de Tenerife</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES132</value>
+    </cap:geocode>
+    <link title="Este, sur y oeste de Tenerife" href="https://meteoalarm.org?geocode=EMMA_ID:ES132" hreflang="en"/>
+    <cap:areaDesc>Este, sur y oeste de Tenerife</cap:areaDesc>
+    <cap:event>Severe rain warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T17:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Severe</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659603PRP2081862089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/ad8be0c4-0f92-4389-9e5a-a65dd97736e6"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/ad8be0c4-0f92-4389-9e5a-a65dd97736e6?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Orange Rain Warning issued for Spain - Este, sur y oeste de Tenerife</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES132</value>
+    </cap:geocode>
+    <link title="Este, sur y oeste de Tenerife" href="https://meteoalarm.org?geocode=EMMA_ID:ES132" hreflang="en"/>
+    <cap:areaDesc>Este, sur y oeste de Tenerife</cap:areaDesc>
+    <cap:event>Moderate rain warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T17:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659603PRP1081862089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/4de28d23-dea3-4166-8c37-e3dccbe6a4f5"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/4de28d23-dea3-4166-8c37-e3dccbe6a4f5?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Rain Warning issued for Spain - Este, sur y oeste de Tenerife</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES132</value>
+    </cap:geocode>
+    <link title="Este, sur y oeste de Tenerife" href="https://meteoalarm.org?geocode=EMMA_ID:ES132" hreflang="en"/>
+    <cap:areaDesc>Este, sur y oeste de Tenerife</cap:areaDesc>
+    <cap:event>Moderate thunderstorm warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T17:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659603TOTO081862089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/69524ab0-de06-432a-ba7c-b46c9a12cf9f"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/69524ab0-de06-432a-ba7c-b46c9a12cf9f?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Thunderstorm Warning issued for Spain - Este, sur y oeste de Tenerife</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES129</value>
+    </cap:geocode>
+    <link title="El Hierro" href="https://meteoalarm.org?geocode=EMMA_ID:ES129" hreflang="en"/>
+    <cap:areaDesc>El Hierro</cap:areaDesc>
+    <cap:event>Moderate thunderstorm warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T17:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659501TOTO081862089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/301c8245-a835-427a-bdf8-edf3cf151ba2"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/301c8245-a835-427a-bdf8-edf3cf151ba2?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Thunderstorm Warning issued for Spain - El Hierro</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES131</value>
+    </cap:geocode>
+    <link title="Área metropolitana de Tenerife" href="https://meteoalarm.org?geocode=EMMA_ID:ES131" hreflang="en"/>
+    <cap:areaDesc>Área metropolitana de Tenerife</cap:areaDesc>
+    <cap:event>Moderate wind warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659602VIRM090062089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/5d79b9c7-8e22-4768-8631-69726da4fb6b"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/5d79b9c7-8e22-4768-8631-69726da4fb6b?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Wind Warning issued for Spain - Área metropolitana de Tenerife</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES131</value>
+    </cap:geocode>
+    <link title="Área metropolitana de Tenerife" href="https://meteoalarm.org?geocode=EMMA_ID:ES131" hreflang="en"/>
+    <cap:areaDesc>Área metropolitana de Tenerife</cap:areaDesc>
+    <cap:event>Moderate thunderstorm warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T17:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659602TOTO081862089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/689d415d-83cc-4a06-99dd-2f2df6024761"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/689d415d-83cc-4a06-99dd-2f2df6024761?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Thunderstorm Warning issued for Spain - Área metropolitana de Tenerife</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES130</value>
+    </cap:geocode>
+    <link title="Norte de Tenerife" href="https://meteoalarm.org?geocode=EMMA_ID:ES130" hreflang="en"/>
+    <cap:areaDesc>Norte de Tenerife</cap:areaDesc>
+    <cap:event>Moderate rain warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T17:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659601PRP1081862089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/ff1da1f2-6a80-464e-9ef0-89d1df8f691e"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/ff1da1f2-6a80-464e-9ef0-89d1df8f691e?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Rain Warning issued for Spain - Norte de Tenerife</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES129</value>
+    </cap:geocode>
+    <link title="El Hierro" href="https://meteoalarm.org?geocode=EMMA_ID:ES129" hreflang="en"/>
+    <cap:areaDesc>El Hierro</cap:areaDesc>
+    <cap:event>Severe rain warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T17:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Severe</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659501PRP2081862089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/5596ba17-5c0c-4320-95e9-45ce620fd6c1"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/5596ba17-5c0c-4320-95e9-45ce620fd6c1?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Orange Rain Warning issued for Spain - El Hierro</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES129</value>
+    </cap:geocode>
+    <link title="El Hierro" href="https://meteoalarm.org?geocode=EMMA_ID:ES129" hreflang="en"/>
+    <cap:areaDesc>El Hierro</cap:areaDesc>
+    <cap:event>Moderate rain warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T17:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659501PRP1081862089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/2754c77c-ac8b-4bf5-a475-efb8d5cbbe3e"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/2754c77c-ac8b-4bf5-a475-efb8d5cbbe3e?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Rain Warning issued for Spain - El Hierro</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES131</value>
+    </cap:geocode>
+    <link title="Área metropolitana de Tenerife" href="https://meteoalarm.org?geocode=EMMA_ID:ES131" hreflang="en"/>
+    <cap:areaDesc>Área metropolitana de Tenerife</cap:areaDesc>
+    <cap:event>Severe rain warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T17:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Severe</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659602PRP2081862089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/ef16c708-fbfc-4a97-880e-3564b3179ae8"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/ef16c708-fbfc-4a97-880e-3564b3179ae8?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Orange Rain Warning issued for Spain - Área metropolitana de Tenerife</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES131</value>
+    </cap:geocode>
+    <link title="Área metropolitana de Tenerife" href="https://meteoalarm.org?geocode=EMMA_ID:ES131" hreflang="en"/>
+    <cap:areaDesc>Área metropolitana de Tenerife</cap:areaDesc>
+    <cap:event>Moderate rain warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T17:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659602PRP1081862089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/974b0c89-e858-414e-b800-973187c1c569"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/974b0c89-e858-414e-b800-973187c1c569?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Rain Warning issued for Spain - Área metropolitana de Tenerife</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES128</value>
+    </cap:geocode>
+    <link title="La Gomera" href="https://meteoalarm.org?geocode=EMMA_ID:ES128" hreflang="en"/>
+    <cap:areaDesc>La Gomera</cap:areaDesc>
+    <cap:event>Moderate thunderstorm warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T17:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659401TOTO081862089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/b9279313-2dff-4a9a-85ea-b1cdf54feb94"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/b9279313-2dff-4a9a-85ea-b1cdf54feb94?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Thunderstorm Warning issued for Spain - La Gomera</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES128</value>
+    </cap:geocode>
+    <link title="La Gomera" href="https://meteoalarm.org?geocode=EMMA_ID:ES128" hreflang="en"/>
+    <cap:areaDesc>La Gomera</cap:areaDesc>
+    <cap:event>Severe rain warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T17:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Severe</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659401PRP2081862089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/eefca187-01cd-4f16-8d2b-2f4de32595e0"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/eefca187-01cd-4f16-8d2b-2f4de32595e0?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Orange Rain Warning issued for Spain - La Gomera</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES128</value>
+    </cap:geocode>
+    <link title="La Gomera" href="https://meteoalarm.org?geocode=EMMA_ID:ES128" hreflang="en"/>
+    <cap:areaDesc>La Gomera</cap:areaDesc>
+    <cap:event>Moderate rain warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T17:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659401PRP1081862089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/335e0e2b-31f0-489d-919d-c49b8b2eb9f7"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/335e0e2b-31f0-489d-919d-c49b8b2eb9f7?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Rain Warning issued for Spain - La Gomera</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES130</value>
+    </cap:geocode>
+    <link title="Norte de Tenerife" href="https://meteoalarm.org?geocode=EMMA_ID:ES130" hreflang="en"/>
+    <cap:areaDesc>Norte de Tenerife</cap:areaDesc>
+    <cap:event>Severe wind warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Severe</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659601VIRM090062089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/4f209ab1-bc86-46bf-9579-6c1e02ced7ab"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/4f209ab1-bc86-46bf-9579-6c1e02ced7ab?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Orange Wind Warning issued for Spain - Norte de Tenerife</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES127</value>
+    </cap:geocode>
+    <link title="Oeste de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES127" hreflang="en"/>
+    <cap:areaDesc>Oeste de La Palma</cap:areaDesc>
+    <cap:event>Severe rain warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T17:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Severe</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659304PRP1081862089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/4d5dbcf6-2cf7-4ac2-b787-3d910cfb194c"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/4d5dbcf6-2cf7-4ac2-b787-3d910cfb194c?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Orange Rain Warning issued for Spain - Oeste de La Palma</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES129</value>
+    </cap:geocode>
+    <link title="El Hierro" href="https://meteoalarm.org?geocode=EMMA_ID:ES129" hreflang="en"/>
+    <cap:areaDesc>El Hierro</cap:areaDesc>
+    <cap:event>Moderate wind warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659501VIRM090062089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/0a24e444-d188-4774-becb-08349f0bbb49"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/0a24e444-d188-4774-becb-08349f0bbb49?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Wind Warning issued for Spain - El Hierro</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES127</value>
+    </cap:geocode>
+    <link title="Oeste de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES127" hreflang="en"/>
+    <cap:areaDesc>Oeste de La Palma</cap:areaDesc>
+    <cap:event>Severe wind warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Severe</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659304VIRM090062089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/b437183e-529b-4709-9bbf-4e3fe8e49799"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/b437183e-529b-4709-9bbf-4e3fe8e49799?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Orange Wind Warning issued for Spain - Oeste de La Palma</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES130</value>
+    </cap:geocode>
+    <link title="Norte de Tenerife" href="https://meteoalarm.org?geocode=EMMA_ID:ES130" hreflang="en"/>
+    <cap:areaDesc>Norte de Tenerife</cap:areaDesc>
+    <cap:event>Moderate thunderstorm warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T17:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659601TOTO081862089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/5bf52a5a-57f9-4048-a231-42760e7884b1"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/5bf52a5a-57f9-4048-a231-42760e7884b1?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Thunderstorm Warning issued for Spain - Norte de Tenerife</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES128</value>
+    </cap:geocode>
+    <link title="La Gomera" href="https://meteoalarm.org?geocode=EMMA_ID:ES128" hreflang="en"/>
+    <cap:areaDesc>La Gomera</cap:areaDesc>
+    <cap:event>Moderate wind warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659401VIRM090062089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/a1713bdf-0553-45ce-a687-ef1aa17de4d3"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/a1713bdf-0553-45ce-a687-ef1aa17de4d3?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Wind Warning issued for Spain - La Gomera</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES127</value>
+    </cap:geocode>
+    <link title="Oeste de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES127" hreflang="en"/>
+    <cap:areaDesc>Oeste de La Palma</cap:areaDesc>
+    <cap:event>Severe rain warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T17:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Severe</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659304PRP2081862089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/63f3a5e5-c8c4-4ec1-8c6b-1092a3cf2418"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/63f3a5e5-c8c4-4ec1-8c6b-1092a3cf2418?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Orange Rain Warning issued for Spain - Oeste de La Palma</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES130</value>
+    </cap:geocode>
+    <link title="Norte de Tenerife" href="https://meteoalarm.org?geocode=EMMA_ID:ES130" hreflang="en"/>
+    <cap:areaDesc>Norte de Tenerife</cap:areaDesc>
+    <cap:event>Severe rain warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T17:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Severe</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659601PRP2081862089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/e5b5cb80-a85c-42ea-9d67-8854584b74db"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/e5b5cb80-a85c-42ea-9d67-8854584b74db?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Orange Rain Warning issued for Spain - Norte de Tenerife</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES127</value>
+    </cap:geocode>
+    <link title="Oeste de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES127" hreflang="en"/>
+    <cap:areaDesc>Oeste de La Palma</cap:areaDesc>
+    <cap:event>Moderate thunderstorm warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T17:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659304TOTO081862089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/bdbde3ef-6d75-4dc1-9852-125fc470ee4e"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/bdbde3ef-6d75-4dc1-9852-125fc470ee4e?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Thunderstorm Warning issued for Spain - Oeste de La Palma</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES125</value>
+    </cap:geocode>
+    <link title="Cumbres de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES125" hreflang="en"/>
+    <cap:areaDesc>Cumbres de La Palma</cap:areaDesc>
+    <cap:event>Moderate thunderstorm warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T17:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659302TOTO081862089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/2f7f9123-4768-4e7b-991c-e1cc0b140da2"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/2f7f9123-4768-4e7b-991c-e1cc0b140da2?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Thunderstorm Warning issued for Spain - Cumbres de La Palma</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES126</value>
+    </cap:geocode>
+    <link title="Este de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES126" hreflang="en"/>
+    <cap:areaDesc>Este de La Palma</cap:areaDesc>
+    <cap:event>Moderate thunderstorm warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T17:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659303TOTO081862089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/125788f8-175e-46b6-9813-cc6fe44f084a"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/125788f8-175e-46b6-9813-cc6fe44f084a?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Thunderstorm Warning issued for Spain - Este de La Palma</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES880</value>
+    </cap:geocode>
+    <link title="Costa - Oeste de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES880" hreflang="en"/>
+    <cap:areaDesc>Costa - Oeste de La Palma</cap:areaDesc>
+    <cap:event>Moderate coastalevent warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T03:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659304COCO080462089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/5c1ca452-7f7b-4da4-9202-865a6826c5f4"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/5c1ca452-7f7b-4da4-9202-865a6826c5f4?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Coastalevent Warning issued for Spain - Costa - Oeste de La Palma</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES125</value>
+    </cap:geocode>
+    <link title="Cumbres de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES125" hreflang="en"/>
+    <cap:areaDesc>Cumbres de La Palma</cap:areaDesc>
+    <cap:event>Severe wind warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Severe</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659302VIRM090062089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/22b23d30-74e7-4a56-9c6a-b5d5afa85e31"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/22b23d30-74e7-4a56-9c6a-b5d5afa85e31?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Orange Wind Warning issued for Spain - Cumbres de La Palma</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES126</value>
+    </cap:geocode>
+    <link title="Este de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES126" hreflang="en"/>
+    <cap:areaDesc>Este de La Palma</cap:areaDesc>
+    <cap:event>Severe rain warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T17:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Severe</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659303PRP2081862089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/93e7cf0d-495f-44ea-b6d7-8bb039b76c74"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/93e7cf0d-495f-44ea-b6d7-8bb039b76c74?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Orange Rain Warning issued for Spain - Este de La Palma</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES124</value>
+    </cap:geocode>
+    <link title="Fuerteventura" href="https://meteoalarm.org?geocode=EMMA_ID:ES124" hreflang="en"/>
+    <cap:areaDesc>Fuerteventura</cap:areaDesc>
+    <cap:event>Moderate thunderstorm warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T12:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659201TOTO090062089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/6a3ec291-efe4-4a0f-941a-43454c894e05"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/6a3ec291-efe4-4a0f-941a-43454c894e05?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Thunderstorm Warning issued for Spain - Fuerteventura</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES125</value>
+    </cap:geocode>
+    <link title="Cumbres de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES125" hreflang="en"/>
+    <cap:areaDesc>Cumbres de La Palma</cap:areaDesc>
+    <cap:event>Severe rain warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T17:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Severe</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659302PRP2081862089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/e687255c-d175-49f2-8110-a0497bd4acc0"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/e687255c-d175-49f2-8110-a0497bd4acc0?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Orange Rain Warning issued for Spain - Cumbres de La Palma</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES126</value>
+    </cap:geocode>
+    <link title="Este de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES126" hreflang="en"/>
+    <cap:areaDesc>Este de La Palma</cap:areaDesc>
+    <cap:event>Severe wind warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Severe</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659303VIRM090062089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/a0ecc411-5d39-422d-b8b4-70b1bd8dfaba"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/a0ecc411-5d39-422d-b8b4-70b1bd8dfaba?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Orange Wind Warning issued for Spain - Este de La Palma</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES124</value>
+    </cap:geocode>
+    <link title="Fuerteventura" href="https://meteoalarm.org?geocode=EMMA_ID:ES124" hreflang="en"/>
+    <cap:areaDesc>Fuerteventura</cap:areaDesc>
+    <cap:event>Moderate rain warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T12:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659201PRP1090062089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/f53bebbf-7e99-4f92-9f20-fd1340325430"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/f53bebbf-7e99-4f92-9f20-fd1340325430?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Rain Warning issued for Spain - Fuerteventura</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES126</value>
+    </cap:geocode>
+    <link title="Este de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES126" hreflang="en"/>
+    <cap:areaDesc>Este de La Palma</cap:areaDesc>
+    <cap:event>Severe rain warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T17:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Severe</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659303PRP1081862089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/03610016-7d9d-425d-bff5-071a504db577"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/03610016-7d9d-425d-bff5-071a504db577?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Orange Rain Warning issued for Spain - Este de La Palma</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES121</value>
+    </cap:geocode>
+    <link title="Cumbres de Gran Canaria" href="https://meteoalarm.org?geocode=EMMA_ID:ES121" hreflang="en"/>
+    <cap:areaDesc>Cumbres de Gran Canaria</cap:areaDesc>
+    <cap:event>Moderate rain warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T12:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659003PRP1090062089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/88ec4ea6-ece8-4c67-88b0-48b67cd04c2a"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/88ec4ea6-ece8-4c67-88b0-48b67cd04c2a?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Rain Warning issued for Spain - Cumbres de Gran Canaria</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES125</value>
+    </cap:geocode>
+    <link title="Cumbres de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES125" hreflang="en"/>
+    <cap:areaDesc>Cumbres de La Palma</cap:areaDesc>
+    <cap:event>Severe rain warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T17:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Severe</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659302PRP1081862089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/5a6e03fd-d137-425a-b79e-55900f89c54a"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/5a6e03fd-d137-425a-b79e-55900f89c54a?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Orange Rain Warning issued for Spain - Cumbres de La Palma</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES087</value>
+    </cap:geocode>
+    <link title="Litoral de Huelva" href="https://meteoalarm.org?geocode=EMMA_ID:ES087" hreflang="en"/>
+    <cap:areaDesc>Litoral de Huelva</cap:areaDesc>
+    <cap:event>Moderate thunderstorm warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T22:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T20:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.612103TOTO082362089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/a5dcaea7-b651-4961-b18a-0fa4ae48fc7e"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/a5dcaea7-b651-4961-b18a-0fa4ae48fc7e?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Thunderstorm Warning issued for Spain - Litoral de Huelva</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES121</value>
+    </cap:geocode>
+    <link title="Cumbres de Gran Canaria" href="https://meteoalarm.org?geocode=EMMA_ID:ES121" hreflang="en"/>
+    <cap:areaDesc>Cumbres de Gran Canaria</cap:areaDesc>
+    <cap:event>Moderate thunderstorm warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T12:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659003TOTO090062089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/adf91bc3-65ff-4770-b9e5-007c3b9199d7"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/adf91bc3-65ff-4770-b9e5-007c3b9199d7?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Thunderstorm Warning issued for Spain - Cumbres de Gran Canaria</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES120</value>
+    </cap:geocode>
+    <link title="Norte de Gran Canaria" href="https://meteoalarm.org?geocode=EMMA_ID:ES120" hreflang="en"/>
+    <cap:areaDesc>Norte de Gran Canaria</cap:areaDesc>
+    <cap:event>Moderate wind warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659001VIRM090062089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/8fdf0839-ba40-4bf1-b560-9edcccc1eead"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/8fdf0839-ba40-4bf1-b560-9edcccc1eead?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Wind Warning issued for Spain - Norte de Gran Canaria</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES123</value>
+    </cap:geocode>
+    <link title="Lanzarote" href="https://meteoalarm.org?geocode=EMMA_ID:ES123" hreflang="en"/>
+    <cap:areaDesc>Lanzarote</cap:areaDesc>
+    <cap:event>Moderate thunderstorm warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T12:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659101TOTO090062089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/b8c9d086-3790-41ae-aa14-cf4c6a9ffc4d"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/b8c9d086-3790-41ae-aa14-cf4c6a9ffc4d?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Thunderstorm Warning issued for Spain - Lanzarote</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES086</value>
+    </cap:geocode>
+    <link title="Andévalo y Condado" href="https://meteoalarm.org?geocode=EMMA_ID:ES086" hreflang="en"/>
+    <cap:areaDesc>Andévalo y Condado</cap:areaDesc>
+    <cap:event>Moderate thunderstorm warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T22:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T20:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.612102TOTO082362089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/02c5bdfa-31e0-4b95-85ec-57190033a627"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/02c5bdfa-31e0-4b95-85ec-57190033a627?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Thunderstorm Warning issued for Spain - Andévalo y Condado</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES121</value>
+    </cap:geocode>
+    <link title="Cumbres de Gran Canaria" href="https://meteoalarm.org?geocode=EMMA_ID:ES121" hreflang="en"/>
+    <cap:areaDesc>Cumbres de Gran Canaria</cap:areaDesc>
+    <cap:event>Severe rain warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T12:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Severe</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659003PRP2090062089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/77a45cb2-8cd6-4bc1-bbec-651fbf5c849f"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/77a45cb2-8cd6-4bc1-bbec-651fbf5c849f?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Orange Rain Warning issued for Spain - Cumbres de Gran Canaria</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES120</value>
+    </cap:geocode>
+    <link title="Norte de Gran Canaria" href="https://meteoalarm.org?geocode=EMMA_ID:ES120" hreflang="en"/>
+    <cap:areaDesc>Norte de Gran Canaria</cap:areaDesc>
+    <cap:event>Moderate thunderstorm warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T12:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659001TOTO090062089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/e7b96d2d-be81-4c74-8190-464e5770e9d5"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/e7b96d2d-be81-4c74-8190-464e5770e9d5?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Thunderstorm Warning issued for Spain - Norte de Gran Canaria</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES122</value>
+    </cap:geocode>
+    <link title="Este, sur y oeste de Gran Canaria" href="https://meteoalarm.org?geocode=EMMA_ID:ES122" hreflang="en"/>
+    <cap:areaDesc>Este, sur y oeste de Gran Canaria</cap:areaDesc>
+    <cap:event>Moderate thunderstorm warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T12:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659004TOTO090062089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/d56a4658-015a-445e-bb0d-8519bb0fb2f3"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/d56a4658-015a-445e-bb0d-8519bb0fb2f3?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Thunderstorm Warning issued for Spain - Este, sur y oeste de Gran Canaria</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES120</value>
+    </cap:geocode>
+    <link title="Norte de Gran Canaria" href="https://meteoalarm.org?geocode=EMMA_ID:ES120" hreflang="en"/>
+    <cap:areaDesc>Norte de Gran Canaria</cap:areaDesc>
+    <cap:event>Moderate rain warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T12:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659001PRP1090062089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/747c04c8-0aaf-4ade-a08f-37bd6e14734e"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/747c04c8-0aaf-4ade-a08f-37bd6e14734e?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Rain Warning issued for Spain - Norte de Gran Canaria</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES123</value>
+    </cap:geocode>
+    <link title="Lanzarote" href="https://meteoalarm.org?geocode=EMMA_ID:ES123" hreflang="en"/>
+    <cap:areaDesc>Lanzarote</cap:areaDesc>
+    <cap:event>Moderate rain warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T12:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659101PRP1090062089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/46d157b4-e638-4e68-b533-c61d9eeeebcc"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/46d157b4-e638-4e68-b533-c61d9eeeebcc?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Rain Warning issued for Spain - Lanzarote</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES122</value>
+    </cap:geocode>
+    <link title="Este, sur y oeste de Gran Canaria" href="https://meteoalarm.org?geocode=EMMA_ID:ES122" hreflang="en"/>
+    <cap:areaDesc>Este, sur y oeste de Gran Canaria</cap:areaDesc>
+    <cap:event>Moderate rain warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T12:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659004PRP1090062089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/ff692bbd-7e9c-4c45-ad98-0364a552808c"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/ff692bbd-7e9c-4c45-ad98-0364a552808c?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Rain Warning issued for Spain - Este, sur y oeste de Gran Canaria</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES087</value>
+    </cap:geocode>
+    <link title="Litoral de Huelva" href="https://meteoalarm.org?geocode=EMMA_ID:ES087" hreflang="en"/>
+    <cap:areaDesc>Litoral de Huelva</cap:areaDesc>
+    <cap:event>Moderate rain warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T22:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T20:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.612103PRP1082362089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/88d9d9dd-8ae8-44dd-b324-df76b0d07bcc"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/88d9d9dd-8ae8-44dd-b324-df76b0d07bcc?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Rain Warning issued for Spain - Litoral de Huelva</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES122</value>
+    </cap:geocode>
+    <link title="Este, sur y oeste de Gran Canaria" href="https://meteoalarm.org?geocode=EMMA_ID:ES122" hreflang="en"/>
+    <cap:areaDesc>Este, sur y oeste de Gran Canaria</cap:areaDesc>
+    <cap:event>Moderate wind warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659004VIRM090062089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/f15745b3-1fa1-4e1d-9332-9156d338a153"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/f15745b3-1fa1-4e1d-9332-9156d338a153?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Wind Warning issued for Spain - Este, sur y oeste de Gran Canaria</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES121</value>
+    </cap:geocode>
+    <link title="Cumbres de Gran Canaria" href="https://meteoalarm.org?geocode=EMMA_ID:ES121" hreflang="en"/>
+    <cap:areaDesc>Cumbres de Gran Canaria</cap:areaDesc>
+    <cap:event>Moderate wind warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659003VIRM090062089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/4d67763c-8f18-4bff-ab05-7be2fc38c493"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/4d67763c-8f18-4bff-ab05-7be2fc38c493?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Wind Warning issued for Spain - Cumbres de Gran Canaria</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES122</value>
+    </cap:geocode>
+    <link title="Este, sur y oeste de Gran Canaria" href="https://meteoalarm.org?geocode=EMMA_ID:ES122" hreflang="en"/>
+    <cap:areaDesc>Este, sur y oeste de Gran Canaria</cap:areaDesc>
+    <cap:event>Severe rain warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T12:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Severe</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.659004PRP2090062089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/536c973d-fd61-48ba-b424-fb18acb90bf0"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/536c973d-fd61-48ba-b424-fb18acb90bf0?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Orange Rain Warning issued for Spain - Este, sur y oeste de Gran Canaria</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES086</value>
+    </cap:geocode>
+    <link title="Andévalo y Condado" href="https://meteoalarm.org?geocode=EMMA_ID:ES086" hreflang="en"/>
+    <cap:areaDesc>Andévalo y Condado</cap:areaDesc>
+    <cap:event>Moderate rain warning</cap:event>
+    <cap:sent>2026-11-06T10:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-08T22:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:46:19+00:00</cap:effective>
+    <cap:onset>2026-11-08T20:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104809.612102PRP1082362089</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/fa0595b7-7f42-40b4-a50a-1832c9a18ca5"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/fa0595b7-7f42-40b4-a50a-1832c9a18ca5?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Rain Warning issued for Spain - Andévalo y Condado</title>
+    <updated>2026-11-06T10:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES125</value>
+    </cap:geocode>
+    <link title="Cumbres de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES125" hreflang="en"/>
+    <cap:areaDesc>Cumbres de La Palma</cap:areaDesc>
+    <cap:event>Severe rain warning</cap:event>
+    <cap:sent>2026-11-06T10:42:09+00:00</cap:sent>
+    <cap:expires>2026-11-07T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:40:07+00:00</cap:effective>
+    <cap:onset>2026-11-07T21:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Severe</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104209.659302PRP2080061729</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/4f2c8045-c934-4cc0-9a14-371c0fcdfa89"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:42:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/4f2c8045-c934-4cc0-9a14-371c0fcdfa89?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Orange Rain Warning issued for Spain - Cumbres de La Palma</title>
+    <updated>2026-11-06T10:42:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES880</value>
+    </cap:geocode>
+    <link title="Costa - Oeste de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES880" hreflang="en"/>
+    <cap:areaDesc>Costa - Oeste de La Palma</cap:areaDesc>
+    <cap:event>Moderate coastalevent warning</cap:event>
+    <cap:sent>2026-11-06T10:42:09+00:00</cap:sent>
+    <cap:expires>2026-11-07T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:40:07+00:00</cap:effective>
+    <cap:onset>2026-11-07T18:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Update</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104209.659304COCO080061729</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/b9192846-3fb5-4cba-af0c-68d0a022b038"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:42:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/b9192846-3fb5-4cba-af0c-68d0a022b038?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Coastalevent Warning issued for Spain - Costa - Oeste de La Palma</title>
+    <updated>2026-11-06T10:42:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES126</value>
+    </cap:geocode>
+    <link title="Este de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES126" hreflang="en"/>
+    <cap:areaDesc>Este de La Palma</cap:areaDesc>
+    <cap:event>Severe rain warning</cap:event>
+    <cap:sent>2026-11-06T10:42:09+00:00</cap:sent>
+    <cap:expires>2026-11-07T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:40:07+00:00</cap:effective>
+    <cap:onset>2026-11-07T21:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Severe</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104209.659303PRP1080061729</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/a0fda1e9-71f7-4c3e-a7e6-29f2fbd35d62"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:42:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/a0fda1e9-71f7-4c3e-a7e6-29f2fbd35d62?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Orange Rain Warning issued for Spain - Este de La Palma</title>
+    <updated>2026-11-06T10:42:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES125</value>
+    </cap:geocode>
+    <link title="Cumbres de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES125" hreflang="en"/>
+    <cap:areaDesc>Cumbres de La Palma</cap:areaDesc>
+    <cap:event>Moderate thunderstorm warning</cap:event>
+    <cap:sent>2026-11-06T10:42:09+00:00</cap:sent>
+    <cap:expires>2026-11-07T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:40:07+00:00</cap:effective>
+    <cap:onset>2026-11-07T21:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104209.659302TOTO080061729</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/8bdd521e-7987-406a-a328-0716b3d51fef"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:42:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/8bdd521e-7987-406a-a328-0716b3d51fef?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Thunderstorm Warning issued for Spain - Cumbres de La Palma</title>
+    <updated>2026-11-06T10:42:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES127</value>
+    </cap:geocode>
+    <link title="Oeste de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES127" hreflang="en"/>
+    <cap:areaDesc>Oeste de La Palma</cap:areaDesc>
+    <cap:event>Severe rain warning</cap:event>
+    <cap:sent>2026-11-06T10:42:09+00:00</cap:sent>
+    <cap:expires>2026-11-07T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:40:07+00:00</cap:effective>
+    <cap:onset>2026-11-07T21:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Severe</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104209.659304PRP2080061729</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/ac6b38da-fb6e-49f9-8c55-145cac8151eb"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:42:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/ac6b38da-fb6e-49f9-8c55-145cac8151eb?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Orange Rain Warning issued for Spain - Oeste de La Palma</title>
+    <updated>2026-11-06T10:42:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES127</value>
+    </cap:geocode>
+    <link title="Oeste de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES127" hreflang="en"/>
+    <cap:areaDesc>Oeste de La Palma</cap:areaDesc>
+    <cap:event>Severe rain warning</cap:event>
+    <cap:sent>2026-11-06T10:42:09+00:00</cap:sent>
+    <cap:expires>2026-11-07T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:40:07+00:00</cap:effective>
+    <cap:onset>2026-11-07T21:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Severe</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104209.659304PRP1080061729</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/e52088d0-9794-4769-a5d0-0bd630e8e1e4"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:42:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/e52088d0-9794-4769-a5d0-0bd630e8e1e4?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Orange Rain Warning issued for Spain - Oeste de La Palma</title>
+    <updated>2026-11-06T10:42:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES125</value>
+    </cap:geocode>
+    <link title="Cumbres de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES125" hreflang="en"/>
+    <cap:areaDesc>Cumbres de La Palma</cap:areaDesc>
+    <cap:event>Severe rain warning</cap:event>
+    <cap:sent>2026-11-06T10:42:09+00:00</cap:sent>
+    <cap:expires>2026-11-07T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:40:07+00:00</cap:effective>
+    <cap:onset>2026-11-07T21:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Severe</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104209.659302PRP1080061729</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/8ba268b7-ea06-4146-a420-0f669b86bc8f"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:42:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/8ba268b7-ea06-4146-a420-0f669b86bc8f?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Orange Rain Warning issued for Spain - Cumbres de La Palma</title>
+    <updated>2026-11-06T10:42:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES126</value>
+    </cap:geocode>
+    <link title="Este de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES126" hreflang="en"/>
+    <cap:areaDesc>Este de La Palma</cap:areaDesc>
+    <cap:event>Severe rain warning</cap:event>
+    <cap:sent>2026-11-06T10:42:09+00:00</cap:sent>
+    <cap:expires>2026-11-07T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:40:07+00:00</cap:effective>
+    <cap:onset>2026-11-07T21:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Severe</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104209.659303PRP2080061729</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/e0b51872-c132-4aab-aae9-6fc361fc28ea"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:42:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/e0b51872-c132-4aab-aae9-6fc361fc28ea?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Orange Rain Warning issued for Spain - Este de La Palma</title>
+    <updated>2026-11-06T10:42:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES126</value>
+    </cap:geocode>
+    <link title="Este de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES126" hreflang="en"/>
+    <cap:areaDesc>Este de La Palma</cap:areaDesc>
+    <cap:event>Moderate thunderstorm warning</cap:event>
+    <cap:sent>2026-11-06T10:42:09+00:00</cap:sent>
+    <cap:expires>2026-11-07T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:40:07+00:00</cap:effective>
+    <cap:onset>2026-11-07T21:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104209.659303TOTO080061729</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/b076c73d-98d3-4f8f-913f-017f9b313bf0"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:42:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/b076c73d-98d3-4f8f-913f-017f9b313bf0?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Thunderstorm Warning issued for Spain - Este de La Palma</title>
+    <updated>2026-11-06T10:42:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES127</value>
+    </cap:geocode>
+    <link title="Oeste de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES127" hreflang="en"/>
+    <cap:areaDesc>Oeste de La Palma</cap:areaDesc>
+    <cap:event>Moderate thunderstorm warning</cap:event>
+    <cap:sent>2026-11-06T10:42:09+00:00</cap:sent>
+    <cap:expires>2026-11-07T23:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-06T10:40:07+00:00</cap:effective>
+    <cap:onset>2026-11-07T21:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261106104209.659304TOTO080061729</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/ae157a8d-efbd-4491-85ab-663bf01d0123"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-06T10:42:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/ae157a8d-efbd-4491-85ab-663bf01d0123?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Thunderstorm Warning issued for Spain - Oeste de La Palma</title>
+    <updated>2026-11-06T10:42:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES207</value>
+    </cap:geocode>
+    <link title="Centro de Lugo" href="https://meteoalarm.org?geocode=EMMA_ID:ES207" hreflang="en"/>
+    <cap:areaDesc>Centro de Lugo</cap:areaDesc>
+    <cap:event>Moderate fog warning</cap:event>
+    <cap:sent>2026-11-05T10:54:08+00:00</cap:sent>
+    <cap:expires>2026-11-06T08:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-05T10:50:53+00:00</cap:effective>
+    <cap:onset>2026-11-05T23:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Update</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261105105408.712702NINI060976048</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/7bac6f6a-ffaa-499e-8e45-daf60ba3b889"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-05T10:54:08Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/7bac6f6a-ffaa-499e-8e45-daf60ba3b889?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Fog Warning issued for Spain - Centro de Lugo</title>
+    <updated>2026-11-05T10:54:08Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES125</value>
+    </cap:geocode>
+    <link title="Cumbres de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES125" hreflang="en"/>
+    <cap:areaDesc>Cumbres de La Palma</cap:areaDesc>
+    <cap:event>Moderate rain warning</cap:event>
+    <cap:sent>2026-11-05T10:14:08+00:00</cap:sent>
+    <cap:expires>2026-11-06T14:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-05T10:10:43+00:00</cap:effective>
+    <cap:onset>2026-11-06T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Update</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261105101408.659302PRP1061573648</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/e298bf39-f28a-4864-8b20-43f49cf5b0a4"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-05T10:14:08Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/e298bf39-f28a-4864-8b20-43f49cf5b0a4?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Rain Warning issued for Spain - Cumbres de La Palma</title>
+    <updated>2026-11-05T10:14:08Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES126</value>
+    </cap:geocode>
+    <link title="Este de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES126" hreflang="en"/>
+    <cap:areaDesc>Este de La Palma</cap:areaDesc>
+    <cap:event>Moderate rain warning</cap:event>
+    <cap:sent>2026-11-05T10:14:08+00:00</cap:sent>
+    <cap:expires>2026-11-06T14:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-05T10:10:43+00:00</cap:effective>
+    <cap:onset>2026-11-06T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Update</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261105101408.659303PRP1061573648</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/3d90fab1-3bca-4783-94cd-5d948fed197f"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-05T10:14:08Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/3d90fab1-3bca-4783-94cd-5d948fed197f?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Rain Warning issued for Spain - Este de La Palma</title>
+    <updated>2026-11-05T10:14:08Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES127</value>
+    </cap:geocode>
+    <link title="Oeste de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES127" hreflang="en"/>
+    <cap:areaDesc>Oeste de La Palma</cap:areaDesc>
+    <cap:event>Moderate rain warning</cap:event>
+    <cap:sent>2026-11-05T10:14:08+00:00</cap:sent>
+    <cap:expires>2026-11-06T14:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-05T10:10:43+00:00</cap:effective>
+    <cap:onset>2026-11-06T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Update</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261105101408.659304PRP1061573648</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/4248729a-4210-439d-b5b5-48a5356a29bc"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-05T10:14:08Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/4248729a-4210-439d-b5b5-48a5356a29bc?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Rain Warning issued for Spain - Oeste de La Palma</title>
+    <updated>2026-11-05T10:14:08Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES159</value>
+    </cap:geocode>
+    <link title="Sanabria" href="https://meteoalarm.org?geocode=EMMA_ID:ES159" hreflang="en"/>
+    <cap:areaDesc>Sanabria</cap:areaDesc>
+    <cap:event>Moderate low-temperature warning</cap:event>
+    <cap:sent>2026-11-05T09:38:08+00:00</cap:sent>
+    <cap:expires>2026-11-06T07:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-05T09:35:05+00:00</cap:effective>
+    <cap:onset>2026-11-05T23:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261105093808.674901BTTI060871488</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/7e6e7606-137c-459f-a9bc-8152b485be62"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-05T09:38:08Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/7e6e7606-137c-459f-a9bc-8152b485be62?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Low-temperature Warning issued for Spain - Sanabria</title>
+    <updated>2026-11-05T09:38:08Z</updated>
+  </entry>
+</feed>
