@@ -216,6 +216,7 @@
 
   function create(o) {
     var map = o.map, L = o.L, toast = o.toast || function () {}, onChange = o.onChange || function () {}, onRemove = o.onRemove || function () {}, onManage = o.onManage || function () {};
+    // o.tip(layer, texto, registro): opcional, deja a la app poner el cartel con la foto en miniatura
     var recs = [], db = null, persist = false, shown = false, timer = 0, busy = false;
     var layer = L.layerGroup().addTo(map), canvas = L.canvas({ padding: 0.4 });
 
@@ -251,7 +252,10 @@
         }
         function mark(p, fill, label) {
           if (!p || p[0] < b[0] || p[0] > b[2] || p[1] < b[1] || p[1] > b[3]) return;
-          L.circleMarker(p, { renderer: canvas, radius: 6.5, color: '#0B0B0B', weight: 2, fillColor: fill, fillOpacity: 1 }).bindTooltip(tip(label + ': ' + r.n), { direction: 'top' }).addTo(layer);
+          var cm = L.circleMarker(p, { renderer: canvas, radius: 6.5, color: '#0B0B0B', weight: 2, fillColor: fill, fillOpacity: 1 });
+          // Con foto, el cartel del inicio y del fin la enseña en pequeño junto al nombre (lo resuelve la app)
+          if (o.tip) o.tip(cm, label + ': ' + r.n, r); else cm.bindTooltip(tip(label + ': ' + r.n), { direction: 'top' });
+          cm.addTo(layer);
         }
         if (few || z >= 12) { mark(first, '#00C853', 'Inicio'); mark(last, '#FF3B30', 'Fin'); }
         if (z >= 13) (r.wp || []).forEach(function (w) {

@@ -1287,6 +1287,7 @@
   var hasCaches = typeof caches !== 'undefined';
   function imgKey(key) { return new URL('kmes-favimg/' + encodeURIComponent(key), location.href).href; }
   function putFavImg(key, dataUrl) {
+    miniDrop(key);
     if (!hasCaches) return Promise.resolve();
     return caches.open(IMG_CACHE).then(function (c) { return c.put(imgKey(key), new Response(dataUrl, { headers: { 'Content-Type': 'text/plain' } })); }).catch(function () { toast('No hay espacio para guardar la imagen'); });
   }
@@ -1296,8 +1297,55 @@
       .then(function (t) { return t && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(t) ? t : null; }).catch(function () { return null; });
   }
   function delFavImg(key) {
+    miniDrop(key);
     if (!hasCaches) return Promise.resolve();
     return caches.open(IMG_CACHE).then(function (c) { return c.delete(imgKey(key)); }).catch(function () { /* */ });
+  }
+  // Miniatura (hasta 120 px) para los carteles que acompañan a un nombre: se calcula una vez y se guarda en memoria
+  var miniCache = {}, miniN = 0;
+  function miniDrop(key) { if (miniCache[key]) { delete miniCache[key]; miniN--; } }
+  function miniImg(key) {
+    if (miniCache[key]) return miniCache[key];
+    var p = getFavImg(key).then(function (d) {
+      if (!d) return null;
+      return new Promise(function (res) {
+        var im = new Image();
+        im.onload = function () {
+          var s = Math.min(1, 120 / Math.max(im.width, im.height)), cv = document.createElement('canvas');
+          cv.width = Math.max(1, Math.round(im.width * s)); cv.height = Math.max(1, Math.round(im.height * s));
+          cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height);
+          res(cv.toDataURL('image/jpeg', 0.7));
+        };
+        im.onerror = function () { res(null); };
+        im.src = d;
+      });
+    });
+    if (miniN >= 40) { miniCache = {}; miniN = 0; }
+    miniCache[key] = p; miniN++;
+    return p;
+  }
+  // Las fotos son una función PRO: solo se ven con el plan activo
+  function picOk() { return framework() && isPremium(); }
+  // Pone la miniatura delante del nombre dentro de un cartel de Leaflet (sin tocar el resto del cartel)
+  function showMini(box, key, tt) {
+    if (box.querySelector('.pic-mini')) return;
+    miniImg(key).then(function (d) {
+      if (!d || box.querySelector('.pic-mini')) return;
+      var im = el('img', { class: 'pic-mini', alt: '' });
+      im.src = d;
+      box.insertBefore(im, box.firstChild);
+      if (tt && tt.update) tt.update();
+    });
+  }
+  function hideMini(box, tt) {
+    var im = box.querySelector('.pic-mini');
+    if (im) { box.removeChild(im); if (tt && tt.update) tt.update(); }
+  }
+  // Cartel con nombre que, si hay foto, la enseña en pequeño al pasar el cursor o al pulsar
+  function bindPicTip(layer, text, key, has, opts) {
+    var box = el('span', { class: 'pic-tip' }, [el('span', { class: 'pic-nm', text: text })]);
+    layer.bindTooltip(box, opts);
+    if (has && picOk()) layer.on('tooltipopen', function (e) { showMini(box, key, e.tooltip); });
   }
   // Foto elegida -> JPEG de hasta 900 px
   function shrinkImage(file) {
@@ -1541,7 +1589,10 @@
     readList('fav').forEach(function (x) {
       var p = favPosition(x);
       if (!p) return;
-      var mk = L.marker(p, { icon: L.divIcon({ className: 'pk-icon', html: favPin(x), iconSize: null }), keyboard: false, zIndexOffset: 2000 });
+      var pin = favPin(x);
+      pin.removeAttribute('title'); // lo sustituye el cartel con nombre (y foto, si la hay)
+      var mk = L.marker(p, { icon: L.divIcon({ className: 'pk-icon', html: pin, iconSize: null }), keyboard: false, zIndexOffset: 2000 });
+      bindPicTip(mk, (x.n ? x.n + ' · ' : 'Favorito · ') + itemTitle(x), itemKey(x), !!x.im, { direction: 'top', offset: [0, -16], className: 'pic-tt' });
       mk.on('click', function () { openItem(x); });
       mk.addTo(favLayer);
       favSpots.push(p);
@@ -2312,7 +2363,8 @@
   var zonesLayer = L.layerGroup().addTo(map);
   // Tracks GPX del propio usuario (PRO): todo local, ver js/tracks.js
   var TR = window.KMTracks ? window.KMTracks.create({ map: map, L: L, toast: toast, onChange: function () { renderLayers(); renderTracksList(); },
-    onRemove: function (id) { delFavImg('t|' + id); }, onManage: function () { openTracksSection(); } }) : null;
+    onRemove: function (id) { delFavImg('t|' + id); }, onManage: function () { openTracksSection(); },
+    tip: function (layer, text, r) { bindPicTip(layer, text, 't|' + r.id, !!r.im, { direction: 'top', className: 'pic-tt' }); } }) : null;
   function zonaInfo(z) {
     var per = K.pathLength(z.pts, z.closed);
     return z.closed ? 'Perímetro ' + K.formatLength(per) + ' · Área ' + K.formatArea(K.polygonArea(z.pts)) : 'Longitud ' + K.formatLength(per);
@@ -2325,7 +2377,23 @@
         ? L.polygon(z.pts, { color: z.col, weight: 2.5, opacity: 0.95, fillColor: z.fil, fillOpacity: 0.1, interactive: false })
         : L.polyline(z.pts, { color: z.col, weight: 3.5, opacity: 0.95, interactive: false });
       shape.addTo(zonesLayer);
-      if (z.n) shape.bindTooltip(z.n, { permanent: true, direction: 'center', className: 'zone-label', interactive: false });
+      if (z.n) {
+        // Con foto, el nombre responde al cursor y al toque: junto al nombre aparece la foto en pequeño
+        var pic = z.im === 1 && picOk(), zb = el('span', { class: 'pic-tip' }, [el('span', { class: 'pic-nm', text: z.n })]);
+        // El evento se escucha antes de crear el cartel: uno permanente se abre en el mismo momento de crearlo
+        if (pic) shape.on('tooltipopen', function (e) {
+          var tt = e.tooltip, c = tt.getElement(), key = 'z|' + z.id;
+          if (!c || c._picOn) return;
+          c._picOn = true;
+          var seen = 0;
+          // «mouseenter/mouseleave» y no «mouseover/out»: no se repiten al cambiar el tamaño del cartel bajo el cursor
+          L.DomEvent.on(c, 'mouseenter', function () { seen = Date.now(); showMini(zb, key, tt); });
+          L.DomEvent.on(c, 'mouseleave', function () { hideMini(zb, tt); });
+          // En el móvil el toque lanza antes un «mouseenter»: el segundo toque es el que la oculta
+          L.DomEvent.on(c, 'click', function (ev) { L.DomEvent.stop(ev); if (Date.now() - seen < 700) return; if (zb.querySelector('.pic-mini')) hideMini(zb, tt); else showMini(zb, key, tt); });
+        });
+        shape.bindTooltip(zb, { permanent: true, direction: 'center', className: 'zone-label' + (pic ? ' has-pic' : ''), interactive: pic });
+      }
     });
   }
   var drawing = null, drawLayer = L.layerGroup().addTo(map);
