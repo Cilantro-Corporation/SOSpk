@@ -118,6 +118,13 @@
   });
   // Lo que solo existe en la app Android no se muestra en la web
   if (!IS_NATIVE) Array.prototype.forEach.call(document.querySelectorAll('.app-only'), function (n) { n.hidden = true; });
+  // Icono de información: solo en la web de sospk.app (abre la presentación, el soporte y los textos legales en otra pestaña)
+  (function () {
+    var btn = $('btnInfo'); if (!btn) return;
+    var site = /(^|.)sospk.app$/.test(location.hostname);
+    btn.hidden = IS_NATIVE || !(site || S.readJSON('info', false) === true);
+    btn.addEventListener('click', function () { window.open(site ? '/info/' : 'https://sospk.app/info/', '_blank', 'noopener'); });
+  })();
   $('btnZoneAdd').addEventListener('click', function () { if (!isPremium()) { showPremium('Los sectores son una función PRO.'); return; } $('layersPop').hidden = true; startDraw(); });
   $('btnLayers').addEventListener('click', function () {
     var pop = $('layersPop');
