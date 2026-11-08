@@ -291,19 +291,23 @@
 
   // ---------- Tarjeta flotante: una sola caja (buscador + ficha) que se mueve ----------
   // Se mueve manteniendo pulsada una parte negra de la caja y arrastrando (ratón: pulsar y arrastrar; táctil: mantener
-  // medio segundo). En el móvil solo sube y baja; en tablet y PC se coloca donde quieras. Recuerda su sitio.
+  // medio segundo). En el móvil en vertical queda fija arriba; en el móvil en horizontal sube hasta el borde de la pantalla
+  // (su banda vacía llega al marco superior) y baja; en tablet y PC se coloca donde quieras. Recuerda su sitio.
   // Doble clic en una parte negra: vuelve a su sitio.
+  var PORT = window.matchMedia('(orientation: portrait)');
+  function fixedTop() { return !window.matchMedia('(min-width: 760px)').matches && PORT.matches; }
   var pos = S.readJSON('card', {});
   if (!pos || typeof pos !== 'object') pos = {};
   function validPos(p) { return Array.isArray(p) && p.length === 2 && isFinite(p[0]) && isFinite(p[1]); }
   function clampX(x, n) { var si = sideInsets(); return Math.round(Math.max(si.l, Math.min(window.innerWidth - si.r - (n.offsetWidth || 400), x))); }
   // Alto de la caja sin las bandas de seguridad (barra de estado arriba / botones del móvil abajo)
   function baseH(n) { var cs = getComputedStyle(n); return (n.offsetHeight || 60) - (n.classList.contains('atbottom') ? parseFloat(cs.paddingBottom) || 0 : 0); }
-  function clampY(y, n) { var si = DESK.matches ? sideInsets() : { t: 0, b: 0 }; return Math.round(Math.max(si.t, Math.min(window.innerHeight - baseH(n) - si.b, y))); }
+  // Arriba llega hasta el borde de la pantalla (0): la banda vacía de la caja queda bajo la barra de estado del móvil
+  function clampY(y, n) { var bb = DESK.matches ? sideInsets().b : 0; return Math.round(Math.max(0, Math.min(window.innerHeight - baseH(n) - bb, y))); }
   function applyPos() {
     var top = document.querySelector('.top'), p = DESK.matches ? pos.d : pos.m;
     if (DESK.matches && validPos(p)) { top.style.left = clampX(p[0], top) + 'px'; top.style.top = clampY(p[1], top) + 'px'; }
-    else if (!DESK.matches && typeof p === 'number' && isFinite(p)) {
+    else if (!DESK.matches && !fixedTop() && typeof p === 'number' && isFinite(p)) {
       // Movida del sitio de origen: sin banda arriba; pegada abajo, con banda abajo para no pisar los botones del móvil
       var y = clampY(p, top), fl = y > 0;
       top.classList.toggle('float', fl);
@@ -318,7 +322,7 @@
   (function () {
     var node = document.querySelector('.top'), start = null, timer = null, active = false, armed = false;
     var SKIP = 'button, input, a, select, textarea, label, .chip, .nl';
-    function ok(e) { return !(e.target.closest && e.target.closest(SKIP)); }
+    function ok(e) { return !fixedTop() && !(e.target.closest && e.target.closest(SKIP)); } // en el móvil en vertical no se mueve
     function cancel() { clearTimeout(timer); timer = null; }
     function move(cx, cy) {
       var y = clampY(cy - start[1], node);
@@ -377,6 +381,7 @@
     });
   })();
   if (DESK.addEventListener) DESK.addEventListener('change', applyPos); else if (DESK.addListener) DESK.addListener(applyPos);
+  if (PORT.addEventListener) PORT.addEventListener('change', applyPos); else if (PORT.addListener) PORT.addListener(applyPos);
   window.addEventListener('resize', applyPos);
   applyPos();
   function fitBounds(b) {
