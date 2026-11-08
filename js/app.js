@@ -105,6 +105,7 @@
     $('creditsPrem').hidden = !fw;
     $('optPkgRow').hidden = !fw;
     $('secSectores').hidden = !fw;
+    if ($('secTracks')) $('secTracks').hidden = !fw;
     if (typeof mapOpt !== 'undefined' && mapOpt) renderMapasList();
     if ($('planName')) $('planName').textContent = isPremium() ? 'Premium' : 'Gratis';
     $('devRow').hidden = !devMode || TESTERS;
@@ -160,11 +161,50 @@
     return caches.open(TILE_CACHE).then(function (c) { return c.match(url); }).then(function (r) { return r ? r.blob() : null; })
       .then(function (b) { return b ? URL.createObjectURL(b) : null; }).catch(function () { return null; });
   }
+  // Recorta y amplía la parte que corresponde de una tesela guardada de un nivel inferior (hasta 4 niveles: ×16)
+  function cropTile(blob, d, ox, oy) {
+    return new Promise(function (res) {
+      var img = new Image(), u = URL.createObjectURL(blob);
+      img.onload = function () {
+        var cv = document.createElement('canvas'), sz = 256 / (1 << d);
+        cv.width = cv.height = 256;
+        cv.getContext('2d').drawImage(img, ox * sz, oy * sz, sz, sz, 0, 0, 256, 256);
+        URL.revokeObjectURL(u);
+        cv.toBlob(function (b) { res(b ? URL.createObjectURL(b) : null); });
+      };
+      img.onerror = function () { URL.revokeObjectURL(u); res(null); };
+      img.src = u;
+    });
+  }
+  function fallbackTile(layer, coords) {
+    if (!tilesAny || !hasTileCache) return Promise.resolve(null);
+    return caches.open(TILE_CACHE).then(function (c) {
+      var d = 1;
+      function next() {
+        if (d > 4 || coords.z - d < 6) return null;
+        var ax = coords.x >> d, ay = coords.y >> d;
+        var aurl = L.Util.template(layer._url, L.extend({ x: ax, y: ay, z: coords.z - d }, layer.options));
+        return c.match(aurl).then(function (r) {
+          if (!r) { d++; return next(); }
+          return r.blob().then(function (b) { return cropTile(b, d, coords.x - (ax << d), coords.y - (ay << d)); });
+        });
+      }
+      return next();
+    }).catch(function () { return null; });
+  }
   var OfflineTiles = L.TileLayer.extend({
     createTile: function (coords, done) {
-      var tile = document.createElement('img'), url = this.getTileUrl(coords);
+      var self = this, tile = document.createElement('img'), url = this.getTileUrl(coords), tried = false;
       L.DomEvent.on(tile, 'load', L.Util.bind(this._tileOnLoad, this, done, tile));
-      L.DomEvent.on(tile, 'error', L.Util.bind(this._tileOnError, this, done, tile));
+      L.DomEvent.on(tile, 'error', function (e) {
+        if (tried || !tilesAny) { self._tileOnError(done, tile, e); return; }
+        tried = true;
+        fallbackTile(self, coords).then(function (b) {
+          if (!b) { self._tileOnError(done, tile, e); return; }
+          L.DomEvent.on(tile, 'load', function () { URL.revokeObjectURL(b); });
+          tile.src = b;
+        });
+      });
       tile.alt = '';
       tile.setAttribute('role', 'presentation');
       if (!tilesAny) { tile.src = url; return tile; }
@@ -1327,6 +1367,29 @@
       });
     }
   }
+  // Foto de un sector o de un track: se reduce y se guarda solo en este dispositivo. st.v: undefined = sin cambios, null = quitar, texto = nueva
+  function picField(box, key, has, premMsg) {
+    var prem = isPremium(), st = { v: undefined };
+    box.appendChild(el('div', { class: 'fe-t', text: prem ? 'Foto' : '🔒 Foto · PRO' }));
+    var pic = el('div', { class: 'fe-pic' + (prem ? '' : ' lock') });
+    var thumb = el('img', { class: 'fe-thumb', alt: 'Foto' }), pbtn = el('button', { type: 'button', class: 'pp-b', text: '📷 Añadir foto' }), prm = el('button', { type: 'button', class: 'pp-b del', text: 'Quitar' });
+    var file = el('input', { type: 'file', accept: 'image/*', class: 'fe-file', 'aria-label': 'Elegir foto' });
+    thumb.hidden = true; prm.hidden = true;
+    function show(d) { thumb.hidden = !d; prm.hidden = !d; if (d) thumb.src = d; else thumb.removeAttribute('src'); pbtn.textContent = d ? '📷 Cambiar' : '📷 Añadir foto'; }
+    if (has) getFavImg(key).then(function (d) { if (st.v === undefined) show(d); });
+    thumb.addEventListener('click', function () { if (thumb.src) { $('imgViewImg').src = thumb.src; $('imgView').hidden = false; } });
+    pbtn.addEventListener('click', function () { if (!prem) { showPremium(premMsg); return; } file.click(); });
+    prm.addEventListener('click', function () { st.v = null; show(null); });
+    file.addEventListener('change', function () {
+      var fl = file.files && file.files[0];
+      if (!fl) return;
+      shrinkImage(fl).then(function (d) { st.v = d; show(d); }, function () { toast('No se pudo usar esa imagen'); });
+      file.value = '';
+    });
+    pic.appendChild(thumb); pic.appendChild(pbtn); pic.appendChild(prm); pic.appendChild(file);
+    box.appendChild(pic);
+    return st;
+  }
   $('imgView').addEventListener('click', function () { $('imgView').hidden = true; $('imgViewImg').removeAttribute('src'); });
   function favsChanged() {
     if (current) renderFav();
@@ -2241,14 +2304,15 @@
     return true;
   }
   function cleanZona(z) {
-    return { id: z.id, n: typeof z.n === 'string' ? z.n.trim().slice(0, 40) : '', closed: z.closed === true && z.pts.length >= 3, pts: z.pts.map(function (p) { return [+(+p[0]).toFixed(6), +(+p[1]).toFixed(6)]; }),
+    return { id: z.id, im: z.im === 1 ? 1 : 0, n: typeof z.n === 'string' ? z.n.trim().slice(0, 40) : '', closed: z.closed === true && z.pts.length >= 3, pts: z.pts.map(function (p) { return [+(+p[0]).toFixed(6), +(+p[1]).toFixed(6)]; }),
       col: FAV_COLORS.indexOf(z.col) >= 0 ? z.col : FAV_COLORS[0], fil: FAV_COLORS.indexOf(z.fil) >= 0 ? z.fil : FAV_COLORS[0] };
   }
   function readZonas() { var v = S.readJSON('zonas', []); return Array.isArray(v) ? v.filter(validZona).slice(0, ZMAX).map(cleanZona) : []; }
   function writeZonas(list) { S.writeJSON('zonas', list.slice(0, ZMAX)); }
   var zonesLayer = L.layerGroup().addTo(map);
   // Tracks GPX del propio usuario (PRO): todo local, ver js/tracks.js
-  var TR = window.KMTracks ? window.KMTracks.create({ map: map, L: L, toast: toast, onChange: function () { renderLayers(); } }) : null;
+  var TR = window.KMTracks ? window.KMTracks.create({ map: map, L: L, toast: toast, onChange: function () { renderLayers(); renderTracksList(); },
+    onRemove: function (id) { delFavImg('t|' + id); }, onManage: function () { openTracksSection(); } }) : null;
   function zonaInfo(z) {
     var per = K.pathLength(z.pts, z.closed);
     return z.closed ? 'Perímetro ' + K.formatLength(per) + ' · Área ' + K.formatArea(K.polygonArea(z.pts)) : 'Longitud ' + K.formatLength(per);
@@ -2321,15 +2385,15 @@
       dot.style.background = z.closed ? z.fil : z.col; dot.style.borderColor = z.col;
       box.appendChild(el('div', { class: 'zl' }, [
         el('button', { type: 'button', class: 'zl-open', onclick: function () { $('settings').hidden = true; map.fitBounds(L.latLngBounds(z.pts).pad(0.3), { animate: false, maxZoom: 16 }); } }, [
-          dot, el('span', { class: 'zl-t' }, [el('b', { text: z.n || (z.closed ? 'Sector' : 'Ruta') }), el('small', { text: zonaInfo(z) })]),
+          dot, el('span', { class: 'zl-t' }, [el('b', { text: (z.im ? '📷 ' : '') + (z.n || (z.closed ? 'Sector' : 'Ruta')) }), el('small', { text: zonaInfo(z) })]),
         ]),
-        el('button', { type: 'button', class: 'del', 'aria-label': 'Editar', title: 'Editar', text: '✎', onclick: function () { $('settings').hidden = true; editZona(z.id); } }),
+        el('button', { type: 'button', class: 'zl-edit', 'aria-label': 'Editar nombre, color y foto', title: 'Editar nombre, color y foto', text: '✎ Editar', onclick: function () { $('settings').hidden = true; editZona(z.id); } }),
       ]));
     });
   }
   $('zonesNew').addEventListener('click', function () { if (!isPremium()) { showPremium('Los sectores son una función PRO.'); return; } startDraw(); });
   // Editor de zona: nombre, color del contorno y sombra interior
-  var editingZ = null;
+  var editingZ = null, zPic = null;
   function editZona(id) {
     var z = readZonas().filter(function (x) { return x.id === id; })[0];
     if (!z) return;
@@ -2354,6 +2418,7 @@
     }
     var r1 = z.closed || true ? swatches('Color del contorno', 'col') : null;
     var r2 = z.closed ? swatches('Sombra interior', 'fil') : null;
+    zPic = picField(box, 'z|' + z.id, z.im === 1, 'La foto de un sector es una función PRO.');
     function mark() {
       [[r1, 'col'], [r2, 'fil']].forEach(function (pair) {
         if (!pair[0]) return;
@@ -2369,19 +2434,112 @@
   $('zoneSave').addEventListener('click', function () {
     if (!editingZ) return;
     var list = readZonas();
+    var job = Promise.resolve(), k = 'z|' + editingZ.id;
+    if (isPremium() && zPic) {
+      if (zPic.v) { editingZ.im = 1; job = putFavImg(k, zPic.v); } else if (zPic.v === null) { editingZ.im = 0; job = delFavImg(k); }
+    }
     list.forEach(function (z, i) { if (z.id === editingZ.id) { editingZ.n = $('zoneName').value.trim().slice(0, 40); list[i] = cleanZona(editingZ); } });
     writeZonas(list);
     closeZoneEdit();
     renderZonas(); renderZonasList();
-    toast('Sector guardado');
+    job.then(function () { toast('Sector guardado'); });
   });
   $('zoneDel').addEventListener('click', function () {
     if (!editingZ) return;
     var id = editingZ.id;
+    delFavImg('z|' + id);
     writeZonas(readZonas().filter(function (z) { return z.id !== id; }));
     closeZoneEdit();
     renderZonas(); renderZonasList();
     toast('Sector borrado');
+  });
+
+  // Tracks GPX en Configuración: lista con filtro (puede haber cientos), y edición de nombre, color y foto
+  var TRK_PAGE = 40, trkShow = TRK_PAGE, editingT = null, tPic = null;
+  function fmtKm(m) { return m >= 1000 ? (m / 1000).toLocaleString('es-ES', { maximumFractionDigits: 1 }) + ' km' : Math.round(m) + ' m'; }
+  function openTracksSection() {
+    $('layersPop').hidden = true;
+    $('settings').hidden = false;
+    var d = $('secTracks'); d.open = true;
+    d.scrollIntoView({ block: 'start' });
+  }
+  function renderTracksList() {
+    var box = $('tracksList');
+    if (!box) return;
+    var sc = box.closest('.set-scroll'), keep = sc ? sc.scrollTop : 0;
+    clear(box);
+    $('secTracks').hidden = !framework() || !TR;
+    if (!framework() || !TR) return;
+    var prem = isPremium();
+    $('tracksImport').classList.toggle('lock', !prem);
+    $('tracksTools').hidden = !prem || !TR.count();
+    $('tracksFilter').hidden = !prem || TR.count() < 6;
+    if (!prem) { box.appendChild(el('p', { class: 'set-help', text: '🔒 Los tracks GPX son una función PRO.' })); return; }
+    var all = TR.list(), q = $('tracksFilter').value.trim().toLowerCase(), list = q ? all.filter(function (t) { return t.n.toLowerCase().indexOf(q) >= 0; }) : all;
+    if (!all.length) box.appendChild(el('p', { class: 'set-help', text: 'Aún no tienes tracks. Pulsa «Importar GPX» y elige uno o varios archivos de tu móvil.' }));
+    else box.appendChild(el('p', { class: 'set-help', text: all.length + (all.length === 1 ? ' track' : ' tracks') + (q ? ' · ' + list.length + ' coinciden' : '') + (TR.persisted() ? '' : ' · no se guardarán al cerrar la app') }));
+    list.slice(0, trkShow).forEach(function (t) {
+      var dot = el('span', { class: 'zl-dot' });
+      dot.style.background = t.col; dot.style.borderColor = t.col;
+      box.appendChild(el('div', { class: 'zl' + (t.vis ? '' : ' off') }, [
+        el('button', { type: 'button', class: 'zl-open', onclick: function () { $('settings').hidden = true; TR.update(t.id, { vis: true }); TR.goTo(t.id); } }, [
+          dot, el('span', { class: 'zl-t' }, [el('b', { text: (t.im ? '📷 ' : '') + t.n }), el('small', { text: (t.len ? fmtKm(t.len) + ' · ' : '') + t.np.toLocaleString('es-ES') + ' puntos' + (t.wp ? ' · ' + t.wp + ' marcas' : '') + (t.vis ? '' : ' · oculto') })]),
+        ]),
+        el('button', { type: 'button', class: 'zl-edit', 'aria-label': 'Editar nombre, color y foto', title: 'Editar nombre, color y foto', text: '✎ Editar', onclick: function () { $('settings').hidden = true; editTrack(t.id); } }),
+      ]));
+    });
+    if (list.length > trkShow) box.appendChild(el('button', { type: 'button', class: 'pp-b', text: 'Mostrar ' + Math.min(TRK_PAGE, list.length - trkShow) + ' más (' + (list.length - trkShow) + ' sin ver)', onclick: function () { trkShow += TRK_PAGE; renderTracksList(); } }));
+    if (sc) sc.scrollTop = keep;
+  }
+  $('tracksFilter').addEventListener('input', function () { trkShow = TRK_PAGE; renderTracksList(); });
+  $('tracksImport').addEventListener('click', function () { if (!isPremium()) { showPremium('Los tracks GPX son una función PRO.'); return; } if (TR) TR.pick(); });
+  $('tracksShowAll').addEventListener('click', function () { if (TR) TR.setAllVisible(true); });
+  $('tracksHideAll').addEventListener('click', function () { if (TR) TR.setAllVisible(false); });
+  $('tracksDelAll').addEventListener('click', function () {
+    var b = $('tracksDelAll');
+    if (b.dataset.sure !== '1') { b.dataset.sure = '1'; b.textContent = 'Toca otra vez: borrar todos'; setTimeout(function () { b.dataset.sure = ''; b.textContent = 'Borrar todos'; }, 3500); return; }
+    b.dataset.sure = ''; b.textContent = 'Borrar todos';
+    if (TR) { TR.removeAll(); toast('Tracks borrados'); }
+  });
+  function editTrack(id) {
+    var t = TR && TR.list().filter(function (x) { return x.id === id; })[0];
+    if (!t) return;
+    editingT = { id: id, col: t.col };
+    var box = $('trackEditBody');
+    clear(box);
+    box.appendChild(el('div', { class: 'fe-where', text: (t.len ? fmtKm(t.len) + ' · ' : '') + t.np.toLocaleString('es-ES') + ' puntos' + (t.wp ? ' · ' + t.wp + ' marcas' : '') }));
+    var name = el('input', { class: 'fe-name', id: 'trackName', type: 'text', maxlength: '60', placeholder: 'Nombre', 'aria-label': 'Nombre del track', spellcheck: 'false' });
+    name.value = t.n;
+    name.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); $('trackSave').click(); } });
+    box.appendChild(name);
+    box.appendChild(el('div', { class: 'fe-t', text: 'Color' }));
+    var row = el('div', { class: 'fe-cols', role: 'radiogroup', 'aria-label': 'Color del track' });
+    function mark() { Array.prototype.forEach.call(row.children, function (b) { var on = b.dataset.v === editingT.col; b.classList.toggle('on', on); b.setAttribute('aria-checked', on ? 'true' : 'false'); }); }
+    FAV_COLORS.forEach(function (c, i) {
+      var b = el('button', { type: 'button', class: 'fe-col', role: 'radio', 'aria-label': 'Color ' + (i + 1), onclick: function () { editingT.col = c; mark(); } });
+      b.style.background = c; b.dataset.v = c;
+      row.appendChild(b);
+    });
+    box.appendChild(row);
+    mark();
+    tPic = picField(box, 't|' + id, t.im === 1, 'La foto de un track es una función PRO.');
+    $('trackEdit').hidden = false;
+  }
+  function closeTrackEdit() { $('trackEdit').hidden = true; editingT = null; }
+  $('trackEditClose').addEventListener('click', closeTrackEdit);
+  $('trackSave').addEventListener('click', function () {
+    if (!editingT || !TR) return;
+    var id = editingT.id, patch = { n: $('trackName').value, col: editingT.col }, job = Promise.resolve();
+    if (isPremium() && tPic) {
+      if (tPic.v) { patch.im = 1; job = putFavImg('t|' + id, tPic.v); } else if (tPic.v === null) { patch.im = 0; job = delFavImg('t|' + id); }
+    }
+    closeTrackEdit();
+    job.then(function () { TR.update(id, patch); toast('Track guardado'); });
+  });
+  $('trackGo').addEventListener('click', function () { if (!editingT || !TR) return; var id = editingT.id; closeTrackEdit(); TR.update(id, { vis: true }); TR.goTo(id); });
+  $('trackDel').addEventListener('click', function () {
+    if (!editingT || !TR) return;
+    var id = editingT.id; closeTrackEdit(); TR.remove(id); toast('Track borrado');
   });
 
   // --- Panel «Capas» ---
@@ -2400,8 +2558,12 @@
     return hotState === 'ok' ? mineHot().length + ' focos de hoy' : hotState === 'error' ? 'Mapa de EFFIS' : hotState === 'loading' ? 'Consultando…' : 'Focos de hoy';
   }
   function renderLayers() {
-    var box = $('layersList');
+    var box = $('layersList'), pop = $('layersPop'), keep = pop ? pop.scrollTop : 0;
     if (!box) return;
+    renderLayersInner(box);
+    if (pop && keep) pop.scrollTop = keep;
+  }
+  function renderLayersInner(box) {
     clear(box);
     LAYERS.forEach(function (l) {
       var prem = isPremium(), on = prem && lyrOn(l[0]);
@@ -2432,6 +2594,7 @@
   function applyLayers() {
     renderZonas();
     if (TR) TR.render(lyrOn('trk'));
+    renderTracksList();
     renderCams();
     applyFire();
     loadAvisos(false);
@@ -2454,7 +2617,7 @@
     base: { name: 'Mapa', defs: [{ svc: 'ign-base', layer: 'IGNBaseTodo', fmt: 'image/png', kb: 45 }] },
     sat: { name: 'Satélite', defs: [{ svc: 'pnoa-ma', layer: 'OI.OrthoimageCoverage', fmt: 'image/jpeg', kb: 15 }, { svc: 'ign-base', layer: 'IGNBaseOrto', fmt: 'image/png', kb: 10 }] },
   };
-  var MAP_ZOOMS = [[13, 'Medio', 'calles principales'], [14, 'Alto', 'calles y caminos']];
+  var MAP_ZOOMS = [[13, 'Medio', 'calles principales'], [14, 'Alto', 'calles y caminos']]; // Muy alto (15) y Máximo (16) aplazados: pesan demasiado (ver docs/premium/TRACKS-Y-MAPAS.md)
   var mapOpt = S.readJSON('mapopt', null);
   if (!mapOpt || !MAP_LAYERS[mapOpt.layer] || [13, 14].indexOf(mapOpt.z) < 0) mapOpt = { layer: mapOpt && MAP_LAYERS[mapOpt.layer] ? mapOpt.layer : 'base', z: 13 };
   var mapStore = S.readJSON('mapas', {});
@@ -2504,7 +2667,7 @@
     var kb = MAP_LAYERS[layerKey].defs.reduce(function (s, d) { return s + d.kb; }, 0);
     return tileCount(code, z) * kb / 1024;
   }
-  function fmtMB(mb) { return mb < 1 ? '<1 MB' : mb < 10 ? mb.toFixed(1).replace('.', ',') + ' MB' : Math.round(mb) + ' MB'; }
+  function fmtMB(mb) { return mb < 1 ? '<1 MB' : mb < 10 ? mb.toFixed(1).replace('.', ',') + ' MB' : mb < 1000 ? Math.round(mb) + ' MB' : (mb / 1024).toFixed(1).replace('.', ',') + ' GB'; }
   function b64bytes(s) {
     var bin = atob(s), arr = new Uint8Array(bin.length);
     for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
@@ -2611,6 +2774,7 @@
     box.appendChild(el('div', { class: 'map-line' }, [el('span', { class: 'map-lbl', text: 'Detalle' }), dsegs]));
     var zd = MAP_ZOOMS.filter(function (z) { return z[0] === mapOpt.z; })[0];
     box.appendChild(el('p', { class: 'set-help', text: zd ? zd[1] + ': ' + zd[2] + '.' : '' }));
+    if (mapOpt.z >= 15) box.appendChild(el('p', { class: 'set-help warn', text: '⚠️ Este detalle ocupa mucho: una provincia grande puede pasar de 1 GB (Muy alto) o de 4 GB (Máximo). Usa wifi y comprueba que te queda espacio. Se baja provincia a provincia: puedes cancelar y lo ya guardado se conserva. Sin cobertura, al acercar más allá de lo guardado se estira la imagen.' }));
     if (!selected.length) box.appendChild(el('p', { class: 'set-help', text: 'Marca antes alguna provincia en «Provincias».' }));
     var total = 0;
     Object.keys(mapStore).forEach(function (k) { total += mapStore[k].mb || 0; });
@@ -2621,8 +2785,11 @@
       else tail = [el('button', { type: 'button', class: 'pp-b pp-par' + (mapAsk === key ? ' ask' : ''), text: mapAsk === key ? 'Confirmar ' + fmtMB(mb) : (rec ? 'Ampliar ' : 'Descargar ') + '≈ ' + fmtMB(mb), onclick: function () {
         if (mb > 120 && mapAsk !== key) { mapAsk = key; renderMapasList(); return; }
         mapAsk = null;
-        if (navigator.storage && navigator.storage.estimate) navigator.storage.estimate().then(function (e) { if (e && e.quota && e.quota - e.usage < mb * 1.3 * 1048576) toast('Puede que no haya espacio suficiente en el móvil', 4000); });
-        startMapDownload(code, mapOpt.layer, mapOpt.z);
+        var go = function () { startMapDownload(code, mapOpt.layer, mapOpt.z); };
+        if (navigator.storage && navigator.storage.estimate) navigator.storage.estimate().then(function (e) {
+          if (e && e.quota && e.quota - e.usage < mb * 1.1 * 1048576) toast('No hay espacio suficiente: necesitas unos ' + fmtMB(mb * 1.1) + ' libres y quedan ' + fmtMB(Math.max(0, (e.quota - e.usage) / 1048576)), 5000);
+          else go();
+        }, go); else go();
       } })];
       box.appendChild(el('div', { class: 'prov-par map-row' }, [el('span', { class: 'pp-t', text: provName(code) })].concat(tail)));
     });

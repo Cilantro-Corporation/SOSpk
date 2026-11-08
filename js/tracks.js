@@ -5,7 +5,7 @@
 (function (root) {
   'use strict';
 
-  var MAX_BYTES = 15 * 1048576, MAX_PTS = 200000, MAX_TRACKS = 20, MAX_DRAW = 5000, MAX_WPT = 2000, MAX_DEPTH = 40;
+  var MAX_BYTES = 15 * 1048576, MAX_PTS = 200000, MAX_TRACKS = 500, MAX_DRAW = 5000, MAX_BUDGET = 30000, MAX_WPT = 2000, MAX_DEPTH = 40;
   var TOLS = [2, 10, 50]; // metros: detalle alto (zoom 17+), medio (14-16) y bajo
   var COLORS = ['#FF3B30', '#00B0FF', '#C6F400', '#FFB020', '#E040FB', '#00E5A0', '#FF7A00', '#FFFFFF'];
 
@@ -139,7 +139,7 @@
   }
   // Tres niveles de detalle por track: [[segmentos a 2 m], [a 10 m], [a 50 m]]
   function levelsOf(segs) { return TOLS.map(function (t) { return segs.map(function (s) { return simplify(s, t); }); }); }
-  function levelForZoom(z) { return z >= 17 ? 0 : z >= 14 ? 1 : 2; }
+  function levelForZoom(z) { return z >= 17 ? 0 : z >= 14 ? 1 : z >= 11 ? 2 : 3; }
 
   // Recorta un segmento a la vista (b = [sur, oeste, norte, este]): conserva cada tramo entre dos puntos cuya caja toca la vista; tope de puntos
   function clip(seg, b, cap) {
@@ -173,13 +173,13 @@
       var lv = levelsOf(t.segs), np = 0;
       t.segs.forEach(function (s) { np += s.length; });
       out.push({ id: id(), n: t.n || (parsed.tracks.length > 1 ? base + ' ' + (i + 1) : base), col: COLORS[(startIndex + out.length) % COLORS.length], vis: true,
-        len: Math.round(trackLength(t.segs)), np: np, lv: lv, wp: i === 0 ? parsed.wpts : [], bb: bboxOf(t.segs, i === 0 ? parsed.wpts : []), t: t0 + i });
+        len: Math.round(trackLength(t.segs)), np: np, lv: lv, im: 0, wp: i === 0 ? parsed.wpts : [], bb: bboxOf(t.segs, i === 0 ? parsed.wpts : []), t: t0 + i });
     });
-    if (!out.length) out.push({ id: id(), n: base, col: COLORS[startIndex % COLORS.length], vis: true, len: 0, np: 0, lv: [[], [], []], wp: parsed.wpts, bb: bboxOf([], parsed.wpts), t: t0 });
+    if (!out.length) out.push({ id: id(), n: base, col: COLORS[startIndex % COLORS.length], vis: true, len: 0, np: 0, lv: [[], [], []], im: 0, wp: parsed.wpts, bb: bboxOf([], parsed.wpts), t: t0 });
     return out;
   }
   function validRec(r) {
-    return r && typeof r.id === 'string' && typeof r.n === 'string' && Array.isArray(r.lv) && r.lv.length === 3 && Array.isArray(r.bb) && r.bb.length === 4 && r.bb.every(isFinite);
+    return r && typeof r.id === 'string' && r.id.length < 80 && typeof r.n === 'string' && /^#[0-9a-fA-F]{6}$/.test(r.col) && Array.isArray(r.lv) && r.lv.length === 3 && Array.isArray(r.bb) && r.bb.length === 4 && r.bb.every(isFinite);
   }
 
   // ---------- Almacén local (IndexedDB, con alternativa en memoria) ----------
@@ -203,38 +203,60 @@
     });
   }
 
-  // ---------- Capa en el mapa y panel ----------
+  // ---------- Capa en el mapa y gestión ----------
+  // Pensada para muchos tracks (p. ej. una búsqueda con decenas de equipos): solo se dibuja lo que toca la vista, con el nivel de detalle
+  // que cabe en un presupuesto de puntos, y la lista y el filtro viven en Configuración.
+  function lvAt(r, i) {
+    if (i < 3) return r.lv[i] || [];
+    return r._l3 || (r._l3 = (r.lv[2] || []).map(function (s) { return simplify(s, 250); })); // vista general: ~250 m
+  }
+  function countAt(r, i) { var n = 0; lvAt(r, i).forEach(function (s) { n += s.length; }); return n; }
+  function touches(bb, b) { return bb[2] >= b[0] && bb[0] <= b[2] && bb[3] >= b[1] && bb[1] <= b[3]; }
+  function okColor(c) { return typeof c === 'string' && /^#[0-9a-fA-F]{6}$/.test(c); }
+
   function create(o) {
-    var map = o.map, L = o.L, toast = o.toast || function () {}, onChange = o.onChange || function () {};
+    var map = o.map, L = o.L, toast = o.toast || function () {}, onChange = o.onChange || function () {}, onRemove = o.onRemove || function () {}, onManage = o.onManage || function () {};
     var recs = [], db = null, persist = false, shown = false, timer = 0, busy = false;
     var layer = L.layerGroup().addTo(map), canvas = L.canvas({ padding: 0.4 });
 
     function put(r) { return db ? idbDo(db, 'readwrite', function (s) { return s.put(r); }).catch(function () { persist = false; }) : Promise.resolve(); }
     function del(id) { return db ? idbDo(db, 'readwrite', function (s) { return s.delete(id); }).catch(function () { /* */ }) : Promise.resolve(); }
+    function byId(id) { return recs.filter(function (r) { return r.id === id; })[0] || null; }
 
     function tip(text) { var d = document.createElement('span'); d.textContent = text; return d; }
     function draw() {
       layer.clearLayers();
       if (!shown || !recs.length) return;
-      var bnd = map.getBounds().pad(0.3), b = [bnd.getSouth(), bnd.getWest(), bnd.getNorth(), bnd.getEast()], lvl = levelForZoom(map.getZoom());
-      recs.forEach(function (r) {
-        if (!r.vis) return;
-        var segs = r.lv[lvl] || [], first = null, last = null;
+      var z = map.getZoom(), bnd = map.getBounds().pad(0.3), b = [bnd.getSouth(), bnd.getWest(), bnd.getNorth(), bnd.getEast()];
+      var vis = recs.filter(function (r) { return r.vis && r.bb[0] <= r.bb[2] && touches(r.bb, b); });
+      if (!vis.length) return;
+      // Nivel de detalle por zoom; si hay demasiados puntos a la vista, uno más grueso, y como último recurso, muestreo
+      var lvl = levelForZoom(z), total = 0;
+      for (;;) {
+        total = 0;
+        vis.forEach(function (r) { total += countAt(r, lvl); });
+        if (total <= MAX_BUDGET || lvl >= 3) break;
+        lvl++;
+      }
+      var cap = Math.max(60, Math.min(MAX_DRAW, Math.floor(MAX_BUDGET / vis.length))), few = vis.length <= 60;
+      vis.forEach(function (r) {
+        var segs = lvAt(r, lvl), runs = [], first = null, last = null;
         segs.forEach(function (s) {
           if (s.length) { if (!first) first = s[0]; last = s[s.length - 1]; }
-          clip(s, b, MAX_DRAW).forEach(function (run) {
-            L.polyline(run, { renderer: canvas, color: '#0B0B0B', weight: 6.5, opacity: 0.85, interactive: false, lineCap: 'round', lineJoin: 'round' }).addTo(layer);
-            L.polyline(run, { renderer: canvas, color: r.col, weight: 3.5, opacity: 1, interactive: false, lineCap: 'round', lineJoin: 'round' }).addTo(layer);
-          });
+          clip(s, b, cap).forEach(function (run) { runs.push(run); });
         });
+        if (runs.length) {
+          L.polyline(runs, { renderer: canvas, color: '#0B0B0B', weight: 6.5, opacity: 0.85, interactive: false, lineCap: 'round', lineJoin: 'round' }).addTo(layer);
+          L.polyline(runs, { renderer: canvas, color: okColor(r.col) ? r.col : '#FF3B30', weight: 3.5, opacity: 1, interactive: false, lineCap: 'round', lineJoin: 'round' }).addTo(layer);
+        }
         function mark(p, fill, label) {
-          if (!p) return;
+          if (!p || p[0] < b[0] || p[0] > b[2] || p[1] < b[1] || p[1] > b[3]) return;
           L.circleMarker(p, { renderer: canvas, radius: 6.5, color: '#0B0B0B', weight: 2, fillColor: fill, fillOpacity: 1 }).bindTooltip(tip(label + ': ' + r.n), { direction: 'top' }).addTo(layer);
         }
-        mark(first, '#00C853', 'Inicio'); mark(last, '#FF3B30', 'Fin');
-        (r.wp || []).forEach(function (w) {
+        if (few || z >= 12) { mark(first, '#00C853', 'Inicio'); mark(last, '#FF3B30', 'Fin'); }
+        if (z >= 13) (r.wp || []).forEach(function (w) {
           if (w.lat < b[0] || w.lat > b[2] || w.lon < b[1] || w.lon > b[3]) return;
-          var m = L.circleMarker([w.lat, w.lon], { renderer: canvas, radius: 4.5, color: '#0B0B0B', weight: 1.5, fillColor: r.col, fillOpacity: 1 }).addTo(layer);
+          var m = L.circleMarker([w.lat, w.lon], { renderer: canvas, radius: 4.5, color: '#0B0B0B', weight: 1.5, fillColor: okColor(r.col) ? r.col : '#FF3B30', fillOpacity: 1 }).addTo(layer);
           if (w.n) m.bindTooltip(tip(w.n), { direction: 'top' });
         });
       });
@@ -251,40 +273,52 @@
       }).catch(function () { db = null; persist = false; }).then(function () { draw(); onChange(); });
     }
 
-    function importFile(file) {
-      if (busy) return;
-      if (!file) return;
-      if (file.size > MAX_BYTES) { toast('El archivo es demasiado grande (máximo 15 MB)'); return; }
-      if (recs.length >= MAX_TRACKS) { toast('Máximo ' + MAX_TRACKS + ' tracks: borra alguno'); return; }
-      busy = true; toast('Leyendo ' + cleanName(file.name) + '…');
-      var rd = new FileReader();
-      rd.onerror = function () { busy = false; toast('No se pudo leer el archivo'); };
-      rd.onload = function () {
-        setTimeout(function () {
-          var res;
-          try { res = parseGPX(String(rd.result)); } catch (e) { res = { error: 'No se pudo leer el archivo.' }; }
-          if (res.error) { busy = false; toast(res.error); return; }
-          var list = toRecords(res, file.name, recs.length), room = MAX_TRACKS - recs.length, skipped = list.length - room;
-          list = list.slice(0, room);
-          recs = recs.concat(list);
-          Promise.all(list.map(put)).then(function () {
-            busy = false; shown = true;
-            toast(list.length + (list.length === 1 ? ' track importado' : ' tracks importados') + (skipped > 0 ? ' (' + skipped + ' no caben: máximo ' + MAX_TRACKS + ')' : '') + (persist ? '' : ' · no se guardará al cerrar la app'));
-            draw(); onChange();
-            var f = list[0];
-            if (f && f.bb[0] <= f.bb[2]) map.fitBounds([[f.bb[0], f.bb[1]], [f.bb[2], f.bb[3]]], { maxZoom: 16, animate: false });
-          });
-        }, 30);
-      };
-      rd.readAsText(file);
+    function fit(r) {
+      if (r && r.bb[0] <= r.bb[2]) map.fitBounds([[r.bb[0], r.bb[1]], [r.bb[2], r.bb[3]]], { maxZoom: 16, animate: false, padding: [30, 30] });
+    }
+    // Varios archivos a la vez: se leen de uno en uno para no bloquear el móvil
+    function importFiles(files) {
+      if (busy || !files || !files.length) return;
+      var list = Array.prototype.slice.call(files), done = 0, added = 0, bad = 0, skipped = 0, lastRec = null, firstMsg = '';
+      busy = true;
+      (function next() {
+        var file = list.shift();
+        if (!file) {
+          busy = false; shown = true; draw(); onChange();
+          if (lastRec && added === 1) fit(lastRec);
+          toast((added ? added + (added === 1 ? ' track importado' : ' tracks importados') : 'No se importó ningún track') + (bad ? ' · ' + bad + (bad === 1 ? ' archivo no válido' : ' archivos no válidos') + (added === 0 && firstMsg ? ': ' + firstMsg : '') : '') + (skipped ? ' · ' + skipped + ' no caben (máximo ' + MAX_TRACKS + ')' : '') + (persist ? '' : ' · no se guardarán al cerrar la app'), 4500);
+          return;
+        }
+        done++;
+        if (file.size > MAX_BYTES) { bad++; firstMsg = firstMsg || 'más de 15 MB'; next(); return; }
+        if (recs.length >= MAX_TRACKS) { skipped++; next(); return; }
+        toast('Leyendo ' + done + ' de ' + (done + list.length) + ': ' + cleanName(file.name) + '…', 6000);
+        var rd = new FileReader();
+        rd.onerror = function () { bad++; next(); };
+        rd.onload = function () {
+          setTimeout(function () {
+            var res;
+            try { res = parseGPX(String(rd.result)); } catch (e) { res = { error: 'No se pudo leer el archivo.' }; }
+            if (res.error) { bad++; firstMsg = firstMsg || res.error.replace(/\.$/, ''); next(); return; }
+            var recsNew = toRecords(res, file.name, recs.length), room = MAX_TRACKS - recs.length;
+            skipped += Math.max(0, recsNew.length - room);
+            recsNew = recsNew.slice(0, room);
+            recs = recs.concat(recsNew);
+            added += recsNew.length;
+            lastRec = recsNew[0] || lastRec;
+            Promise.all(recsNew.map(put)).then(next);
+          }, 20);
+        };
+        rd.readAsText(file);
+      })();
     }
 
     var input = null;
     function pick() {
       if (!input) {
         input = document.createElement('input');
-        input.type = 'file'; input.accept = '.gpx,application/gpx+xml,application/xml,text/xml,application/octet-stream'; input.hidden = true;
-        input.addEventListener('change', function () { var f = input.files && input.files[0]; input.value = ''; importFile(f); });
+        input.type = 'file'; input.multiple = true; input.accept = '.gpx,application/gpx+xml,application/xml,text/xml,application/octet-stream'; input.hidden = true;
+        input.addEventListener('change', function () { var fs = input.files ? Array.prototype.slice.call(input.files) : []; input.value = ''; importFiles(fs); });
         document.body.appendChild(input);
       }
       input.click();
@@ -296,49 +330,58 @@
       (kids || []).forEach(function (c) { if (c) e.appendChild(c); });
       return e;
     }
+    // Resumen para el panel de capas (la lista completa y la edición están en Configuración)
     function panel() {
-      var box = h('div', { class: 'trk-panel' });
-      box.appendChild(h('button', { type: 'button', class: 'trk-imp', text: '＋ Importar GPX', onclick: pick }));
-      if (!recs.length) box.appendChild(h('p', { class: 'trk-help', text: 'Carga un archivo GPX de tu móvil. Se queda solo en este dispositivo.' }));
-      recs.forEach(function (r) {
-        var dot = h('button', { type: 'button', class: 'trk-dot', 'aria-label': 'Cambiar color', title: 'Cambiar color', onclick: function () {
-          r.col = COLORS[(COLORS.indexOf(r.col) + 1) % COLORS.length]; put(r); draw(); onChange();
-        } });
-        dot.style.background = r.col;
-        box.appendChild(h('div', { class: 'trk-row' + (r.vis ? '' : ' off') }, [
-          dot,
-          h('button', { type: 'button', class: 'trk-go', title: 'Ir al track', onclick: function () {
-            var $p = document.getElementById('layersPop'); if ($p) $p.hidden = true;
-            if (r.bb[0] <= r.bb[2]) map.fitBounds([[r.bb[0], r.bb[1]], [r.bb[2], r.bb[3]]], { maxZoom: 16, animate: false, padding: [30, 30] });
-          } }, [h('b', { text: r.n }), h('small', { text: (r.len ? fmtLen(r.len) + ' · ' : '') + r.np.toLocaleString('es-ES') + ' puntos' + ((r.wp || []).length ? ' · ' + r.wp.length + ' marcas' : '') })]),
-          h('button', { type: 'button', class: 'trk-b', 'aria-label': r.vis ? 'Ocultar' : 'Mostrar', title: r.vis ? 'Ocultar' : 'Mostrar', text: r.vis ? '👁' : '—', onclick: function () { r.vis = !r.vis; put(r); draw(); onChange(); } }),
-          h('button', { type: 'button', class: 'trk-b', 'aria-label': 'Borrar', title: 'Borrar', text: '🗑', onclick: function () {
-            recs = recs.filter(function (x) { return x.id !== r.id; }); del(r.id); draw(); onChange(); toast('Track borrado');
-          } }),
+      var box = h('div', { class: 'trk-panel' }), nVis = recs.filter(function (r) { return r.vis; }).length;
+      box.appendChild(h('button', { type: 'button', class: 'trk-imp', text: '＋ Importar GPX (puedes elegir varios)', onclick: pick }));
+      if (!recs.length) box.appendChild(h('p', { class: 'trk-help', text: 'Carga archivos GPX de tu móvil. Se quedan solo en este dispositivo.' }));
+      else {
+        box.appendChild(h('p', { class: 'trk-help', text: recs.length + (recs.length === 1 ? ' track' : ' tracks') + ' · ' + nVis + ' a la vista' + (persist ? '' : ' · no se guardarán al cerrar la app') }));
+        box.appendChild(h('div', { class: 'trk-btns' }, [
+          h('button', { type: 'button', class: 'subchip', text: 'Mostrar todos', onclick: function () { setAllVisible(true); } }),
+          h('button', { type: 'button', class: 'subchip', text: 'Ocultar todos', onclick: function () { setAllVisible(false); } }),
+          h('button', { type: 'button', class: 'subchip on', text: 'Lista y edición', onclick: onManage }),
         ]));
-      });
-      if (recs.length > 1) {
-        var all = h('button', { type: 'button', class: 'trk-all', text: 'Borrar todos', onclick: function () {
-          if (all.dataset.sure !== '1') { all.dataset.sure = '1'; all.textContent = 'Toca otra vez para borrar todos'; setTimeout(function () { all.dataset.sure = ''; all.textContent = 'Borrar todos'; }, 3500); return; }
-          var ids = recs.map(function (x) { return x.id; }); recs = []; ids.forEach(del); draw(); onChange(); toast('Tracks borrados');
-        } });
-        box.appendChild(all);
       }
-      if (recs.length && !persist) box.appendChild(h('p', { class: 'trk-help', text: 'Este dispositivo no permite guardarlos: se perderán al cerrar la app.' }));
       return box;
+    }
+
+    function setAllVisible(v) { recs.forEach(function (r) { if (r.vis !== v) { r.vis = v; put(r); } }); draw(); onChange(); }
+    function update(id, patch) {
+      var r = byId(id); if (!r) return null;
+      if (typeof patch.n === 'string') r.n = cleanName(patch.n) || r.n;
+      if (okColor(patch.col)) { r.col = patch.col; }
+      if (typeof patch.vis === 'boolean') r.vis = patch.vis;
+      if (patch.im === 0 || patch.im === 1) r.im = patch.im;
+      put(r); draw(); onChange();
+      return r;
+    }
+    function remove(id) {
+      var r = byId(id); if (!r) return;
+      recs = recs.filter(function (x) { return x.id !== id; });
+      del(id); onRemove(id); draw(); onChange();
+    }
+    function removeAll() {
+      var ids = recs.map(function (x) { return x.id; });
+      recs = []; ids.forEach(function (id) { del(id); onRemove(id); }); draw(); onChange();
     }
 
     load();
     return {
       render: function (on) { shown = !!on; draw(); },
       panel: panel,
+      pick: pick,
       count: function () { return recs.length; },
       note: function () { return recs.length ? recs.length + (recs.length === 1 ? ' track' : ' tracks') : 'Sin tracks'; },
+      persisted: function () { return persist; },
+      list: function () { return recs.map(function (r) { return { id: r.id, n: r.n, col: r.col, vis: r.vis, len: r.len, np: r.np, wp: (r.wp || []).length, im: r.im ? 1 : 0, bb: r.bb }; }); },
+      update: update, remove: remove, removeAll: removeAll, setAllVisible: setAllVisible,
+      goTo: function (id) { fit(byId(id)); },
     };
   }
 
   root.KMTracks = {
     parseGPX: parseGPX, simplify: simplify, levelsOf: levelsOf, levelForZoom: levelForZoom, clip: clip, trackLength: trackLength, toRecords: toRecords, validRec: validRec,
-    create: create, LIMITS: { bytes: MAX_BYTES, points: MAX_PTS, tracks: MAX_TRACKS, draw: MAX_DRAW },
+    create: create, LIMITS: { bytes: MAX_BYTES, points: MAX_PTS, tracks: MAX_TRACKS, draw: MAX_DRAW, budget: MAX_BUDGET },
   };
 })(typeof window !== 'undefined' ? window : this);
