@@ -258,7 +258,7 @@ button svg, .act svg, .icon-btn svg { width: 22px; height: 22px; fill: currentCo
 .cr-app { font-family: var(--head); font-weight: 700; font-size: 22px; }
 .cr-app small { font-family: var(--body); font-weight: 400; font-size: 13px; color: #CFCFCF; }
 .cr-by { margin-top: 8px; font-size: 15px; }
-.cr-corp { font-family: var(--head); font-size: 17px; letter-spacing: 2px; text-transform: uppercase; color: var(--lime); }
+.cr-brand { display: block; width: 190px; max-width: 70%; height: auto; margin: 6px auto 0; }
 
 .toast {
   position: fixed; left: 50%; transform: translateX(-50%); z-index: 900; top: calc(var(--top-h, 110px) + 10px);
@@ -510,3 +510,16 @@ body.drawing .sheet { display: none; }
 .leaflet-top.leaflet-right { right: var(--zoom-r, var(--safe-r)); }
 @media (max-width: 759px) { .leaflet-control-zoom { display: none; } }
 .leaflet-top.leaflet-right .leaflet-control-zoom { margin-top: var(--zoom-dy, 10px); }
+
+/* Tracks GPX (capa PRO) */
+.trk-panel { margin: 4px 0 2px 8px; display: grid; gap: 6px; }
+.trk-imp { min-height: 38px; border: 1px dashed var(--lime); border-radius: 9px; background: transparent; color: var(--lime); font-size: 14px; }
+.trk-help { margin: 0; font-size: 12px; color: var(--muted); }
+.trk-row { display: flex; align-items: center; gap: 6px; background: var(--panel); border-radius: 9px; padding: 3px 4px; }
+.trk-row.off { opacity: .55; }
+.trk-dot { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 2px solid #0B0B0B; outline: 1px solid var(--line); padding: 0; }
+.trk-go { flex: 1; min-width: 0; display: grid; text-align: left; border: 0; background: transparent; padding: 2px 4px; color: inherit; }
+.trk-go b { font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.trk-go small { font-size: 11px; color: var(--muted); }
+.trk-b { flex: none; width: 32px; height: 32px; border: 0; border-radius: 8px; background: transparent; font-size: 15px; color: inherit; }
+.trk-all { border: 0; background: transparent; color: var(--muted); font-size: 12px; text-decoration: underline; padding: 4px; }

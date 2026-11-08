@@ -2247,6 +2247,8 @@
   function readZonas() { var v = S.readJSON('zonas', []); return Array.isArray(v) ? v.filter(validZona).slice(0, ZMAX).map(cleanZona) : []; }
   function writeZonas(list) { S.writeJSON('zonas', list.slice(0, ZMAX)); }
   var zonesLayer = L.layerGroup().addTo(map);
+  // Tracks GPX del propio usuario (PRO): todo local, ver js/tracks.js
+  var TR = window.KMTracks ? window.KMTracks.create({ map: map, L: L, toast: toast, onChange: function () { renderLayers(); } }) : null;
   function zonaInfo(z) {
     var per = K.pathLength(z.pts, z.closed);
     return z.closed ? 'Perímetro ' + K.formatLength(per) + ' · Área ' + K.formatArea(K.polygonArea(z.pts)) : 'Longitud ' + K.formatLength(per);
@@ -2384,8 +2386,9 @@
 
   // --- Panel «Capas» ---
   var LAYERS = [['cam', '📷', 'Cámaras de tráfico'], ['v16', '🆘', 'Balizas V16 activas'], ['trf', '🚧', 'Accidentes, cortes y obras'], ['avi', '⛈️', 'Avisos meteorológicos'], ['inc', '🔥', 'Incendios activos'], ['vie', '🌬️', 'Viento'],
-    ['agu', '💧', 'Hidrantes y puntos de agua'], ['zon', '⬡', 'Sectores']];
+    ['agu', '💧', 'Hidrantes y puntos de agua'], ['zon', '⬡', 'Sectores'], ['trk', '🥾', 'Tracks GPX']];
   function layerNote(k) {
+    if (k === 'trk') return !TR ? '' : layerOn.trk === false ? 'Ocultos' : TR.note();
     if (k === 'zon') return layerOn.zon === false ? 'Ocultos' : readZonas().length + (readZonas().length === 1 ? ' sector' : ' sectores');
     if (!pkgProvs().length) return 'Descarga una provincia';
     if (!lyrOn(k)) return 'Apagada';
@@ -2407,6 +2410,7 @@
         el('span', { class: 'lyr-i', text: l[1] }), el('span', { class: 'lyr-t', text: l[2] }),
         el('span', { class: 'lyr-s', text: prem ? layerNote(l[0]) : '🔒' }),
       ]));
+      if (l[0] === 'trk' && on && TR) box.appendChild(TR.panel());
       if (l[0] === 'trf' && on) {
         var sub = el('div', { class: 'lyr-sub' });
         [['acc', 'Accidentes'], ['cor', 'Cortes'], ['obs', 'Obstáculos'], ['obr', 'Obras']].forEach(function (c) {
@@ -2419,7 +2423,7 @@
   }
   function toggleLayer(k, title) {
     if (!isPremium()) { showPremium(title + ' es una función PRO.'); return; }
-    if (k !== 'zon' && !pkgProvs().length && !lyrOn(k)) toast('Descarga una provincia en Configuración para ver esta capa');
+    if (k !== 'zon' && k !== 'trk' && !pkgProvs().length && !lyrOn(k)) toast('Descarga una provincia en Configuración para ver esta capa');
     layerOn[k] = !lyrOn(k);
     S.writeJSON('capas', layerOn);
     applyLayers();
@@ -2427,6 +2431,7 @@
   }
   function applyLayers() {
     renderZonas();
+    if (TR) TR.render(lyrOn('trk'));
     renderCams();
     applyFire();
     loadAvisos(false);
