@@ -1944,7 +1944,7 @@
   // En la app Android se leen directamente de la NASA; en la web, de una copia que se actualiza sola cada pocos minutos. Si falla, se usa el mapa de EFFIS (Copernicus).
   var fireLayer = null, hotLayer = L.layerGroup().addTo(map);
   var FIRMS_BASE = 'https://firms.modaps.eosdis.nasa.gov/data/active_fire/';
-  var FIRMS_URLS = [FIRMS_BASE + 'noaa-20-viirs-c2/csv/J1_VIIRS_C2_Europe_24h.csv', FIRMS_BASE + 'suomi-npp-viirs-c2/csv/SUOMI_VIIRS_C2_Europe_24h.csv', FIRMS_BASE + 'modis-c6.1/csv/MODIS_C6_1_Europe_24h.csv'];
+  var FIRMS_URLS = [FIRMS_BASE + 'noaa-20-viirs-c2/csv/J1_VIIRS_C2_Europe_24h.csv', FIRMS_BASE + 'noaa-21-viirs-c2/csv/J2_VIIRS_C2_Europe_24h.csv', FIRMS_BASE + 'suomi-npp-viirs-c2/csv/SUOMI_VIIRS_C2_Europe_24h.csv', FIRMS_BASE + 'modis-c6.1/csv/MODIS_C6_1_Europe_24h.csv'];
   var FIRMS_WEB = 'https://raw.githubusercontent.com/Cilantro-Corporation/SOSpk/live/firms.csv';
   var hot = [], hotState = 'idle', hotAt = 0;
   // Superficie quemada de los últimos 7 días (EFFIS, Copernicus; se actualiza a diario): el área afectada, dibujada como en un mapa de incendios
@@ -1989,7 +1989,7 @@
     hotState = 'loading';
     var direct = IS_NATIVE || /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
     Promise.all((direct ? FIRMS_URLS : [FIRMS_WEB]).map(function (u) { return liveFetch(u); })).then(function (parts) {
-      hot = K.parseFirms(parts.join('\n'), Date.now());
+      hot = K.parseFirms(parts.join('\n'), Date.now(), window.KMES_CALOR_FIJO);
       hotState = 'ok'; hotAt = Date.now();
       applyFire(); renderLayers();
     }).catch(function () { hotState = 'error'; applyFire(); renderLayers(); });
@@ -2002,9 +2002,56 @@
       return h.pc && mine.indexOf(h.pc) >= 0;
     });
   }
+  // Manchas de fuego: los focos VIIRS (píxeles de ~375 m) vecinos forman una mancha (K.fireClusters). Se calculan una vez por descarga y por conjunto de provincias.
+  var clKey = '', clVal = [];
+  function mineClusters() {
+    var key = hotAt + ':' + pkgProvs().join(',') + ':' + hot.length;
+    if (key !== clKey) { clVal = K.fireClusters(mineHot()); clKey = key; }
+    return clVal;
+  }
+  // Extensión aproximada: cada píxel se dibuja con su tamaño real, coloreado por antigüedad y con contorno. Los dos dibujos (contorno debajo, relleno encima)
+  // van en un panel con una sola opacidad, así al solaparse los píxeles no se oscurecen y solo se ve el borde exterior de la mancha.
+  var fpGroup = L.layerGroup().addTo(map), fpOut = null, fpFill = null;
+  function fpInit() {
+    if (fpOut) return;
+    var pane = map.createPane('fireArea');
+    pane.style.zIndex = 350; pane.style.opacity = '0.6';
+    fpOut = L.svg({ pane: 'fireArea', padding: 0.2 }); fpFill = L.svg({ pane: 'fireArea', padding: 0.2 });
+    map.addLayer(fpOut); map.addLayer(fpFill);
+  }
+  var FIRE_COL = ['#FF4B3E', '#FF9F1C', '#F2D600'];
+  function fireAge(t) { var age = Date.now() - t; return age < 10800000 ? 0 : age < 43200000 ? 1 : 2; }
+  function renderFootprints() {
+    fpGroup.clearLayers();
+    if (!lyrOn('inc') || hotState !== 'ok') return;
+    fpInit();
+    var bnd = map.getBounds().pad(0.1), vis = [];
+    mineClusters().forEach(function (c) {
+      if (!c.ha || !bnd.intersects([[c.bb[0], c.bb[1]], [c.bb[2], c.bb[3]]])) return;
+      c.pts.forEach(function (p) { if (p.w && bnd.contains([p.lat, p.lon])) vis.push({ p: p, c: c }); });
+    });
+    // Incendios enormes (miles de píxeles a la vista): se dibuja una celda de f × f píxeles en lugar de cada píxel, con la hora del más reciente
+    var f = vis.length > 1200 ? Math.ceil(Math.sqrt(vis.length / 1200)) : 1, cells = [];
+    if (f === 1) cells = vis.map(function (v) { var p = v.p, dy = p.h / 2 / 110.57, dx = p.w / 2 / (111.32 * Math.cos(p.lat * Math.PI / 180)); return { b: [[p.lat - dy, p.lon - dx], [p.lat + dy, p.lon + dx]], t: p.t, c: v.c }; });
+    else {
+      var bins = {};
+      vis.forEach(function (v) {
+        var sy = 0.4 * f / 110.57, sx = 0.4 * f / (111.32 * Math.cos(v.p.lat * Math.PI / 180)), i = Math.floor(v.p.lat / sy), j = Math.floor(v.p.lon / sx), k = i + ':' + j;
+        if (!bins[k] || bins[k].t < v.p.t) bins[k] = { b: [[i * sy, j * sx], [(i + 1) * sy, (j + 1) * sx]], t: v.p.t, c: v.c };
+      });
+      cells = Object.keys(bins).map(function (k) { return bins[k]; });
+    }
+    cells.slice(0, 1500).forEach(function (q) {
+      L.rectangle(q.b, { renderer: fpOut, interactive: false, stroke: true, color: '#8E1B14', weight: 3, lineJoin: 'miter', fill: true, fillColor: '#8E1B14', fillOpacity: 1 }).addTo(fpGroup);
+      var col = FIRE_COL[fireAge(q.t)]; // el borde del mismo color tapa las juntas entre píxeles
+      L.rectangle(q.b, { renderer: fpFill, stroke: true, color: col, weight: 1.5, opacity: 1, fill: true, fillColor: col, fillOpacity: 1 })
+        .on('click', function (e) { L.DomEvent.stopPropagation(e); openFire(q.c, fireAge(q.c.t1)); }).addTo(fpGroup);
+    });
+  }
   function applyFire() {
     if (fireLayer) { map.removeLayer(fireLayer); fireLayer = null; }
     hotLayer.clearLayers();
+    fpGroup.clearLayers();
     burnLayer.clearLayers();
     if (!lyrOn('inc')) return;
     loadBurn(); renderBurn();
@@ -2021,27 +2068,33 @@
   }
   function renderHot() {
     hotLayer.clearLayers();
-    if (!lyrOn('inc') || hotState !== 'ok') return;
+    if (!lyrOn('inc') || hotState !== 'ok') { fpGroup.clearLayers(); return; }
+    renderFootprints();
+    // Una chincheta por mancha (en su centro); con muchos píxeles juntos ya no hay una por foco
     var bnd = map.getBounds().pad(0.1), grid = {}, n = 0, z = map.getZoom();
-    mineHot().filter(function (h) { return bnd.contains([h.lat, h.lon]); }).sort(function (x, y) { return y.frp - x.frp; }).forEach(function (h) {
+    mineClusters().filter(function (c) { return bnd.contains([c.lat, c.lon]); }).sort(function (x, y) { return y.frp - x.frp; }).forEach(function (c) {
       if (n >= 600) return;
-      var pt = map.latLngToContainerPoint([h.lat, h.lon]), cell = (z < 9 ? 22 : 12) * dm(), k = Math.floor(pt.x / cell) + ':' + Math.floor(pt.y / cell);
+      var pt = map.latLngToContainerPoint([c.lat, c.lon]), cell = (z < 9 ? 22 : 12) * dm(), k = Math.floor(pt.x / cell) + ':' + Math.floor(pt.y / cell);
       if (grid[k]) return;
       grid[k] = 1; n++;
-      var age = Date.now() - h.t, cls = age < 10800000 ? 0 : age < 43200000 ? 1 : 2;
-      var pin = el('span', { class: 'hotpin hp' + cls, text: '🔥', title: 'Foco de calor ' + ago(h.t) });
-      L.marker([h.lat, h.lon], { icon: L.divIcon({ className: 'pk-icon', html: pin, iconSize: null }), keyboard: false, zIndexOffset: 700 + Math.round(h.frp) })
-        .on('click', function () { openHot(h, cls); }).addTo(hotLayer);
+      var cls = fireAge(c.t1);
+      var pin = el('span', { class: 'hotpin hp' + cls, text: '🔥', title: (c.n > 1 ? 'Zona con fuego (' + c.n + ' focos) ' : 'Foco de calor ') + ago(c.t1) });
+      L.marker([c.lat, c.lon], { icon: L.divIcon({ className: 'pk-icon', html: pin, iconSize: null }), keyboard: false, zIndexOffset: 700 + Math.round(c.frp) })
+        .on('click', function () { openFire(c, cls); }).addTo(hotLayer);
     });
   }
-  function openHot(h, cls) {
-    var COL = ['#FF4B3E', '#FF9F1C', '#F2D600'];
+  function fireHa(ha) { return ha < 10 ? ha.toFixed(1).replace('.', ',') : String(Math.round(ha)); }
+  function openFire(c, cls) {
+    var viirs = c.ha > 0;
     var show = function (w) {
-      openItems('Foco de calor', [{ badge: '🔥', col: COL[cls], title: 'Foco de calor · satélite ' + h.sat, lat: h.lat, lon: h.lon,
-        lines: ['Detectado ' + ago(h.t), h.frp ? 'Potencia radiativa: ' + h.frp.toFixed(1).replace('.', ',') + ' MW' : '', w ? 'Viento: ' + windText(w) : '', fmtLL(h.lat, h.lon)] }],
-        'Fuente: NASA FIRMS (VIIRS/MODIS). Es un punto de calor visto desde el espacio, no el perímetro ni la confirmación de un incendio: puede ser una quema controlada o un error. SOSpk no es un servicio oficial ni llama a emergencias.');
+      var first = c.t1 - c.t0 >= 1800000 ? ' · primer foco ' + ago(c.t0) : '';
+      openItems(c.n > 1 ? 'Zona con fuego' : 'Foco de calor', [{ badge: '🔥', col: FIRE_COL[cls], title: c.n > 1 ? 'Zona con fuego · ' + c.n + ' focos de satélite' : 'Foco de calor · satélite ' + (viirs ? 'VIIRS' : 'MODIS'), lat: c.lat, lon: c.lon,
+        lines: [viirs ? 'Superficie con fuego detectada: ≈ ' + fireHa(c.ha) + ' ha' : '', 'Último foco ' + ago(c.t1) + first,
+          c.frp ? 'Potencia radiativa: ' + c.frp.toFixed(1).replace('.', ',') + ' MW' + (c.n > 1 ? ' (suma)' : '') : '', w ? 'Viento: ' + windText(w) : '', fmtLL(c.lat, c.lon)] }],
+        (viirs ? 'En el mapa, la mancha se colorea por antigüedad de cada foco: rojo, menos de 3 h; naranja, menos de 12 h; amarillo, más de 12 h. ' : '') +
+        'Fuente: NASA FIRMS (VIIRS/MODIS); la superficie la calcula SOSpk sumando los píxeles de ~375 m detectados en las últimas 24 h, y es una estimación (no todo el píxel arde). Se ocultan las fuentes fijas de calor conocidas (industria, minas, vertederos). Es lo que ve el satélite, no el perímetro ni la confirmación de un incendio: puede ser una quema controlada o un error. SOSpk no es un servicio oficial ni llama a emergencias.');
     };
-    windAt(h.lat, h.lon).then(show, function () { show(null); });
+    windAt(c.lat, c.lon).then(show, function () { show(null); });
   }
   setInterval(function () { if (document.visibilityState === 'visible' && lyrOn('inc')) loadHot(true); }, 300000);
   document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && lyrOn('inc')) loadHot(false); });
@@ -2618,6 +2671,7 @@
   // --- Panel «Capas» ---
   var LAYERS = [['cam', '📷', 'Cámaras de tráfico'], ['v16', '🆘', 'Balizas V16 activas'], ['trf', '🚧', 'Accidentes, cortes y obras'], ['avi', '⛈️', 'Avisos meteorológicos'], ['inc', '🔥', 'Incendios activos'], ['vie', '🌬️', 'Viento'],
     ['agu', '💧', 'Hidrantes y puntos de agua'], ['zon', '⬡', 'Sectores'], ['trk', '🥾', 'Tracks GPX']];
+  function layerErr() { return navigator.onLine === false ? 'Sin conexión' : 'No disponible ahora'; }
   function layerNote(k) {
     if (k === 'trk') return !TR ? '' : layerOn.trk === false ? 'Ocultos' : TR.note();
     if (k === 'zon') return layerOn.zon === false ? 'Ocultos' : readZonas().length + (readZonas().length === 1 ? ' sector' : ' sectores');
@@ -2625,9 +2679,9 @@
     if (!lyrOn(k)) return 'Apagada';
     if (k === 'cam') return allCams().length + ' cámaras';
     if (k === 'agu') return allAgua().length.toLocaleString('es-ES') + ' puntos';
-    if (k === 'v16' || k === 'trf') return sitState === 'error' ? 'Sin conexión' : sitState === 'loading' ? 'Consultando…' : sitState === 'ok' ? (k === 'v16' ? mySits('v16').length + ' activas' : mySits().length + ' incidencias') : '';
-    if (k === 'avi') return avisosState === 'error' ? 'Sin conexión' : avisosState === 'loading' ? 'Consultando…' : avisosState === 'ok' ? (myAvisos().length ? myAvisos().length + ' vigentes' : 'Sin avisos vigentes') : '';
-    if (k === 'vie') return windState === 'error' ? 'Sin conexión' : 'Flechas de viento';
+    if (k === 'v16' || k === 'trf') return sitState === 'error' ? layerErr() : sitState === 'loading' ? 'Consultando…' : sitState === 'ok' ? (k === 'v16' ? mySits('v16').length + ' activas' : mySits().length + ' incidencias') : '';
+    if (k === 'avi') return avisosState === 'error' ? layerErr() : avisosState === 'loading' ? 'Consultando…' : avisosState === 'ok' ? (myAvisos().length ? myAvisos().length + ' vigentes' : 'Sin avisos vigentes') : '';
+    if (k === 'vie') return windState === 'error' ? layerErr() : 'Flechas de viento';
     return hotState === 'ok' ? mineHot().length + ' focos de hoy' : hotState === 'error' ? 'Mapa de EFFIS' : hotState === 'loading' ? 'Consultando…' : 'Focos de hoy';
   }
   function renderLayers() {

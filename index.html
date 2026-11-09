@@ -343,7 +343,7 @@
           <div class="cr-help">Ayuda y contacto:<br><a href="mailto:info@sospk.app">info@sospk.app</a></div>
         </div>
         <p class="set-help">Datos: hitos kilométricos oficiales del Instituto Geográfico Nacional (IGR Redes de Transporte, CC BY 4.0), puntos kilométricos de CartoCiudad (IGN · SCNE, CC BY 4.0 scne.es) y trazado de © colaboradores de OpenStreetMap (ODbL) y nombres de lugares del Nomenclátor Geográfico Básico de España (IGN, CC BY 4.0). Mapas: IGN / PNOA. Las posiciones entre hitos (≈) son una estimación. <span id="dataDate"></span></p>
-        <p class="set-help" id="creditsPrem" hidden>Cámaras, balizas V16 e incidencias: DGT, vía el Punto de Acceso Nacional del Ministerio de Transportes (Powered by MITRAMS); puntos de agua: © colaboradores de OpenStreetMap (ODbL); focos de calor: NASA FIRMS (VIIRS y MODIS); áreas quemadas: EFFIS (Copernicus); viento: MET Norway (CC BY 4.0); Servei Català de Trànsit; Gobierno Vasco (CC BY 4.0); ayuntamientos de Madrid, Valencia y Málaga (CC BY 4.0); Vitoria-Gasteiz. Avisos: AEMET, vía Meteoalarm (CC BY 4.0). Incendios: EFFIS, Copernicus EMS.</p>
+        <p class="set-help" id="creditsPrem" hidden>Cámaras, balizas V16 e incidencias: DGT, vía el Punto de Acceso Nacional del Ministerio de Transportes (Powered by MITRAMS); puntos de agua: © colaboradores de OpenStreetMap (ODbL); focos de calor: NASA FIRMS (VIIRS de NOAA-20, NOAA-21 y Suomi NPP, y MODIS), con la extensión aproximada calculada por SOSpk a partir de esos focos y las fuentes fijas de calor según NASA FIRMS; áreas quemadas: EFFIS, Copernicus © Unión Europea (CC BY 4.0), solo las de tus provincias; viento: MET Norway (CC BY 4.0); Servei Català de Trànsit; Gobierno Vasco (CC BY 4.0); ayuntamientos de Madrid, Valencia y Málaga (CC BY 4.0); Vitoria-Gasteiz. Avisos: AEMET, vía Meteoalarm (CC BY 4.0). Incendios: EFFIS, Copernicus EMS.</p>
         <p class="set-help"><b>Descargo de responsabilidad:</b> SOSpk solo te facilita el buscador y el enlace. Los puntos kilométricos, las imágenes de las cámaras, los datos y los avisos son responsabilidad del IGN, la DGT, AEMET, EFFIS o la entidad que los publica, y pueden tener errores o retrasos. Las imágenes, el mantenimiento y los fallos o interrupciones de las cámaras no son responsabilidad de SOSpk, que solo enlaza a la web de quien las publica. SOSpk no es un servicio oficial, no sustituye a la señalización ni a los servicios de emergencias y no llama a emergencias.</p>
         <p class="set-help">Aviso: la información es orientativa. Los PK y las posiciones calculadas (≈) pueden contener errores y no sustituyen a la señalización de la carretera ni a la información de los servicios oficiales. No se garantiza su exactitud ni se asume responsabilidad por su uso.</p>
       </details>
@@ -356,6 +356,7 @@
 
   <script src="vendor/leaflet/leaflet.js"></script>
   <script src="js/config.js"></script>
+  <script src="js/calor-fijo.js"></script>
   <script src="js/core.js"></script>
   <script src="js/coords.js"></script>
   <script src="js/store.js"></script>

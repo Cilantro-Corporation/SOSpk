@@ -179,14 +179,36 @@
   var SIT_CUTS = /^(roadClosed|carriagewayClosures|intermittentShortTermClosures)$/;
   var SIT_OBS = /^(vehicleObstruction|obstruction|environmentalObstruction|infrastructureDamageObstruction)$/;
   // Focos de calor de satélite (NASA FIRMS: VIIRS y MODIS, últimas 24 h). El texto puede traer varios CSV seguidos, cada uno con su cabecera.
-  function parseFirms(text, now) {
-    var out = {}, cols = null, lines = String(text || '').split(/\r?\n/);
+  // mask (opcional): fuentes fijas de calor [[lat·1e4, lon·1e4], ...] (industria, minas, vertederos; ver tools/build-calor-fijo.mjs). Los focos a menos de 0,8 km de una se descartan.
+  function staticIndex(mask) {
+    if (!mask || !mask.length) return null;
+    if (mask._ix) return mask._ix;
+    var ix = {};
+    for (var i = 0; i < mask.length; i++) { var k = Math.floor(mask[i][0] / 100) + ':' + Math.floor(mask[i][1] / 100); (ix[k] = ix[k] || []).push(mask[i]); }
+    try { Object.defineProperty(mask, '_ix', { value: ix }); } catch (e) { /* si no se puede guardar, se recalcula */ }
+    return ix;
+  }
+  function isStaticHeat(ix, lat, lon) {
+    var a = Math.floor(lat * 100), b = Math.floor(lon * 100), cos = Math.cos(lat * RAD);
+    for (var da = -1; da <= 1; da++) for (var db = -1; db <= 1; db++) {
+      var arr = ix[(a + da) + ':' + (b + db)];
+      if (!arr) continue;
+      for (var k = 0; k < arr.length; k++) {
+        var dy = (arr[k][0] / 1e4 - lat) * 110.57, dx = (arr[k][1] / 1e4 - lon) * 111.32 * cos;
+        if (dx * dx + dy * dy < 0.64) return true;
+      }
+    }
+    return false;
+  }
+  function parseFirms(text, now, mask) {
+    var out = {}, cols = null, lines = String(text || '').split(/\r?\n/), six = staticIndex(mask);
     for (var i = 0; i < lines.length && i < 60000; i++) {
       var ln = lines[i];
       if (ln.slice(0, 8) === 'latitude') { cols = {}; ln.split(',').forEach(function (h, k) { cols[h.trim()] = k; }); continue; }
       if (!cols || !ln) continue;
       var f = ln.split(','), lat = +f[cols.latitude], lon = +f[cols.longitude];
       if (!isFinite(lat) || !isFinite(lon) || lat < 27.4 || lat > 43.95 || lon < -18.5 || lon > 4.6) continue;
+      if (six && isStaticHeat(six, lat, lon)) continue;
       var d = /^(\d{4})-(\d{2})-(\d{2})$/.exec(f[cols.acq_date] || ''), hm = ('0000' + (f[cols.acq_time] || '')).slice(-4);
       if (!d) continue;
       var t = Date.UTC(+d[1], +d[2] - 1, +d[3], +hm.slice(0, 2), +hm.slice(2));
@@ -196,9 +218,48 @@
       var key = Math.round(lat * 300) + ':' + Math.round(lon * 300);
       var fr = +f[cols.frp];
       if (out[key] && out[key].t >= t) continue;
-      out[key] = { lat: lat, lon: lon, t: t, sat: viirs ? 'VIIRS' : 'MODIS', frp: isFinite(fr) ? fr : 0 };
+      // w y h: tamaño real del píxel en km (VIIRS ≈ 0,4 km; el MODIS, de 1 km, no se usa para dibujar superficie)
+      var sw = +f[cols.scan], sh = +f[cols.track];
+      out[key] = { lat: lat, lon: lon, t: t, sat: viirs ? 'VIIRS' : 'MODIS', frp: isFinite(fr) ? fr : 0,
+        w: viirs ? (sw >= 0.2 && sw <= 1.2 ? sw : 0.4) : 0, h: viirs ? (sh >= 0.2 && sh <= 1.2 ? sh : 0.4) : 0 };
     }
     return Object.keys(out).map(function (k) { return out[k]; }).sort(function (a, b) { return b.t - a.t; }).slice(0, 6000);
+  }
+  // Agrupa los focos VIIRS (píxeles de unos 375 m) en manchas: los que distan menos de 0,9 km se unen. Los focos MODIS (1 km) que caen a menos de 1,5 km
+  // de un VIIRS se descartan (el VIIRS es más preciso); los demás quedan solos. Devuelve { n, t0 (el más antiguo), t1 (el más reciente), frp (suma, MW),
+  // ha (superficie de los píxeles, estimada), lat, lon (centro), bb [sur, oeste, norte, este], pts }, el más reciente primero.
+  function fireClusters(hots) {
+    var vi = [], mo = [], i, j, g = {}, CL = 0.015, CO = 0.02;
+    for (i = 0; i < hots.length; i++) (hots[i].w > 0 ? vi : mo).push(hots[i]);
+    vi = vi.slice(0, 4000);
+    var cell = function (p) { return [Math.floor(p.lat / CL), Math.floor(p.lon / CO)]; };
+    var d2 = function (a, b) { var dy = (a.lat - b.lat) * 110.57, dx = (a.lon - b.lon) * 111.32 * Math.cos(a.lat * Math.PI / 180); return dx * dx + dy * dy; };
+    var near = function (p, r2, fn) {
+      var c = cell(p);
+      for (var a = -1; a <= 1; a++) for (var b = -1; b <= 1; b++) {
+        var arr = g[(c[0] + a) + ':' + (c[1] + b)];
+        if (arr) for (var k = 0; k < arr.length; k++) if (d2(p, vi[arr[k]]) < r2 && fn(arr[k])) return true;
+      }
+      return false;
+    };
+    var par = [];
+    var find = function (x) { while (par[x] !== x) { par[x] = par[par[x]]; x = par[x]; } return x; };
+    for (i = 0; i < vi.length; i++) { par[i] = i; var c = cell(vi[i]), key = c[0] + ':' + c[1]; (g[key] = g[key] || []).push(i); }
+    for (i = 0; i < vi.length; i++) near(vi[i], 0.81, function (k) { var a = find(i), b = find(k); if (a !== b) par[a] = b; return false; });
+    var groups = {}, out = [];
+    for (i = 0; i < vi.length; i++) { var r = find(i); (groups[r] = groups[r] || []).push(vi[i]); }
+    var make = function (pts) {
+      var s = { n: pts.length, t0: Infinity, t1: 0, frp: 0, ha: 0, lat: 0, lon: 0, bb: [90, 180, -90, -180], pts: pts };
+      pts.forEach(function (p) {
+        s.t0 = Math.min(s.t0, p.t); s.t1 = Math.max(s.t1, p.t); s.frp += p.frp || 0; s.ha += (p.w || 0) * (p.h || 0) * 100; s.lat += p.lat; s.lon += p.lon;
+        s.bb = [Math.min(s.bb[0], p.lat), Math.min(s.bb[1], p.lon), Math.max(s.bb[2], p.lat), Math.max(s.bb[3], p.lon)];
+      });
+      s.lat /= pts.length; s.lon /= pts.length;
+      return s;
+    };
+    Object.keys(groups).forEach(function (k) { out.push(make(groups[k])); });
+    for (j = 0; j < mo.length; j++) if (!near(mo[j], 2.25, function () { return true; })) out.push(make([mo[j]]));
+    return out.sort(function (a, b) { return b.t1 - a.t1; });
   }
   function parseSituations(xml, now) {
     var out = [], seen = {};
@@ -770,6 +831,7 @@
     zoneProvince: zoneProvince,
     parseSituations: parseSituations,
     parseFirms: parseFirms,
+    fireClusters: fireClusters,
     validAgua: validAgua,
     aguaEntries: aguaEntries,
   };
