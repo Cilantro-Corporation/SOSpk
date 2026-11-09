@@ -107,7 +107,8 @@
     $('secSectores').hidden = !fw;
     if ($('secTracks')) $('secTracks').hidden = !fw;
     if (typeof mapOpt !== 'undefined' && mapOpt) renderMapasList();
-    if ($('planName')) $('planName').textContent = isPremium() ? 'Premium' : 'Gratis';
+    if ($('planName')) $('planName').textContent = isPremium() ? 'PRO' : 'Básica';
+    if ($('whatPrice')) $('whatPrice').textContent = PRE.priceMonth + ' al mes o ' + PRE.priceYear + ' al año, con ' + PRE.trialDays + ' días de prueba gratis';
     $('devRow').hidden = !devMode || TESTERS;
     $('testRow').hidden = !TESTERS;
     $('testPrem').checked = simPremium;
@@ -1479,7 +1480,7 @@
     var f = favOf(item);
     if (!f) {
       var nFav = readList('fav').length;
-      if (!isPremium() && nFav >= PRE.freeFavs) { showPremium('Con la versión gratuita puedes guardar ' + PRE.freeFavs + ' favoritos.'); return; }
+      if (!isPremium() && nFav >= PRE.freeFavs) { showPremium('Con la versión Básica puedes guardar ' + PRE.freeFavs + ' favoritos.'); return; }
       if (nFav >= PRE.maxFavs) { toast('Máximo ' + PRE.maxFavs + ' favoritos'); return; }
       saveFav(item); toast('Guardado en favoritos'); f = favOf(item);
       editFav(f, true);
@@ -1796,6 +1797,7 @@
   applyPremiumUi();
   // En el APK el enlace de descarga no existe (lo quita tools/prepare-android.mjs)
   if ($('apkLink')) $('apkLink').hidden = IS_NATIVE || IS_IOS;
+  if ($('iosLink')) $('iosLink').hidden = IS_NATIVE; // el enlace a la App Store se pondrá cuando exista la app para iOS
   // iPhone/iPad: la web se instala desde Safari (Compartir → Añadir a pantalla de inicio); se avisa una sola vez
   var iosStandalone = window.navigator.standalone === true || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
   if ($('iosHint')) $('iosHint').hidden = !IS_IOS || iosStandalone;

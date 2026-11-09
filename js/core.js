@@ -114,7 +114,7 @@
     return hits.slice(0, limit || 8).map(function (h) { return h.e; });
   }
 
-  // ---------- Cámaras de tráfico (Premium): validación y búsqueda ----------
+  // ---------- Cámaras de tráfico (PRO): validación y búsqueda ----------
   // { v, code, r: [[lat·1e5, lon·1e5, nombre, carretera, km|null, enlace, fuente], ...] }
   function validCamaras(d, code) {
     if (!d || typeof d !== 'object' || d.code !== code || !/^\d{8,12}$/.test(String(d.v)) || !Array.isArray(d.r) || d.r.length > 5000) return false;
@@ -141,7 +141,7 @@
     return best;
   }
 
-  // ---------- Zonas y rutas (Premium): perímetro y área sobre la esfera ----------
+  // ---------- Zonas y rutas (PRO): perímetro y área sobre la esfera ----------
   function pathLength(pts, closed) {
     var L = 0;
     for (var i = 1; i < pts.length; i++) L += distance(pts[i - 1], pts[i]);

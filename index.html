@@ -214,14 +214,15 @@
         <li><span>🚧</span><div><b>Accidentes, cortes y obras</b><small>Accidentes, cortes, obras y obstáculos de la DGT en directo, con carretera, km y enlace a Google Maps.</small></div></li>
         <li><span>💧</span><div><b>Hidrantes y puntos de agua</b><small>Hidrantes, tomas de aspiración, depósitos y balsas para emergencias (OpenStreetMap).</small></div></li>
         <li><span>⛈️</span><div><b>Avisos meteorológicos</b><small>Solo los vigentes, con el nivel (amarillo, naranja o rojo) y el enlace a la fuente. Tipos: tormentas, lluvias, nevadas, hielo, viento, nieblas, temperaturas máximas y mínimas, fenómenos costeros, riesgo de incendios, aludes e inundaciones.</small></div></li>
-        <li><span>🔥</span><div><b>Incendios activos</b><small>Focos de calor detectados por satélite y, dibujada en rojo, el área quemada de los últimos 7 días (se actualiza a diario). Toca el área para ver su superficie.</small></div></li>
+        <li><span>🔥</span><div><b>Incendios activos</b><small>Focos de calor detectados por satélite, su extensión y, dibujado en rojo, el contorno del área quemada de los últimos 7 días (EFFIS, se actualiza a diario). Toca un incendio para ver su ficha: tiempo, superficie, qué se ha quemado, viento y lo que hay cerca.</small></div></li>
+        <li><span>🌬️</span><div><b>Viento</b><small>Flechas de viento sobre el mapa, con la dirección y la velocidad.</small></div></li>
         <li><span>⬡</span><div><b>Sectores</b><small>Dibuja un sector o una ruta, ponle nombre, color y una foto, y mide su perímetro y área.</small></div></li>
         <li><span>🥾</span><div><b>Tracks GPX propios</b><small>Carga en el móvil los GPX que tengas (hasta 500 a la vez, archivos de hasta 15 MB) y míralos sobre el mapa: inicio y fin, marcas con nombre, color y foto de cada uno, y un buscador por nombre. Pensado para búsquedas y operativos con muchos recorridos. Se quedan solo en tu dispositivo: SOSpk no los recibe ni los guarda.</small></div></li>
-        <li class="app-only"><span>🗺️</span><div><b>Mapas sin conexión con detalle alto</b><small>Guarda en el móvil el mapa topográfico o el satélite de tus provincias con calles y caminos, para verlos sin cobertura (app Android). Antes de bajar nada te avisamos de lo que pesa, y si falta una zona al acercar, se amplía la guardada. El detalle medio es gratis.</small></div></li>
-        <li><span>⭐</span><div><b>Hasta 50 favoritos</b><small>Con más colores e iconos (gratis: 5 favoritos).</small></div></li>
+        <li class="app-only"><span>🗺️</span><div><b>Mapas sin conexión con detalle alto</b><small>Guarda en el móvil el mapa topográfico o el satélite de tus provincias con calles y caminos, para verlos sin cobertura (app Android). Antes de bajar nada te avisamos de lo que pesa, y si falta una zona al acercar, se amplía la guardada. El detalle medio está en la versión Básica.</small></div></li>
+        <li><span>⭐</span><div><b>Hasta 50 favoritos</b><small>Con más colores e iconos, y con foto y enlace en cada uno (versión Básica: 5 favoritos).</small></div></li>
       </ul>
       <div class="prem-price" id="premPrice"></div>
-      <p class="set-help">El coste de SOSpk PRO se destina al desarrollo y al mantenimiento de la app, pensada como servicio profesional.</p>
+      <p class="set-help">El coste de SOSpk PRO se destina al mantenimiento y a la mejora de la app: mantener los datos al día y seguir añadiendo funciones. SOSpk no lleva anuncios.</p>
       <button class="prem-go" id="premiumGo" type="button">Probar 10 días gratis</button>
       <p class="set-help">La suscripción se gestiona desde Google Play y se renueva sola; puedes cancelarla cuando quieras. Las cámaras, los avisos y los incendios necesitan conexión. SOSpk solo te facilita el buscador y el enlace: las imágenes, los datos y los avisos son responsabilidad de la DGT, AEMET, EFFIS o la entidad que los publica. SOSpk no es un servicio oficial ni llama a emergencias.</p>
     </div>
@@ -236,16 +237,30 @@
       <details class="sec">
         <summary><span>SOS<span class="lc">pk</span>, ¿qué es?</span></summary>
         <p class="set-help">SOSpk localiza puntos kilométricos de las carreteras de España y te lleva hasta ellos. Escribe la carretera y el km, escribe unas coordenadas (decimales como 40.6265, -3.15006; grados, minutos y segundos como 40°37'35"N 3°9'0"O; grados y minutos decimales; con N/S/E/O; o pega un enlace de Google Maps o Apple Maps) o toca el mapa, y te damos las coordenadas, el PK más cercano, el enlace a Google Maps, copiar las coordenadas y el enlace para WhatsApp.</p>
-        <p class="set-help">Sin anuncios y sin cobertura. Pensada para quienes trabajan en carretera: bomberos, sanitarios, policías, emergencias, protección civil y asistencia en carretera, o cualquiera que necesite compartir su ubicación exacta.</p>
+        <p class="set-help">Sin anuncios y sin cuentas. Pensada para quienes trabajan en carretera: bomberos, sanitarios, policías, emergencias, protección civil y asistencia en carretera, o cualquiera que necesite compartir su ubicación exacta.<span class="app-only"> Con los mapas sin conexión de la app, puedes usarla también sin cobertura.</span></p>
         <div id="whatPrem" hidden>
-          <p class="set-help"><b>La versión Básica incluye:</b> buscador de puntos kilométricos, mapa, tu ubicación con coordenadas y el PK más cercano, 5 favoritos, 5 colores y los iconos básicos.</p>
-          <p class="set-help"><b>La versión Premium añade:</b> municipios, pueblos y parajes en el buscador, cámaras de tráfico, avisos meteorológicos, incendios activos, generador de zonas y sectores con foto, tracks GPX propios, mapas sin conexión con detalle alto, hasta 50 favoritos y más colores e iconos.</p>
-          <p class="set-help"><b>¿Qué es SOSpk Premium?</b> Una suscripción para los profesionales de la carretera, que no se pueden permitir una demora o un error. Al descargar los parajes de una provincia añade en ella las cámaras de tráfico (con enlace a la web oficial), los avisos meteorológicos vigentes y los focos de incendio de hoy, y te deja dibujar zonas y sectores, cargar tus propios tracks GPX y descargar mapas sin conexión con detalle alto. <b>0,99 € al mes o 4,99 € al año, con 10 días de prueba gratis</b>; se cobra por Google Play y se cancela cuando quieras. Cámaras, avisos e incendios necesitan cobertura; el buscador de PK sigue funcionando sin ella.</p>
-          <button type="button" class="prem-go" id="whatGo">Hacerme Premium</button>
+          <p class="set-help"><b>La versión Básica incluye:</b> el buscador de puntos kilométricos, el mapa, tu ubicación con coordenadas y el PK más cercano, 5 favoritos, 5 colores y los iconos básicos<span class="app-only"> y, en la app, los mapas sin conexión con detalle medio</span>.</p>
+          <p class="set-help"><b>¿Qué es SOSpk PRO?</b> Es la versión completa, por suscripción. Añade a todo lo anterior:</p>
+          <ul class="what-list">
+            <li><b>Municipios, pueblos y parajes</b> en el buscador, junto a las carreteras.</li>
+            <li><b>Cámaras de tráfico</b> de la DGT en el mapa, con la más cercana en cada ficha.</li>
+            <li><b>Balizas V16</b> activas y <b>accidentes, cortes y obras</b> de la DGT en directo.</li>
+            <li><b>Avisos meteorológicos</b> vigentes, con su nivel.</li>
+            <li><b>Incendios activos</b>: focos de satélite, su extensión, el contorno de lo quemado y una ficha completa de cada incendio.</li>
+            <li><b>Viento</b> sobre el mapa y <b>puntos de agua</b> (hidrantes, balsas y depósitos).</li>
+            <li><b>Sectores y zonas</b>: dibújalos con nombre, color y foto, y mide su perímetro y su área.</li>
+            <li><b>Tracks GPX propios</b>: cárgalos en el móvil, con nombre, color y foto; se quedan solo en tu dispositivo.</li>
+            <li><b>Hasta 50 favoritos</b>, con más colores e iconos, y con foto y enlace.</li>
+            <li class="app-only"><b>Mapas sin conexión con detalle alto</b>, para ver calles y caminos sin cobertura.</li>
+            <li>Un panel de <b>capas</b> para encender o apagar cada cosa del mapa.</li>
+          </ul>
+          <p class="set-help"><b>¿Por qué se cobra?</b> SOSpk no lleva anuncios ni vende tus datos. El precio de PRO (<b id="whatPrice"></b>) se dedica a su mantenimiento y a su mejora: mantener al día carreteras, cámaras, avisos e incendios, y seguir añadiendo funciones. Se cobra por Google Play y se cancela cuando quieras. Las cámaras, los avisos y los incendios necesitan cobertura; el buscador de PK sigue funcionando sin ella.</p>
+          <button type="button" class="prem-go" id="whatGo">Hacerme PRO</button>
           <label class="plan-row test-row" id="testRow" hidden><input type="checkbox" id="testPrem"> <b>Probar PRO</b> <small>(versión de prueba: actívalo o desactívalo)</small></label>
           <div class="plan-row" id="devRow" hidden>Modo de pruebas activo <button type="button" class="pp-b" id="devOff">Salir</button></div>
         </div>
         <a class="apk-link" id="apkLink" href="https://github.com/Cilantro-Corporation/SOSpk/releases/latest/download/SOSpk.apk" rel="noopener noreferrer">Descargar app para Android (APK)</a>
+        <span class="apk-link off" id="iosLink" aria-disabled="true">Descargar app para iOS · próximamente</span>
         <p class="set-help" id="iosHint" hidden><b>Instálala en tu iPhone o iPad:</b> toca el botón Compartir (el cuadrado con la flecha hacia arriba) y elige «Añadir a pantalla de inicio». Se abrirá a pantalla completa, como una app, y el móvil no borrará sus datos si pasas semanas sin usarla.</p>
       </details>
 
