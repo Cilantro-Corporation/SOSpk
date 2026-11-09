@@ -389,6 +389,20 @@ button svg, .act svg, .icon-btn svg { width: 22px; height: 22px; fill: currentCo
 .al-pill { color: #0B0B0B; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
 .al-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
 .al-link { display: inline-block; margin-top: 4px; color: var(--lime); font-size: 13px; }
+/* Ficha de incendio por bloques */
+.fc-b { padding: 10px 0; border-bottom: 1px solid var(--line); }
+.fc-h { font-family: var(--head); font-weight: 700; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.fc-r { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: 13px; padding: 2px 0; }
+.fc-k { color: var(--muted); }
+.fc-v { text-align: right; font-weight: 600; }
+.fc-p { font-size: 12px; color: var(--muted); margin: 5px 0 0; line-height: 1.4; }
+.fc-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 7px; }
+.fc-chip { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: var(--panel-2); color: var(--text); }
+.fc-chip.sat { color: var(--lime); }
+.fc-leg { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin: 2px 0 4px; }
+.fc-sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+.fc-how summary { cursor: pointer; color: var(--lime); font-size: 13px; padding: 9px 0 3px; }
+.fc-b .nl { margin: 3px 0; }
 .zl { display: flex; align-items: center; gap: 6px; padding: 4px 0; border-bottom: 1px solid var(--line); }
 .zl-open { flex: 1; display: flex; align-items: center; gap: 10px; border: 0; background: none; color: inherit; text-align: left; padding: 6px 0; }
 .zl-t small { display: block; font-size: 11px; color: var(--muted); }
