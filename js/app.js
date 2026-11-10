@@ -208,7 +208,16 @@
     btn.hidden = IS_NATIVE || !(site || S.readJSON('info', false) === true);
     btn.addEventListener('click', function () { window.open(site ? '/info/' : 'https://sospk.app/info/', '_blank', 'noopener'); });
   })();
-  $('btnZoneAdd').addEventListener('click', function () { if (!isPremium()) { showPremium('Los sectores son una función PRO.'); return; } $('layersPop').hidden = true; startDraw(); });
+  // Información y ayuda en la web de SOSpk, también desde la app instalada (Configuración › Créditos). Solo con CFG.infoUrl rellena
+  (function () {
+    var b = $('infoOpen'); if (!b) return;
+    b.hidden = !(IS_NATIVE && typeof CFG.infoUrl === 'string' && /^https:\/\//.test(CFG.infoUrl));
+    b.addEventListener('click', function () {
+      if (navigator.onLine === false) { toast('Necesitas conexión para abrir la información'); return; }
+      openLink(CFG.infoUrl);
+    });
+  })();
+  $('btnZoneAdd').addEventListener('click', function () { if (!canAddZona(true)) return; $('layersPop').hidden = true; startDraw(); });
   $('btnLayers').addEventListener('click', function () {
     var pop = $('layersPop');
     if (!pop.hidden) { pop.hidden = true; return; }
@@ -1934,7 +1943,20 @@
   var layerOn = S.readJSON('capas', null);
   if (!layerOn || typeof layerOn !== 'object') layerOn = { cam: true, avi: true, inc: true, zon: true }; // con PRO, todo activado hasta que lo apagues
   var OFF_DEFAULT = { vie: true }; // el viento hace consultas a internet al mover el mapa: empieza apagado
-  function lyrOn(k) { return isPremium() && (OFF_DEFAULT[k] ? layerOn[k] === true : layerOn[k] !== false); }
+  // Versión Básica: un sector y un track para probarlos (PRO: hasta 30 sectores y 500 tracks). Lo que ya se tenía se conserva y se ve, aunque se baje de PRO.
+  function layerFree(k) { return k === 'zon' || k === 'trk'; }
+  function freeLimit(k) { var n = k === 'zon' ? PRE.freeZones : PRE.freeTracks; return typeof n === 'number' && n >= 0 ? n : 0; }
+  function canAddZona(say) {
+    if (isPremium() || readZonas().length < freeLimit('zon')) return true;
+    if (say) showPremium('Con la versión Básica puedes tener ' + freeLimit('zon') + (freeLimit('zon') === 1 ? ' sector' : ' sectores') + '. Hazte PRO para dibujar más.');
+    return false;
+  }
+  function canAddTrack(say) {
+    if (isPremium() || !TR || TR.count() < freeLimit('trk')) return true;
+    if (say) showPremium('Con la versión Básica puedes tener ' + freeLimit('trk') + (freeLimit('trk') === 1 ? ' track' : ' tracks') + '. Hazte PRO para importar hasta 500.');
+    return false;
+  }
+  function lyrOn(k) { return (isPremium() || layerFree(k)) && (OFF_DEFAULT[k] ? layerOn[k] === true : layerOn[k] !== false); }
   function pkgProvs() { return selected.filter(function (c) { return parajesOn.indexOf(c) >= 0; }); }
   function provName(c) { return provByCode[c] ? provByCode[c].name : c; }
   function openLink(url) {
@@ -2648,6 +2670,10 @@
   var zonesLayer = L.layerGroup().addTo(map);
   // Tracks GPX del propio usuario (PRO): todo local, ver js/tracks.js
   var TR = window.KMTracks ? window.KMTracks.create({ map: map, L: L, toast: toast, onChange: function () { renderLayers(); renderTracksList(); },
+    // Básica: 1 track; PRO: hasta 500. canAdd enseña el aviso de PRO cuando se llega al tope
+    cap: function () { return isPremium() ? 500 : freeLimit('trk'); },
+    capText: function () { return isPremium() ? '500' : freeLimit('trk') + ' en la versión Básica'; },
+    canAdd: function () { return canAddTrack(true); },
     onRemove: function (id) { delFavImg('t|' + id); }, onManage: function () { openTracksSection(); },
     tip: function (layer, text, r) { bindPicTip(layer, text, 't|' + r.id, !!r.im, { direction: 'top', className: 'pic-tt' }); } }) : null;
   function zonaInfo(z) {
@@ -2656,7 +2682,7 @@
   }
   function renderZonas() {
     zonesLayer.clearLayers();
-    if (!isPremium() || layerOn.zon === false) return;
+    if (layerOn.zon === false) return;
     readZonas().forEach(function (z) {
       var shape = z.closed
         ? L.polygon(z.pts, { color: z.col, weight: 2.5, opacity: 0.95, fillColor: z.fil, fillOpacity: 0.1, interactive: false })
@@ -2715,6 +2741,7 @@
     if (!drawing) return;
     var list = readZonas();
     if (list.length >= ZMAX) { toast('Máximo ' + ZMAX + ' sectores: borra alguno'); return; }
+    if (!isPremium() && list.length >= freeLimit('zon')) { endDraw(); canAddZona(true); return; }
     var z = cleanZona({ id: Date.now().toString(36), n: '', closed: closed, pts: drawing.pts, col: FAV_COLORS[0], fil: FAV_COLORS[0] });
     z.n = (closed ? 'Sector ' : 'Ruta ') + (list.length + 1);
     list.push(z);
@@ -2730,9 +2757,9 @@
     var box = $('zonesList'), list = readZonas();
     clear(box);
     $('secSectores').hidden = !framework();
-    $('zonesNew').classList.toggle('lock', !isPremium());
-    if (!isPremium()) return;
+    $('zonesNew').classList.toggle('lock', !canAddZona(false));
     if (!list.length) box.appendChild(el('p', { class: 'set-help', text: 'Aún no tienes sectores. Pulsa «Nuevo sector» y toca el mapa punto a punto.' }));
+    if (!isPremium()) box.appendChild(el('p', { class: 'set-help', text: 'Con la versión Básica puedes tener ' + freeLimit('zon') + (freeLimit('zon') === 1 ? ' sector' : ' sectores') + ' para probarlos. Con PRO, hasta ' + ZMAX + ', con nombre, color y foto.' }));
     list.forEach(function (z) {
       var dot = el('span', { class: 'zl-dot' });
       dot.style.background = z.closed ? z.fil : z.col; dot.style.borderColor = z.col;
@@ -2744,7 +2771,7 @@
       ]));
     });
   }
-  $('zonesNew').addEventListener('click', function () { if (!isPremium()) { showPremium('Los sectores son una función PRO.'); return; } startDraw(); });
+  $('zonesNew').addEventListener('click', function () { if (!canAddZona(true)) return; startDraw(); });
   // Editor de zona: nombre, color del contorno y sombra interior
   var editingZ = null, zPic = null;
   function editZona(id) {
@@ -2824,12 +2851,12 @@
     $('secTracks').hidden = !framework() || !TR;
     if (!framework() || !TR) return;
     var prem = isPremium();
-    $('tracksImport').classList.toggle('lock', !prem);
-    $('tracksTools').hidden = !prem || !TR.count();
-    $('tracksFilter').hidden = !prem || TR.count() < 6;
-    if (!prem) { box.appendChild(el('p', { class: 'set-help', text: '🔒 Los tracks GPX son una función PRO.' })); return; }
+    $('tracksImport').classList.toggle('lock', !canAddTrack(false));
+    $('tracksTools').hidden = !TR.count();
+    $('tracksFilter').hidden = TR.count() < 6;
     var all = TR.list(), q = $('tracksFilter').value.trim().toLowerCase(), list = q ? all.filter(function (t) { return t.n.toLowerCase().indexOf(q) >= 0; }) : all;
-    if (!all.length) box.appendChild(el('p', { class: 'set-help', text: 'Aún no tienes tracks. Pulsa «Importar GPX» y elige uno o varios archivos de tu móvil.' }));
+    if (!all.length) box.appendChild(el('p', { class: 'set-help', text: prem ? 'Aún no tienes tracks. Pulsa «Importar tracks» y elige uno o varios archivos de tu móvil (GPX, KML, KMZ, TCX o GeoJSON).' : 'Aún no tienes tracks. Pulsa «Importar tracks» y elige un archivo de tu móvil (GPX, KML, KMZ, TCX o GeoJSON).' }));
+    if (!prem) box.appendChild(el('p', { class: 'set-help', text: 'Con la versión Básica puedes tener ' + freeLimit('trk') + (freeLimit('trk') === 1 ? ' track' : ' tracks') + ' para probarlos. Con PRO, hasta 500, con nombre, color y foto.' }));
     else box.appendChild(el('p', { class: 'set-help', text: all.length + (all.length === 1 ? ' track' : ' tracks') + (q ? ' · ' + list.length + ' coinciden' : '') + (TR.persisted() ? '' : ' · no se guardarán al cerrar la app') }));
     list.slice(0, trkShow).forEach(function (t) {
       var dot = el('span', { class: 'zl-dot' });
@@ -2845,7 +2872,7 @@
     if (sc) sc.scrollTop = keep;
   }
   $('tracksFilter').addEventListener('input', function () { trkShow = TRK_PAGE; renderTracksList(); });
-  $('tracksImport').addEventListener('click', function () { if (!isPremium()) { showPremium('Los tracks GPX son una función PRO.'); return; } if (TR) TR.pick(); });
+  $('tracksImport').addEventListener('click', function () { if (TR) TR.pick(); }); // pick() ya avisa de PRO si la versión Básica llegó a su tope
   $('tracksShowAll').addEventListener('click', function () { if (TR) TR.setAllVisible(true); });
   $('tracksHideAll').addEventListener('click', function () { if (TR) TR.setAllVisible(false); });
   $('tracksDelAll').addEventListener('click', function () {
@@ -2897,7 +2924,7 @@
 
   // --- Panel «Capas» ---
   var LAYERS = [['cam', '📷', 'Cámaras de tráfico'], ['v16', '🆘', 'Balizas V16 activas'], ['trf', '🚧', 'Accidentes, cortes y obras'], ['avi', '⛈️', 'Avisos meteorológicos'], ['inc', '🔥', 'Incendios activos'], ['vie', '🌬️', 'Viento'],
-    ['agu', '💧', 'Hidrantes y puntos de agua'], ['zon', '⬡', 'Sectores'], ['trk', '🥾', 'Tracks GPX']];
+    ['agu', '💧', 'Hidrantes y puntos de agua'], ['zon', '⬡', 'Sectores'], ['trk', '🥾', 'Tracks']];
   function layerErr() { return navigator.onLine === false ? 'Sin conexión' : 'No disponible ahora'; }
   function layerNote(k) {
     if (k === 'trk') return !TR ? '' : layerOn.trk === false ? 'Ocultos' : TR.note();
@@ -2920,7 +2947,7 @@
   function renderLayersInner(box) {
     clear(box);
     LAYERS.forEach(function (l) {
-      var prem = isPremium(), on = prem && lyrOn(l[0]);
+      var prem = isPremium() || layerFree(l[0]), on = prem && lyrOn(l[0]);
       box.appendChild(el('button', { type: 'button', class: 'lyr' + (prem ? (on ? ' on' : '') : ' lock'), 'aria-label': l[2] + (prem ? (on ? ' (activada)' : ' (apagada)') : ' (PRO)'),
         onclick: function () { toggleLayer(l[0], l[2]); } }, [
         el('span', { class: 'lyr-i', text: l[1] }), el('span', { class: 'lyr-t', text: l[2] }),
@@ -2938,7 +2965,7 @@
     });
   }
   function toggleLayer(k, title) {
-    if (!isPremium()) { showPremium(title + ' es una función PRO.'); return; }
+    if (!isPremium() && !layerFree(k)) { showPremium(title + ' es una función PRO.'); return; }
     if (k !== 'zon' && k !== 'trk' && !pkgProvs().length && !lyrOn(k)) toast('Descarga una provincia en Configuración para ver esta capa');
     layerOn[k] = !lyrOn(k);
     S.writeJSON('capas', layerOn);
@@ -2971,9 +2998,11 @@
     base: { name: 'Mapa', defs: [{ svc: 'ign-base', layer: 'IGNBaseTodo', fmt: 'image/png', kb: 45 }] },
     sat: { name: 'Satélite', defs: [{ svc: 'pnoa-ma', layer: 'OI.OrthoimageCoverage', fmt: 'image/jpeg', kb: 15 }, { svc: 'ign-base', layer: 'IGNBaseOrto', fmt: 'image/png', kb: 10 }] },
   };
-  var MAP_ZOOMS = [[13, 'Medio', 'calles principales'], [14, 'Alto', 'calles y caminos']]; // Muy alto (15) y Máximo (16) aplazados: pesan demasiado (ver docs/premium/TRACKS-Y-MAPAS.md)
+  var MAP_ZOOMS = [[13, 'Medio', 'calles principales'], [14, 'Alto', 'calles y caminos']];
+  // Muy alto (zoom 15): hecho, solo PRO y con aviso de peso, pero apagado hasta que el CNIG autorice (CFG.mapMuyAlto). Máximo (16) sigue aplazado (ver docs/premium/TRACKS-Y-MAPAS.md)
+  if (CFG.mapMuyAlto === true) MAP_ZOOMS.push([15, 'Muy alto', 'calles, caminos y pistas']);
   var mapOpt = S.readJSON('mapopt', null);
-  if (!mapOpt || !MAP_LAYERS[mapOpt.layer] || [13, 14].indexOf(mapOpt.z) < 0) mapOpt = { layer: mapOpt && MAP_LAYERS[mapOpt.layer] ? mapOpt.layer : 'base', z: 13 };
+  if (!mapOpt || !MAP_LAYERS[mapOpt.layer] || MAP_ZOOMS.every(function (z) { return z[0] !== mapOpt.z; })) mapOpt = { layer: mapOpt && MAP_LAYERS[mapOpt.layer] ? mapOpt.layer : 'base', z: 13 };
   var mapStore = S.readJSON('mapas', {});
   if (!mapStore || typeof mapStore !== 'object' || Array.isArray(mapStore)) mapStore = {};
   var mapJob = null, mapAsk = null, estMemo = {};
@@ -3128,7 +3157,7 @@
     box.appendChild(el('div', { class: 'map-line' }, [el('span', { class: 'map-lbl', text: 'Detalle' }), dsegs]));
     var zd = MAP_ZOOMS.filter(function (z) { return z[0] === mapOpt.z; })[0];
     box.appendChild(el('p', { class: 'set-help', text: zd ? zd[1] + ': ' + zd[2] + '.' : '' }));
-    if (mapOpt.z >= 15) box.appendChild(el('p', { class: 'set-help warn', text: '⚠️ Este detalle ocupa mucho: una provincia grande puede pasar de 1 GB (Muy alto) o de 4 GB (Máximo). Usa wifi y comprueba que te queda espacio. Se baja provincia a provincia: puedes cancelar y lo ya guardado se conserva. Sin cobertura, al acercar más allá de lo guardado se estira la imagen.' }));
+    if (mapOpt.z >= 15) box.appendChild(el('p', { class: 'set-help warn', text: '⚠️ El detalle muy alto ocupa mucho: una provincia grande puede pasar de 1 GB. Mira el peso de cada provincia en su botón, usa wifi y comprueba que te queda espacio. Al pulsar «Descargar» te pedirá confirmar antes de empezar. Se baja provincia a provincia: puedes cancelar y lo ya guardado se conserva. Sin cobertura, al acercar más allá de lo guardado se estira la imagen.' }));
     if (!selected.length) box.appendChild(el('p', { class: 'set-help', text: 'Marca antes alguna provincia en «Provincias».' }));
     var total = 0;
     Object.keys(mapStore).forEach(function (k) { total += mapStore[k].mb || 0; });

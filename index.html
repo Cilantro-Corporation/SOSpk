@@ -216,8 +216,8 @@
         <li><span>⛈️</span><div><b>Avisos meteorológicos</b><small>Solo los vigentes, con el nivel (amarillo, naranja o rojo) y el enlace a la fuente. Tipos: tormentas, lluvias, nevadas, hielo, viento, nieblas, temperaturas máximas y mínimas, fenómenos costeros, riesgo de incendios, aludes e inundaciones.</small></div></li>
         <li><span>🔥</span><div><b>Incendios activos</b><small>Focos de calor detectados por satélite, su extensión y, dibujado en rojo, el contorno del área quemada de los últimos 7 días (EFFIS, se actualiza a diario). Toca un incendio para ver su ficha: tiempo, superficie, qué se ha quemado, viento y lo que hay cerca.</small></div></li>
         <li><span>🌬️</span><div><b>Viento</b><small>Flechas de viento sobre el mapa, con la dirección y la velocidad.</small></div></li>
-        <li><span>⬡</span><div><b>Sectores</b><small>Dibuja un sector o una ruta, ponle nombre, color y una foto, y mide su perímetro y área.</small></div></li>
-        <li><span>🥾</span><div><b>Tracks GPX propios</b><small>Carga en el móvil los GPX que tengas (hasta 500 a la vez, archivos de hasta 15 MB) y míralos sobre el mapa: inicio y fin, marcas con nombre, color y foto de cada uno, y un buscador por nombre. Pensado para búsquedas y operativos con muchos recorridos. Se quedan solo en tu dispositivo: SOSpk no los recibe ni los guarda.</small></div></li>
+        <li><span>⬡</span><div><b>Hasta 30 sectores</b><small>Dibuja sectores y rutas, ponles nombre, color y una foto, y mide su perímetro y área (versión Básica: 1 sector para probarlo).</small></div></li>
+        <li><span>🥾</span><div><b>Hasta 500 tracks propios</b><small>Carga en el móvil los archivos GPX, KML, KMZ, TCX o GeoJSON que tengas (hasta 500, de hasta 15 MB cada uno; versión Básica: 1 track para probarlo) y míralos sobre el mapa: inicio y fin, marcas con nombre, color y foto de cada uno, y un buscador por nombre. Pensado para búsquedas y operativos con muchos recorridos. Se quedan solo en tu dispositivo: SOSpk no los recibe ni los guarda.</small></div></li>
         <li class="app-only"><span>🗺️</span><div><b>Mapas sin conexión con detalle alto</b><small>Guarda en el móvil el mapa topográfico o el satélite de tus provincias con calles y caminos, para verlos sin cobertura (app Android). Antes de bajar nada te avisamos de lo que pesa, y si falta una zona al acercar, se amplía la guardada. El detalle medio está en la versión Básica.</small></div></li>
         <li><span>⭐</span><div><b>Hasta 50 favoritos</b><small>Con más colores e iconos, y con foto y enlace en cada uno (versión Básica: 5 favoritos).</small></div></li>
       </ul>
@@ -245,7 +245,7 @@
         <p class="set-help">SOSpk localiza puntos kilométricos de las carreteras de España y te lleva hasta ellos. Escribe la carretera y el km, escribe unas coordenadas (decimales como 40.6265, -3.15006; grados, minutos y segundos como 40°37'35"N 3°9'0"O; grados y minutos decimales; con N/S/E/O; o pega un enlace de Google Maps o Apple Maps) o toca el mapa, y te damos las coordenadas, el PK más cercano, el enlace a Google Maps, copiar las coordenadas y el enlace para WhatsApp.</p>
         <p class="set-help">Sin anuncios y sin registro. Pensada para quienes trabajan en carretera: bomberos, sanitarios, policías, emergencias, protección civil y asistencia en carretera, o cualquiera que necesite compartir su ubicación exacta.<span class="app-only"> Con los mapas sin conexión de la app, puedes usarla también sin cobertura.</span></p>
         <div id="whatPrem" hidden>
-          <p class="set-help"><b>La versión Básica incluye:</b> el buscador de puntos kilométricos, el mapa, tu ubicación con coordenadas y el PK más cercano, 5 favoritos, 5 colores y los iconos básicos<span class="app-only"> y, en la app, los mapas sin conexión con detalle medio</span>.</p>
+          <p class="set-help"><b>La versión Básica incluye:</b> el buscador de puntos kilométricos, el mapa, tu ubicación con coordenadas y el PK más cercano, 5 favoritos, 5 colores y los iconos básicos, 1 sector y 1 track para probarlos<span class="app-only"> y, en la app, los mapas sin conexión con detalle medio</span>.</p>
           <p class="set-help"><b>¿Qué es SOSpk PRO?</b> Es la versión completa, por suscripción. Añade a todo lo anterior:</p>
           <ul class="what-list">
             <li><b>Municipios, pueblos y parajes</b> en el buscador, junto a las carreteras.</li>
@@ -254,8 +254,8 @@
             <li><b>Avisos meteorológicos</b> vigentes, con su nivel.</li>
             <li><b>Incendios activos</b>: focos de satélite, su extensión, el contorno de lo quemado y una ficha completa de cada incendio.</li>
             <li><b>Viento</b> sobre el mapa y <b>puntos de agua</b> (hidrantes, balsas y depósitos).</li>
-            <li><b>Sectores y zonas</b>: dibújalos con nombre, color y foto, y mide su perímetro y su área.</li>
-            <li><b>Tracks GPX propios</b>: cárgalos en el móvil, con nombre, color y foto; se quedan solo en tu dispositivo.</li>
+            <li><b>Hasta 30 sectores y zonas</b>: dibújalos con nombre, color y foto, y mide su perímetro y su área.</li>
+            <li><b>Hasta 500 tracks propios</b> (GPX, KML, KMZ, TCX o GeoJSON): cárgalos en el móvil, con nombre, color y foto; se quedan solo en tu dispositivo.</li>
             <li><b>Hasta 50 favoritos</b>, con más colores e iconos, y con foto y enlace.</li>
             <li class="app-only"><b>Mapas sin conexión con detalle alto</b>, para ver calles y caminos sin cobertura.</li>
             <li>Un panel de <b>capas</b> para encender o apagar cada cosa del mapa.</li>
@@ -286,15 +286,15 @@
 
       <details class="sec" id="secSectores" hidden>
         <summary>Sectores</summary>
-        <p class="set-help">Dibuja un sector punto a punto sobre el mapa: si lo cierras obtienes su perímetro y su área; si no, es una ruta con su longitud. Ponle nombre, color y una foto (pulsa «✎ Editar»). Se guardan solo en este dispositivo.</p>
+        <p class="set-help">Dibuja un sector punto a punto sobre el mapa: si lo cierras obtienes su perímetro y su área; si no, es una ruta con su longitud. Ponle nombre y color, y con PRO también una foto (pulsa «✎ Editar»). La versión Básica admite 1 sector; con PRO, hasta 30. Se guardan solo en este dispositivo.</p>
         <div id="zonesList"></div>
         <button class="prem-go" id="zonesNew" type="button">+ Nuevo sector</button>
       </details>
 
       <details class="sec" id="secTracks" hidden>
-        <summary>Tracks GPX</summary>
-        <p class="set-help">Carga archivos GPX de tu móvil (recorridos de senderismo, rutas de equipos, búsquedas…) y míralos sobre el mapa, con una línea de color, el inicio en verde y el fin en rojo. Puedes elegir varios a la vez, cambiarles el nombre y el color y añadirles una foto. Se guardan solo en este dispositivo: SOSpk no los envía ni los guarda en ningún servidor. Es una función PRO.</p>
-        <button class="prem-go" id="tracksImport" type="button">＋ Importar GPX</button>
+        <summary>Tracks</summary>
+        <p class="set-help">Carga archivos GPX, KML, KMZ, TCX o GeoJSON de tu móvil (recorridos de senderismo, rutas de equipos, búsquedas…) y míralos sobre el mapa, con una línea de color, el inicio en verde y el fin en rojo. Puedes cambiarles el nombre y el color y, con PRO, añadirles una foto. La versión Básica admite 1 track; con PRO, hasta 500 y puedes elegir varios a la vez. Se guardan solo en este dispositivo: SOSpk no los envía ni los guarda en ningún servidor.</p>
+        <button class="prem-go" id="tracksImport" type="button">＋ Importar tracks</button>
         <input class="fe-name" id="tracksFilter" type="search" placeholder="Buscar un track por nombre" aria-label="Buscar un track por nombre" spellcheck="false" hidden>
         <div class="trk-tools" id="tracksTools" hidden>
           <button type="button" class="subchip" id="tracksShowAll">Mostrar todos</button>
@@ -343,10 +343,10 @@
           <span class="lg-i">🔥</span><span>Foco de calor de las últimas 24 h visto por satélite (más rojo = más reciente). La zona roja es el área quemada de los últimos 7 días</span>
           <span class="lg-i">➤</span><span>Viento: la flecha apunta hacia donde sopla y el número son km/h</span>
           <span class="lg-i"><span class="lg-zone"></span></span><span>Sector o ruta dibujado, con su perímetro y área</span>
-          <span class="lg-i"><span class="lg-trk"></span></span><span>Track GPX tuyo: línea de color con borde oscuro (cambia el color en Configuración › Tracks GPX)</span>
+          <span class="lg-i"><span class="lg-trk"></span></span><span>Track tuyo: línea de color con borde oscuro (cambia el color en Configuración › Tracks)</span>
           <span class="lg-i"><span class="lg-dot s"></span></span><span>Inicio de un track</span>
           <span class="lg-i"><span class="lg-dot e"></span></span><span>Fin de un track</span>
-          <span class="lg-i"><span class="lg-dot w"></span></span><span>Marca con nombre del archivo GPX (toca para ver el nombre)</span>
+          <span class="lg-i"><span class="lg-dot w"></span></span><span>Marca con nombre del archivo del track (toca para ver el nombre)</span>
           <span class="lg-i">📷</span><span>En una lista: ese sector o track tiene una foto</span>
         </div>
         <p class="set-help">De lejos se ven el primer y el último PK de cada carretera en tus provincias y algunos km de autovías y nacionales; al acercar aparecen más, con el nombre de la carretera.</p>
@@ -360,6 +360,7 @@
           <div class="cr-by">Created by CIL</div>
           <img class="cr-brand" src="icons/cilantropic.png" alt="CILANTROPIC" width="220" height="23">
           <div class="cr-help">Ayuda y contacto:<br><a href="mailto:info@sospk.app">info@sospk.app</a></div>
+          <button class="pp-b" id="infoOpen" type="button" hidden>ⓘ Información y ayuda en sospk.app</button>
         </div>
         <p class="set-help">Mapa: © <a href="https://www.ign.es" target="_blank" rel="noopener noreferrer">IGN</a> · PK: IGN, CartoCiudad · trazado © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OSM</a>.</p>
         <p class="set-help">Mapas sin conexión: mapas © IGN (CNIG). Para uso personal dentro de la app.</p>
