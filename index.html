@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob: https://www.ign.es https://maps.effis.emergency.copernicus.eu; font-src 'self'; connect-src 'self' https://cilantro-corporation.github.io https://raw.githubusercontent.com https://api.met.no https://maps.effis.emergency.copernicus.eu; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob: https://www.ign.es https://maps.effis.emergency.copernicus.eu; font-src 'self'; connect-src 'self' https://sospk.app https://cilantro-corporation.github.io https://raw.githubusercontent.com https://api.met.no https://maps.effis.emergency.copernicus.eu; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="format-detection" content="telephone=no">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -224,6 +224,12 @@
       <div class="prem-price" id="premPrice"></div>
       <p class="set-help">El coste de SOSpk PRO se destina al mantenimiento y a la mejora de la app: mantener los datos al día y seguir añadiendo funciones. SOSpk no lleva anuncios.</p>
       <button class="prem-go" id="premiumGo" type="button">Probar 10 días gratis</button>
+      <div id="licBox" hidden>
+        <p class="set-help"><b>¿Ya tienes una licencia?</b> Pégala aquí. Se comprueba en tu dispositivo, sin conexión.</p>
+        <textarea id="licText" rows="3" spellcheck="false" autocomplete="off" aria-label="Licencia de SOSpk PRO" placeholder="SOSPK1.…"></textarea>
+        <button class="prem-go" id="licGo" type="button">Activar licencia</button>
+        <p class="set-help" id="licMsg" hidden></p>
+      </div>
       <p class="set-help">La suscripción se gestiona desde Google Play y se renueva sola; puedes cancelarla cuando quieras. Las cámaras, los avisos y los incendios necesitan conexión. SOSpk solo te facilita el buscador y el enlace: las imágenes, los datos y los avisos son responsabilidad de la DGT, AEMET, EFFIS o la entidad que los publica. SOSpk no es un servicio oficial ni llama a emergencias.</p>
     </div>
   </section>
@@ -370,12 +376,14 @@
   <div class="toast" id="toast" role="status" hidden></div>
 
   <script src="vendor/leaflet/leaflet.js"></script>
+  <script src="vendor/nacl/nacl-fast.min.js"></script>
   <script src="js/config.js"></script>
   <script src="js/calor-fijo.js"></script>
   <script src="js/core.js"></script>
   <script src="js/coords.js"></script>
   <script src="js/store.js"></script>
   <script src="js/tracks.js"></script>
+  <script src="js/licencia.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

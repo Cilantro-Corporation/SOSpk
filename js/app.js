@@ -61,7 +61,18 @@
   var devMode = TESTERS || S.readJSON('dev', false) === true;
   var simPremium = S.readJSON('prem', false) === true;
   function framework() { return !!(PRE.enforced || devMode); }
-  function isPremium() { return !framework() || simPremium; }
+  // Licencia firmada (Stripe / APK / web): se comprueba aquí, sin conexión, con la clave pública de config.js. Ver docs/premium/COBROS-Y-LICENCIAS.md.
+  var licInfo = null; // resultado de KMLic.verify cuando hay una licencia válida
+  function licCheck() {
+    var t = S.readJSON('lic', ''), rev = S.readJSON('licrev', []);
+    licInfo = null;
+    if (!t || !PRE.licenciaPublica || !window.KMLic) return { ok: false, reason: t ? 'sinclave' : 'vacia' };
+    var r = window.KMLic.verify(t, PRE.licenciaPublica, undefined, Array.isArray(rev) ? rev : []);
+    if (r.ok) licInfo = r;
+    return r;
+  }
+  function isPremium() { return !framework() || simPremium || !!licInfo; }
+  licCheck();
   var premiumReason = '';
   function showPremium(reason) {
     premiumReason = reason || '';
@@ -77,10 +88,70 @@
     $('premiumGo').textContent = on ? (devMode ? 'PRO de prueba activo: desactivar' : 'Ya eres PRO') : devMode ? 'Activar PRO de prueba' : 'Probar ' + PRE.trialDays + ' días gratis';
     $('premiumGo').classList.toggle('on', on);
     $('premPrice').textContent = PRE.priceMonth + ' al mes · o ' + PRE.priceYear + ' al año · ' + PRE.trialDays + ' días de prueba gratis';
+    $('licBox').hidden = !PRE.licenciaPublica;
+    if (licInfo) {
+      $('licMsg').hidden = false;
+      $('licMsg').textContent = 'Licencia ' + (licInfo.plan === 'org' ? 'de organización' : licInfo.plan === 'mes' ? 'mensual' : 'anual') + ' activa: quedan ' + licInfo.daysLeft + ' días.';
+    }
   }
+  var LIC_MSG = {
+    formato: 'Eso no parece una licencia de SOSpk: cópiala entera, empieza por SOSPK1.',
+    firma: 'Esta licencia no es válida.',
+    version: 'Esta licencia es de una versión más nueva: actualiza la app.',
+    caducada: 'Esta licencia ha caducado.',
+    revocada: 'Esta licencia se ha cancelado.',
+    reloj: 'Revisa la fecha y la hora del móvil.',
+    sinclave: 'La app todavía no puede comprobar licencias.'
+  };
+  // Activa una licencia pegada o recibida por enlace. Devuelve true si es válida; si no, enseña el motivo (salvo en modo silencioso).
+  function licActivate(text, quiet) {
+    var rev = S.readJSON('licrev', []);
+    var r = window.KMLic ? window.KMLic.verify(text, PRE.licenciaPublica, undefined, Array.isArray(rev) ? rev : []) : { ok: false, reason: 'sinclave' };
+    if (r.ok) { S.writeJSON('lic', r.token); licCheck(); premiumChanged(); renderPremium(); toast('Licencia activada'); return true; }
+    if (!quiet) { $('licMsg').hidden = false; $('licMsg').textContent = LIC_MSG[r.reason] || LIC_MSG.formato; }
+    return false;
+  }
+  $('licGo').addEventListener('click', function () { licActivate($('licText').value, false); if (licInfo) $('licText').value = ''; });
+  // Con conexión y cada pocos días: se baja la lista de licencias canceladas y se renueva la licencia si la suscripción sigue activa.
+  // Sin licenciaApi (hoy) no hace nada. Los errores de red se ignoran: la licencia sigue valiendo hasta su caducidad.
+  function licRefresh() {
+    if (!PRE.licenciaApi || !window.fetch || !S.readJSON('lic', '')) return;
+    if (Date.now() - (S.readJSON('licchk', 0) || 0) < 3 * 86400000) return;
+    var o = { credentials: 'omit', cache: 'no-store' };
+    fetch(PRE.licenciaApi + 'api/revocadas.php', o).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+      if (j && Array.isArray(j.ids)) S.writeJSON('licrev', j.ids);
+      var cur = licCheck();
+      if (!cur.id || cur.reason === 'revocada') { premiumChanged(); return null; }
+      return fetch(PRE.licenciaApi + 'api/licencia.php?id=' + encodeURIComponent(cur.id), o).then(function (r) { return r.ok ? r.json() : null; }).then(function (n) {
+        if (n && n.licencia) licActivate(n.licencia, true); else premiumChanged();
+      });
+    }).then(function () { S.writeJSON('licchk', Date.now()); })['catch'](function () {});
+  }
+  // Enlace de activación: sospk.app/#licencia=SOSPK1.… (lo ofrece la página de gracias tras pagar)
+  setTimeout(function () {
+    var m = /[#&]licencia=([^&]+)/.exec(location.hash || '');
+    if (m && PRE.licenciaPublica) {
+      var ok = licActivate(decodeURIComponent(m[1]), true);
+      try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+      if (!ok) toast('La licencia del enlace no es válida');
+    }
+    // App de Android: enlace profundo sospk://licencia/<licencia> (botón «Abrir en la app» de la página de gracias)
+    var capApp = IS_NATIVE && window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App;
+    if (capApp && PRE.licenciaPublica) {
+      var deep = function (u) {
+        if (typeof u !== 'string' || u.indexOf('sospk://') !== 0) return;
+        if (!licActivate(u, true)) toast('La licencia del enlace no es válida');
+      };
+      capApp.addListener('appUrlOpen', function (e) { deep(e && e.url); });
+      capApp.getLaunchUrl().then(function (r) { if (r) deep(r.url); })['catch'](function () {});
+    }
+    licRefresh();
+  }, 0);
   $('premiumGo').addEventListener('click', function () {
+    if (licInfo && !devMode) { toast('Ya eres PRO: quedan ' + licInfo.daysLeft + ' días de licencia'); return; }
     if (devMode) { simPremium = !simPremium; S.writeJSON('prem', simPremium); premiumChanged(); renderPremium(); toast(simPremium ? 'PRO de prueba activado' : 'PRO de prueba desactivado'); return; }
-    if (PRE.checkoutUrl) { openLink(PRE.checkoutUrl); return; }
+    // En la web (no en la app instalada) el pago va por Stripe: sospk.app/api/checkout.php. En la app de Play irá Google Play Billing.
+    if (PRE.checkoutUrl && !IS_NATIVE) { openLink(PRE.checkoutUrl); return; }
     toast('La suscripción estará disponible en Google Play');
   });
   $('testPrem').addEventListener('change', function () { simPremium = $('testPrem').checked; S.writeJSON('prem', simPremium); premiumChanged(); renderPremium(); toast(simPremium ? 'PRO de prueba activado' : 'PRO de prueba desactivado'); });
