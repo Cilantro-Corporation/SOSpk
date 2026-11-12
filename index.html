@@ -38,6 +38,9 @@
       <button class="icon-btn" id="btnFav" type="button" aria-label="Favoritos y recientes">
         <svg viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg>
       </button>
+      <button class="icon-btn" id="btnFull" type="button" aria-label="Pantalla completa" title="Pantalla completa" hidden>
+        <svg viewBox="0 0 24 24"><path id="fullIcon" d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
       <button class="icon-btn" id="btnSettings" type="button" aria-label="Configuración">
         <svg viewBox="0 0 24 24"><path d="M19.4 13a7.5 7.5 0 0 0 0-2l2-1.6-2-3.4-2.4 1a7.4 7.4 0 0 0-1.7-1L15 3.5h-4L10.7 6a7.4 7.4 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.6a7.5 7.5 0 0 0 0 2l-2 1.6 2 3.4 2.4-1a7.4 7.4 0 0 0 1.7 1l.3 2.5h4l.3-2.5a7.4 7.4 0 0 0 1.7-1l2.4 1 2-3.4zM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7z"/></svg>
       </button>
@@ -230,6 +233,7 @@
         <button class="prem-go" id="licGo" type="button">Activar licencia</button>
         <p class="set-help" id="licMsg" hidden></p>
       </div>
+      <button class="pp-b" id="manageSub" type="button" hidden>Gestionar suscripción</button>
       <p class="set-help">La suscripción se gestiona desde Google Play y se renueva sola; puedes cancelarla cuando quieras. Las cámaras, los avisos y los incendios necesitan conexión. SOSpk solo te facilita el buscador y el enlace: las imágenes, los datos y los avisos son responsabilidad de la DGT, AEMET, EFFIS o la entidad que los publica. SOSpk no es un servicio oficial ni llama a emergencias.</p>
     </div>
   </section>
@@ -268,6 +272,20 @@
         <a class="apk-link" id="apkLink" href="https://github.com/Cilantro-Corporation/SOSpk/releases/latest/download/SOSpk.apk" rel="noopener noreferrer">Descargar app para Android (APK)</a>
         <span class="apk-link off" id="iosLink" aria-disabled="true">Descargar app para iOS · próximamente</span>
         <p class="set-help" id="iosHint" hidden><b>Instálala en tu iPhone o iPad:</b> toca el botón Compartir (el cuadrado con la flecha hacia arriba) y elige «Añadir a pantalla de inicio». Se abrirá a pantalla completa, como una app, y el móvil no borrará sus datos si pasas semanas sin usarla.</p>
+        <div class="credits">
+          <img class="cr-logo" src="icons/logo-credits.png" alt="Logo de SOSpk" width="112" height="112">
+          <div class="cr-app">SOSpk <small id="appVersion"></small></div>
+          <div class="cr-by">Created by CIL</div>
+          <img class="cr-brand" src="icons/cilantropic.png" alt="CILANTROPIC" width="220" height="23">
+          <div class="cr-help">Ayuda y contacto:<br><a href="mailto:info@sospk.app">info@sospk.app</a></div>
+          <button class="pp-b" id="infoOpen" type="button" hidden>ⓘ Información y ayuda en sospk.app</button>
+        </div>
+        <p class="set-help">Mapa: © <a href="https://www.ign.es" target="_blank" rel="noopener noreferrer">IGN</a> · PK: IGN, CartoCiudad · trazado © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OSM</a>.</p>
+        <p class="set-help">Mapas sin conexión: mapas © IGN (CNIG). Para uso personal dentro de la app.</p>
+        <p class="set-help">Datos: hitos kilométricos oficiales del Instituto Geográfico Nacional (IGR Redes de Transporte, CC BY 4.0), puntos kilométricos de CartoCiudad (IGN · SCNE, CC BY 4.0 scne.es) y trazado de © colaboradores de OpenStreetMap (ODbL) y nombres de lugares del Nomenclátor Geográfico Básico de España (IGN, CC BY 4.0). Mapas: IGN / PNOA. Las posiciones entre hitos (≈) son una estimación. <span id="dataDate"></span></p>
+        <p class="set-help" id="creditsPrem" hidden>Cámaras, balizas V16 e incidencias: DGT, vía el Punto de Acceso Nacional del Ministerio de Transportes (Powered by MITRAMS); puntos de agua: © colaboradores de OpenStreetMap (ODbL); focos de calor: NASA FIRMS (VIIRS de NOAA-20, NOAA-21 y Suomi NPP, y MODIS), con la extensión aproximada calculada por SOSpk a partir de esos focos y las fuentes fijas de calor según NASA FIRMS; áreas quemadas: EFFIS, Copernicus © Unión Europea (CC BY 4.0), solo las de tus provincias; viento: MET Norway (CC BY 4.0); Servei Català de Trànsit; Gobierno Vasco (CC BY 4.0); ayuntamientos de Madrid, Valencia y Málaga (CC BY 4.0); Vitoria-Gasteiz. Avisos: AEMET, vía Meteoalarm (CC BY 4.0). Incendios: EFFIS, Copernicus EMS.</p>
+        <p class="set-help"><b>Descargo de responsabilidad:</b> SOSpk solo te facilita el buscador y el enlace. Los puntos kilométricos, las imágenes de las cámaras, los datos y los avisos son responsabilidad del IGN, la DGT, AEMET, EFFIS o la entidad que los publica, y pueden tener errores o retrasos. Las imágenes, el mantenimiento y los fallos o interrupciones de las cámaras no son responsabilidad de SOSpk, que solo enlaza a la web de quien las publica. SOSpk no es un servicio oficial, no sustituye a la señalización ni a los servicios de emergencias y no llama a emergencias.</p>
+        <p class="set-help">Aviso: la información es orientativa. Los PK y las posiciones calculadas (≈) pueden contener errores y no sustituyen a la señalización de la carretera ni a la información de los servicios oficiales. No se garantiza su exactitud ni se asume responsabilidad por su uso.</p>
       </details>
 
       <details class="sec">
@@ -352,23 +370,6 @@
         <p class="set-help">De lejos se ven el primer y el último PK de cada carretera en tus provincias y algunos km de autovías y nacionales; al acercar aparecen más, con el nombre de la carretera.</p>
       </details>
 
-      <details class="sec">
-        <summary>Créditos</summary>
-        <div class="credits">
-          <img class="cr-logo" src="icons/logo-credits.png" alt="Logo de SOSpk" width="112" height="112">
-          <div class="cr-app">SOSpk <small id="appVersion"></small></div>
-          <div class="cr-by">Created by CIL</div>
-          <img class="cr-brand" src="icons/cilantropic.png" alt="CILANTROPIC" width="220" height="23">
-          <div class="cr-help">Ayuda y contacto:<br><a href="mailto:info@sospk.app">info@sospk.app</a></div>
-          <button class="pp-b" id="infoOpen" type="button" hidden>ⓘ Información y ayuda en sospk.app</button>
-        </div>
-        <p class="set-help">Mapa: © <a href="https://www.ign.es" target="_blank" rel="noopener noreferrer">IGN</a> · PK: IGN, CartoCiudad · trazado © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OSM</a>.</p>
-        <p class="set-help">Mapas sin conexión: mapas © IGN (CNIG). Para uso personal dentro de la app.</p>
-        <p class="set-help">Datos: hitos kilométricos oficiales del Instituto Geográfico Nacional (IGR Redes de Transporte, CC BY 4.0), puntos kilométricos de CartoCiudad (IGN · SCNE, CC BY 4.0 scne.es) y trazado de © colaboradores de OpenStreetMap (ODbL) y nombres de lugares del Nomenclátor Geográfico Básico de España (IGN, CC BY 4.0). Mapas: IGN / PNOA. Las posiciones entre hitos (≈) son una estimación. <span id="dataDate"></span></p>
-        <p class="set-help" id="creditsPrem" hidden>Cámaras, balizas V16 e incidencias: DGT, vía el Punto de Acceso Nacional del Ministerio de Transportes (Powered by MITRAMS); puntos de agua: © colaboradores de OpenStreetMap (ODbL); focos de calor: NASA FIRMS (VIIRS de NOAA-20, NOAA-21 y Suomi NPP, y MODIS), con la extensión aproximada calculada por SOSpk a partir de esos focos y las fuentes fijas de calor según NASA FIRMS; áreas quemadas: EFFIS, Copernicus © Unión Europea (CC BY 4.0), solo las de tus provincias; viento: MET Norway (CC BY 4.0); Servei Català de Trànsit; Gobierno Vasco (CC BY 4.0); ayuntamientos de Madrid, Valencia y Málaga (CC BY 4.0); Vitoria-Gasteiz. Avisos: AEMET, vía Meteoalarm (CC BY 4.0). Incendios: EFFIS, Copernicus EMS.</p>
-        <p class="set-help"><b>Descargo de responsabilidad:</b> SOSpk solo te facilita el buscador y el enlace. Los puntos kilométricos, las imágenes de las cámaras, los datos y los avisos son responsabilidad del IGN, la DGT, AEMET, EFFIS o la entidad que los publica, y pueden tener errores o retrasos. Las imágenes, el mantenimiento y los fallos o interrupciones de las cámaras no son responsabilidad de SOSpk, que solo enlaza a la web de quien las publica. SOSpk no es un servicio oficial, no sustituye a la señalización ni a los servicios de emergencias y no llama a emergencias.</p>
-        <p class="set-help">Aviso: la información es orientativa. Los PK y las posiciones calculadas (≈) pueden contener errores y no sustituyen a la señalización de la carretera ni a la información de los servicios oficiales. No se garantiza su exactitud ni se asume responsabilidad por su uso.</p>
-      </details>
     </div>
   </section>
 

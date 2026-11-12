@@ -205,16 +205,29 @@
   (function () {
     var btn = $('btnInfo'); if (!btn) return;
     var site = /(^|.)sospk.app$/.test(location.hostname);
-    btn.hidden = IS_NATIVE || !(site || S.readJSON('info', false) === true);
-    btn.addEventListener('click', function () { window.open(site ? '/info/' : 'https://sospk.app/info/', '_blank', 'noopener'); });
+    btn.hidden = false;   // visible en la web, en la PWA y en la app
+    btn.addEventListener('click', function () {
+      if (IS_NATIVE) { if (navigator.onLine === false) { toast('Necesitas conexión para abrir la información'); return; } openLink('https://sospk.app/info/'); return; }
+      window.open(site ? '/info/' : 'https://sospk.app/info/', '_blank', 'noopener');
+    });
   })();
   // Información y ayuda en la web de SOSpk, también desde la app instalada (Configuración › Créditos). Solo con CFG.infoUrl rellena
   (function () {
     var b = $('infoOpen'); if (!b) return;
-    b.hidden = !(IS_NATIVE && typeof CFG.infoUrl === 'string' && /^https:\/\//.test(CFG.infoUrl));
+    var url = (typeof CFG.infoUrl === 'string' && /^https:\/\//.test(CFG.infoUrl)) ? CFG.infoUrl : 'https://sospk.app/info/';
+    b.hidden = false;
     b.addEventListener('click', function () {
       if (navigator.onLine === false) { toast('Necesitas conexión para abrir la información'); return; }
-      openLink(CFG.infoUrl);
+      if (IS_NATIVE) openLink(url); else window.open(url, '_blank', 'noopener');
+    });
+  })();
+  // Gestionar la suscripción (cancelar, facturas, tarjeta): enlace al portal del cliente. Solo con CFG.premium.portalUrl rellena (https)
+  (function () {
+    var b = $('manageSub'), u = CFG.premium && CFG.premium.portalUrl; if (!b) return;
+    b.hidden = !(typeof u === 'string' && /^https:\/\//.test(u));
+    b.addEventListener('click', function () {
+      if (navigator.onLine === false) { toast('Necesitas conexión para gestionar la suscripción'); return; }
+      openLink(u);
     });
   })();
   $('btnZoneAdd').addEventListener('click', function () { if (!canAddZona(true)) return; $('layersPop').hidden = true; startDraw(); });
@@ -1873,6 +1886,25 @@
   });
   $('optAuto').checked = autoProv;
   $('optAuto').addEventListener('change', function () { autoProv = $('optAuto').checked; S.writeJSON('auto', autoProv); });
+  // Pantalla completa (solo en el navegador de ordenador: en el móvil y en la app ya va a pantalla completa)
+  (function () {
+    var b = $('btnFull'), ic = $('fullIcon'), de = document.documentElement;
+    var can = !IS_NATIVE && b && document.fullscreenEnabled && de.requestFullscreen && !(window.matchMedia && matchMedia('(pointer: coarse)').matches) && !(window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+    if (!can) return;
+    b.hidden = false;
+    function paint() {
+      var on = !!document.fullscreenElement, t = on ? 'Salir de pantalla completa' : 'Pantalla completa';
+      b.setAttribute('aria-label', t); b.title = t;
+      // Entrar: esquinas hacia fuera; salir: esquinas hacia dentro
+      ic.setAttribute('d', on ? 'M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5' : 'M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5');
+    }
+    b.addEventListener('click', function () {
+      if (document.fullscreenElement) { if (document.exitFullscreen) document.exitFullscreen(); }
+      else { var r = de.requestFullscreen(); if (r && r.catch) r.catch(function () { toast('No se pudo activar la pantalla completa'); }); }
+    });
+    document.addEventListener('fullscreenchange', function () { paint(); setTimeout(function () { map.invalidateSize(); }, 150); });
+    paint();
+  })();
   $('appVersion').textContent = 'versión ' + CFG.version;
   applyPremiumUi();
   // En el APK el enlace de descarga no existe (lo quita tools/prepare-android.mjs)
@@ -2656,8 +2688,9 @@
 
   // --- Zonas y sectores: dibujar punto a punto; si se cierra es un sector (perímetro y área), si no, una ruta ---
   var ZMAX = 30;
+  var ZPTS = 1000;   // puntos por sector o ruta; el dibujo se detiene aquí para que lo guardado siempre se pueda volver a leer
   function validZona(z) {
-    if (!z || typeof z !== 'object' || typeof z.id !== 'string' || z.id.length > 24 || !Array.isArray(z.pts) || z.pts.length < 2 || z.pts.length > 300) return false;
+    if (!z || typeof z !== 'object' || typeof z.id !== 'string' || z.id.length > 24 || !Array.isArray(z.pts) || z.pts.length < 2 || z.pts.length > ZPTS) return false;
     for (var i = 0; i < z.pts.length; i++) { var p = z.pts[i]; if (!Array.isArray(p) || !isFinite(p[0]) || !isFinite(p[1]) || Math.abs(p[0]) > 90 || Math.abs(p[1]) > 180) return false; }
     return true;
   }
@@ -2734,7 +2767,7 @@
     $('drawRoute').disabled = n < 2;
     $('drawUndo').disabled = n < 1;
   }
-  function addDrawPoint(ll) { drawing.pts.push([+ll.lat.toFixed(6), +ll.lng.toFixed(6)]); renderDraw(); }
+  function addDrawPoint(ll) { if (drawing.pts.length >= ZPTS) { toast('Máximo ' + ZPTS + ' puntos por sector: ciérralo o guárdalo'); return; } drawing.pts.push([+ll.lat.toFixed(6), +ll.lng.toFixed(6)]); renderDraw(); }
   $('drawUndo').addEventListener('click', function () { if (drawing && drawing.pts.length) { drawing.pts.pop(); renderDraw(); } });
   $('drawCancel').addEventListener('click', endDraw);
   function finishDraw(closed) {
