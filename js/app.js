@@ -1886,23 +1886,30 @@
   });
   $('optAuto').checked = autoProv;
   $('optAuto').addEventListener('change', function () { autoProv = $('optAuto').checked; S.writeJSON('auto', autoProv); });
-  // Pantalla completa (solo en el navegador de ordenador: en el móvil y en la app ya va a pantalla completa)
+  // Pantalla completa: icono siempre visible en la web (navegador). No sale en la app ni en la web instalada, que ya van a pantalla completa.
+  // Safari antiguo y el iPad usan el prefijo webkit; el iPhone no permite pantalla completa en una página web y se le explica cómo conseguirla.
   (function () {
     var b = $('btnFull'), ic = $('fullIcon'), de = document.documentElement;
-    var can = !IS_NATIVE && b && document.fullscreenEnabled && de.requestFullscreen && !(window.matchMedia && matchMedia('(pointer: coarse)').matches) && !(window.matchMedia && matchMedia('(display-mode: standalone)').matches);
-    if (!can) return;
+    var standalone = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+    if (!b || IS_NATIVE || standalone) return;
     b.hidden = false;
+    function req() { return de.requestFullscreen ? de.requestFullscreen() : de.webkitRequestFullscreen ? de.webkitRequestFullscreen() : null; }
+    function cur() { return document.fullscreenElement || document.webkitFullscreenElement || null; }
+    function can() { return !!(de.requestFullscreen || de.webkitRequestFullscreen) && document.fullscreenEnabled !== false && document.webkitFullscreenEnabled !== false; }
     function paint() {
-      var on = !!document.fullscreenElement, t = on ? 'Salir de pantalla completa' : 'Pantalla completa';
+      var on = !!cur(), t = on ? 'Salir de pantalla completa' : 'Pantalla completa';
       b.setAttribute('aria-label', t); b.title = t;
       // Entrar: esquinas hacia fuera; salir: esquinas hacia dentro
       ic.setAttribute('d', on ? 'M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5' : 'M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5');
     }
     b.addEventListener('click', function () {
-      if (document.fullscreenElement) { if (document.exitFullscreen) document.exitFullscreen(); }
-      else { var r = de.requestFullscreen(); if (r && r.catch) r.catch(function () { toast('No se pudo activar la pantalla completa'); }); }
+      if (cur()) { (document.exitFullscreen || document.webkitExitFullscreen || function () {}).call(document); return; }
+      if (!can()) { toast(IS_IOS ? 'En el iPhone: toca Compartir y «Añadir a pantalla de inicio» para verla a pantalla completa' : 'Tu navegador no permite la pantalla completa'); return; }
+      try { var r = req(); if (r && r.catch) r.catch(function () { toast('No se pudo activar la pantalla completa'); }); } catch (e) { toast('No se pudo activar la pantalla completa'); }
     });
-    document.addEventListener('fullscreenchange', function () { paint(); setTimeout(function () { map.invalidateSize(); }, 150); });
+    function changed() { paint(); setTimeout(function () { map.invalidateSize(); }, 150); }
+    document.addEventListener('fullscreenchange', changed);
+    document.addEventListener('webkitfullscreenchange', changed);
     paint();
   })();
   $('appVersion').textContent = 'versión ' + CFG.version;
