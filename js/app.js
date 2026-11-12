@@ -58,20 +58,28 @@
   // PRO. Cuando haya compras reales, simPremium se sustituye por el estado de la suscripción y se quita el modo de pruebas.
   var PRE = CFG.premium;
   var TESTERS = PRE.testers === true; // versión para probadores: casilla visible para probar PRO
-  var devMode = TESTERS || S.readJSON('dev', false) === true;
-  var simPremium = S.readJSON('prem', false) === true;
+  var DEV_TAP = PRE.devTap === true;   // los siete toques solo funcionan en compilaciones de prueba (devTap en config.js)
+  var devMode = TESTERS || (DEV_TAP && S.readJSON('dev', false) === true);
+  var simPremium = devMode && S.readJSON('prem', false) === true;   // sin modo de pruebas, «prem» en localStorage no cuenta
   function framework() { return !!(PRE.enforced || devMode); }
   // Licencia firmada (Stripe / APK / web): se comprueba aquí, sin conexión, con la clave pública de config.js. Ver docs/premium/COBROS-Y-LICENCIAS.md.
   var licInfo = null; // resultado de KMLic.verify cuando hay una licencia válida
+  // Fecha de referencia: la mayor entre el reloj y la mayor fecha vista antes (atrasar el reloj del móvil no revive una licencia caducada)
+  function licNow() {
+    var now = Math.floor(Date.now() / 1000), seen = +S.readJSON('lict', 0) || 0;
+    if (seen > now + 400 * 86400) seen = now;   // valor guardado absurdo: se ignora
+    if (now > seen) S.writeJSON('lict', now);
+    return Math.max(now, seen);
+  }
   function licCheck() {
     var t = S.readJSON('lic', ''), rev = S.readJSON('licrev', []);
     licInfo = null;
     if (!t || !PRE.licenciaPublica || !window.KMLic) return { ok: false, reason: t ? 'sinclave' : 'vacia' };
-    var r = window.KMLic.verify(t, PRE.licenciaPublica, undefined, Array.isArray(rev) ? rev : []);
+    var r = window.KMLic.verify(t, PRE.licenciaPublica, licNow(), Array.isArray(rev) ? rev : []);
     if (r.ok) licInfo = r;
     return r;
   }
-  function isPremium() { return !framework() || simPremium || !!licInfo; }
+  function isPremium() { return !framework() || (devMode && simPremium) || !!licInfo; }
   licCheck();
   var premiumReason = '';
   function showPremium(reason) {
@@ -106,7 +114,9 @@
   // Activa una licencia pegada o recibida por enlace. Devuelve true si es válida; si no, enseña el motivo (salvo en modo silencioso).
   function licActivate(text, quiet) {
     var rev = S.readJSON('licrev', []);
-    var r = window.KMLic ? window.KMLic.verify(text, PRE.licenciaPublica, undefined, Array.isArray(rev) ? rev : []) : { ok: false, reason: 'sinclave' };
+    var r = window.KMLic ? window.KMLic.verify(text, PRE.licenciaPublica, licNow(), Array.isArray(rev) ? rev : []) : { ok: false, reason: 'sinclave' };
+    // B2: una licencia que llega por enlace no sustituye a otra válida que dure más (evita que una web o app ajena la cambie)
+    if (r.ok && licInfo && r.id !== licInfo.id && r.exp <= licInfo.exp) { if (!quiet) toast('Ya tienes una licencia activa que dura más'); return false; }
     if (r.ok) { S.writeJSON('lic', r.token); licCheck(); premiumChanged(); renderPremium(); toast('Licencia activada'); return true; }
     if (!quiet) { $('licMsg').hidden = false; $('licMsg').textContent = LIC_MSG[r.reason] || LIC_MSG.formato; }
     return false;
@@ -248,7 +258,7 @@
       taps++;
       clearTimeout(timer);
       timer = setTimeout(function () { taps = 0; }, 3000);
-      if (taps >= 7 && !TESTERS) { taps = 0; devMode = !devMode; S.writeJSON('dev', devMode); if (!devMode) { simPremium = false; S.writeJSON('prem', false); } premiumChanged(); toast(devMode ? 'Modo de pruebas activado' : 'Modo de pruebas desactivado'); }
+      if (taps >= 7 && !TESTERS && DEV_TAP) { taps = 0; devMode = !devMode; S.writeJSON('dev', devMode); if (!devMode) { simPremium = false; S.writeJSON('prem', false); } premiumChanged(); toast(devMode ? 'Modo de pruebas activado' : 'Modo de pruebas desactivado'); }
     });
   })();
 
@@ -1998,7 +2008,14 @@
   function lyrOn(k) { return (isPremium() || layerFree(k)) && (OFF_DEFAULT[k] ? layerOn[k] === true : layerOn[k] !== false); }
   function pkgProvs() { return selected.filter(function (c) { return parajesOn.indexOf(c) >= 0; }); }
   function provName(c) { return provByCode[c] ? provByCode[c].name : c; }
+  // Solo se abren enlaces https (y http de dos webs oficiales de cámaras que aún no tienen https): nunca javascript:, data:, etc.
+  var HTTP_OK = /^http:\/\/(mct\.gencat\.cat|www\.bcn\.cat)\//i;
+  // Cámaras: solo de los organismos que las publican (si alguien manipulara los datos, no podría meter un enlace a otra web)
+  var CAM_OK = /^https?:\/\/([a-z0-9-]+\.)*(dgt\.es|gencat\.cat|bcn\.cat|valencia\.es|malaga\.eu|terrassa\.cat|madrid\.es|bizkaimove\.com|vitoria-gasteiz\.org)\//i;
+  function camLink(url) { if (typeof url === 'string' && CAM_OK.test(url)) openLink(url); else toast('Enlace de cámara no válido'); }
   function openLink(url) {
+    url = String(url || '');
+    if (!/^https:\/\//i.test(url) &&!HTTP_OK.test(url) && !/^(mailto:|whatsapp:|geo:|maps:)/i.test(url)) return;
     var a = el('a', { href: url, target: '_blank', rel: 'noopener noreferrer' });
     a.style.display = 'none';
     document.body.appendChild(a);
@@ -2072,7 +2089,7 @@
   function addCamMarker(c) {
     var pin = el('span', { class: 'campin', text: '📷', title: 'Abrir la cámara: ' + c.name });
     L.marker([c.lat, c.lon], { icon: L.divIcon({ className: 'pk-icon', html: pin, iconSize: null }), keyboard: false, zIndexOffset: 600 })
-      .on('click', function () { openLink(c.url); }).addTo(camLayer);
+      .on('click', function () { camLink(c.url); }).addTo(camLayer);
   }
   map.on('moveend', renderCams);
   // Cámara más cercana a un punto, para la ficha
@@ -2080,7 +2097,7 @@
     if (!isPremium() || !framework()) return null;
     var best = K.nearestCamara(allCams(), lat, lon, 5000);
     if (!best) return null;
-    return el('button', { type: 'button', class: 'nl cam', title: 'Abrir la cámara: ' + best.cam.name, onclick: function () { openLink(best.cam.url); } }, [
+    return el('button', { type: 'button', class: 'nl cam', title: 'Abrir la cámara: ' + best.cam.name, onclick: function () { camLink(best.cam.url); } }, [
       el('span', { text: '📷' }), el('b', { text: 'Cámara' }), el('span', { class: 'nl-d', text: K.formatDist(best.d) }),
     ]);
   }
@@ -2098,8 +2115,17 @@
   function loadBurn() {
     if (!lyrOn('inc') || burnState === 'loading' || (burnState === 'ok' && Date.now() - burnAt < 1800000)) return;
     burnState = 'loading';
-    fetch(BURN_URL, { credentials: 'omit' }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function (j) {
-      burn = (j && j.features) || []; burnState = 'ok'; burnAt = Date.now(); renderBurn();
+    // Respuesta de un tercero: tope de tamaño (8 MB) y de número de áreas, y solo polígonos con coordenadas numéricas
+    fetch(BURN_URL, { credentials: 'omit' }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); }).then(function (t) {
+      if (t.length > 8 * 1048576) throw new Error('demasiado grande');
+      var j = JSON.parse(t), fs = j && Array.isArray(j.features) ? j.features.slice(0, 5000) : [];
+      burn = fs.filter(function (f) {
+        var g = f && f.geometry, c = g && g.coordinates;
+        if (!g || (g.type !== 'Polygon' && g.type !== 'MultiPolygon') || !Array.isArray(c)) return false;
+        var p = g.type === 'Polygon' ? c[0] && c[0][0] : c[0] && c[0][0] && c[0][0][0];
+        return Array.isArray(p) && isFinite(p[0]) && isFinite(p[1]);
+      });
+      burnState = 'ok'; burnAt = Date.now(); renderBurn();
     }).catch(function () { burnState = 'error'; });
   }
   function renderBurn() {
@@ -2112,9 +2138,12 @@
       if (f.pc === undefined) f.pc = borders.provinceAt(c[1], c[0]) || null;
       if (!f.pc || mine.indexOf(f.pc) < 0) return;
       var ha = Math.round(+p.AREA_HA) || 0;
-      L.geoJSON(f, { style: { color: '#FF4B3E', weight: 2, fillColor: '#FF4B3E', fillOpacity: 0.28 } })
-        .on('click', function (e) { L.DomEvent.stopPropagation(e); openBurn(f); })
-        .addTo(burnLayer);
+      // Un área mal formada no corta el pintado de las demás
+      try {
+        L.geoJSON(f, { style: { color: '#FF4B3E', weight: 2, fillColor: '#FF4B3E', fillOpacity: 0.28 } })
+          .on('click', function (e) { L.DomEvent.stopPropagation(e); openBurn(f); })
+          .addTo(burnLayer);
+      } catch (err) { /* se ignora esa área */ }
     });
   }
   function pkgBounds() {
@@ -2308,7 +2337,7 @@
     });
     var cams = 0, cbest = null;
     allCams().forEach(function (c) { var d = K.distance([lat, lon], [c.lat, c.lon]); if (d <= 10000) { cams++; if (!cbest || d < cbest.d) cbest = { cam: c, d: d }; } });
-    if (cbest) rows.push(el('button', { type: 'button', class: 'nl cam', title: 'Abrir la cámara: ' + cbest.cam.name, onclick: function () { openLink(cbest.cam.url); } }, [el('span', { text: '📷' }), el('b', { text: 'Cámara' }), el('span', { class: 'nl-d', text: 'a ' + K.formatDist(cbest.d) + (cams > 1 ? ' · ' + cams + ' a menos de 10 km' : '') })]));
+    if (cbest) rows.push(el('button', { type: 'button', class: 'nl cam', title: 'Abrir la cámara: ' + cbest.cam.name, onclick: function () { camLink(cbest.cam.url); } }, [el('span', { text: '📷' }), el('b', { text: 'Cámara' }), el('span', { class: 'nl-d', text: 'a ' + K.formatDist(cbest.d) + (cams > 1 ? ' · ' + cams + ' a menos de 10 km' : '') })]));
     var water = 0, wbest = null;
     allAgua().forEach(function (a) { var d = K.distance([lat, lon], [a.lat, a.lon]); if (d <= 5000) { water++; if (!wbest || d < wbest) wbest = d; } });
     var traf = mySits('v16').concat(mySits()).filter(function (s) { return K.distance([lat, lon], [s.lat, s.lon]) <= 10000; }).length;
@@ -3102,7 +3131,7 @@
     return http.get({ url: url, responseType: 'blob', connectTimeout: 10000, readTimeout: 20000 }).then(function (r) {
       if (r.status !== 200 || typeof r.data !== 'string') throw new Error('HTTP ' + r.status);
       var arr = b64bytes(r.data), ct = (r.headers && (r.headers['Content-Type'] || r.headers['content-type'])) || 'image/png';
-      if (!/^image\//.test(ct)) throw new Error('no es una imagen');
+      if (!/^image\/(png|jpeg)\b/i.test(ct)) throw new Error('no es una imagen');   // solo PNG y JPEG (nunca SVG ni HTML)
       return { resp: new Response(new Blob([arr], { type: ct }), { headers: { 'Content-Type': ct } }), size: arr.length };
     });
   }

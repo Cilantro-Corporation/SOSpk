@@ -396,10 +396,12 @@
     var ky = 110540, kx = 111320 * Math.cos(pts[0][0] * Math.PI / 180), xs = new Float64Array(n), ys = new Float64Array(n), keep = new Uint8Array(n), i;
     for (i = 0; i < n; i++) { xs[i] = pts[i][1] * kx; ys[i] = pts[i][0] * ky; }
     keep[0] = keep[n - 1] = 1;
-    var st = [0, n - 1];
+    var st = [0, n - 1], ops = 0;
     while (st.length) {
       var b = st.pop(), a = st.pop();
       if (b <= a + 1) continue;
+      // Tope de trabajo: un track preparado (zigzag de cientos de miles de puntos) no congela la app; se pasa a un método lineal
+      if ((ops += b - a) > 2e7) return decimate(pts, tol, xs, ys);
       var dx = xs[b] - xs[a], dy = ys[b] - ys[a], l2 = dx * dx + dy * dy, md = -1, mi = -1;
       for (i = a + 1; i < b; i++) {
         var px = xs[i] - xs[a], py = ys[i] - ys[a], d;
@@ -411,6 +413,16 @@
     }
     var out = [];
     for (i = 0; i < n; i++) if (keep[i]) out.push([+pts[i][0].toFixed(6), +pts[i][1].toFixed(6)]);
+    return out;
+  }
+  // Respaldo lineal de simplify: se queda con un punto cada «tol» metros (más el último)
+  function decimate(pts, tol, xs, ys) {
+    var out = [[+pts[0][0].toFixed(6), +pts[0][1].toFixed(6)]], lx = xs[0], ly = ys[0], n = pts.length, t2 = tol * tol;
+    for (var i = 1; i < n - 1; i++) {
+      var dx = xs[i] - lx, dy = ys[i] - ly;
+      if (dx * dx + dy * dy >= t2) { out.push([+pts[i][0].toFixed(6), +pts[i][1].toFixed(6)]); lx = xs[i]; ly = ys[i]; }
+    }
+    out.push([+pts[n - 1][0].toFixed(6), +pts[n - 1][1].toFixed(6)]);
     return out;
   }
   // Tres niveles de detalle por track: [[segmentos a 2 m], [a 10 m], [a 50 m]]
