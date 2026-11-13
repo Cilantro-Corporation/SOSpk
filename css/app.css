@@ -106,7 +106,9 @@ button svg, .act svg, .icon-btn svg { width: 22px; height: 22px; fill: currentCo
 .up-close { border: 0; background: none; color: var(--bg); font-size: 20px; width: 30px; height: 30px; flex: none; }
 
 /* ---------- Controles del mapa ---------- */
-.map-ctrls { position: fixed; right: calc(4px + var(--safe-r)); z-index: 450; display: flex; flex-direction: column; gap: 4px; bottom: var(--ctrl-b, calc(var(--safe-b) + 18px)); }
+.map-ctrls { position: fixed; right: calc(4px + var(--safe-r)); z-index: 450; display: flex; flex-direction: column-reverse; flex-wrap: wrap-reverse; align-content: flex-end; gap: 4px; bottom: var(--ctrl-b, calc(var(--safe-b) + 18px)); max-height: var(--ctrl-h, none); width: var(--ctrl-w, auto); }
+/* Orden de abajo arriba: ubicación, mapa, capas, sectores, tracks, información (si no caben en una columna, se parte en dos hacia la izquierda) */
+#btnLocate { order: 1; } #btnLayer { order: 2; } #btnLayers { order: 3; } #btnZoneAdd { order: 4; } #btnTracks { order: 5; } #btnInfo { order: 6; }
 .map-ctrls .icon-btn { width: calc(44px * var(--fs)); height: calc(44px * var(--fs)); background: var(--bg); box-shadow: 0 2px 8px rgba(0,0,0,.35); }
 .map-ctrls .icon-btn.on { background: var(--lime); color: var(--bg); }
 
@@ -271,6 +273,28 @@ button svg, .act svg, .icon-btn svg { width: 22px; height: 22px; fill: currentCo
   background: var(--lime); color: var(--bg); font-weight: 600; padding: 10px 16px; border-radius: 999px; max-width: 92%; text-align: center; font-size: 14px;
 }
 
+/* Indicador de carga: el triángulo de Penrose de CILANTROPIC se desmonta y se monta sin parar mientras se carga.
+   La pieza verde grande se queda quieta; las otras tres se deslizan hacia fuera, cada una por su propio eje (arriba-izquierda, abajo-izquierda y derecha). */
+.loading {
+  position: fixed; left: 50%; transform: translateX(-50%); z-index: 850; top: calc(var(--top-h, 110px) + 10px);
+  display: flex; align-items: center; gap: 26px; padding: 14px 24px 14px 20px; border-radius: 20px; width: max-content; max-width: calc(100vw - 24px); white-space: nowrap; background: var(--bg); color: var(--lime);
+  border: 2px solid var(--lime); font-family: var(--head); font-weight: 700; font-size: 16px; letter-spacing: .5px; box-shadow: 0 6px 20px rgba(0,0,0,.5);
+}
+.loading[hidden] { display: none; }
+.loading .penrose { width: 66px; height: auto; flex: none; overflow: visible; }
+.loading .pz { animation-duration: 2.4s; animation-iteration-count: infinite; animation-timing-function: cubic-bezier(.65, 0, .35, 1); }
+.loading .pz-a { animation-name: pz-a; }
+.loading .pz-c { animation-name: pz-c; animation-delay: .1s; }
+.loading .pz-d { animation-name: pz-d; animation-delay: .2s; }
+@keyframes pz-a { 0%, 10% { transform: translate(0, 0); } 42%, 58% { transform: translate(-72px, -99px); } 90%, 100% { transform: translate(0, 0); } }
+@keyframes pz-c { 0%, 10% { transform: translate(0, 0); } 42%, 58% { transform: translate(-70px, 100px); } 90%, 100% { transform: translate(0, 0); } }
+@keyframes pz-d { 0%, 10% { transform: translate(0, 0); } 42%, 58% { transform: translate(150px, 0); } 90%, 100% { transform: translate(0, 0); } }
+/* Quien prefiere menos movimiento: las piezas no se desplazan, solo late suavemente */
+@media (prefers-reduced-motion: reduce) {
+  .loading .pz-a, .loading .pz-c, .loading .pz-d { animation: pz-pulso 2.4s ease-in-out infinite; }
+  @keyframes pz-pulso { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+}
+
 /* ---------- Marcadores PK: forma y color según el tipo de carretera ----------
    autovía/autopista = escudo azul · nacional = círculo rojo · autonómica = hexágono verde · provincial/local = cuadrado amarillo */
 .pk-icon { width: auto !important; height: auto !important; background: none; border: 0; }
@@ -327,6 +351,11 @@ button svg, .act svg, .icon-btn svg { width: 22px; height: 22px; fill: currentCo
   .map-ctrls .icon-btn { width: calc(52px * var(--fs)); height: calc(52px * var(--fs)); }
   .toast { left: calc(50% + 214px); max-width: calc(100% - 450px); }
 }
+/* Móvil apaisado: la caja se queda en la zona de la izquierda (sube y baja, no se lleva a la derecha) y deja libre la franja de los iconos */
+@media (orientation: landscape) and (max-height: 500px) {
+  .top { right: auto; left: max(8px, var(--safe-l)); width: min(calc(400px * var(--box)), calc(100% - 150px - var(--safe-l))); border-radius: 12px; box-shadow: 0 0 0 1.5px var(--lime); }
+  .top.float { padding-top: 0; }
+}
 /* Pantallas bajas (móvil en horizontal): la ficha no tapa medio mapa */
 @media (max-height: 500px) and (max-width: 1000px) {
   .near-list { flex-direction: row; overflow-x: auto; }
@@ -339,6 +368,10 @@ button svg, .act svg, .icon-btn svg { width: 22px; height: 22px; fill: currentCo
   width: min(calc(440px * var(--box)), calc(100% - 20px)); height: auto; max-height: calc(100% - 24px - var(--safe-t) - var(--safe-b));
   border-radius: 14px; box-shadow: 0 0 0 1.5px var(--lime), 0 0 0 100vmax rgba(0,0,0,.55);
 }
+
+/* Los iconos Sectores y Tracks abren la misma ventana central pero enseñando solo ese apartado */
+#settings.solo .set-scroll > details.sec:not(.pick) { display: none; }
+#settings.solo .set-scroll > details.sec.pick > summary, #settings.solo .sec-up { display: none; }
 
 /* Acciones: solo iconos cuando la tarjeta es pequeña; con espacio vuelve el texto */
 .act svg { width: 18px; height: 18px; }
@@ -361,7 +394,7 @@ button svg, .act svg, .icon-btn svg { width: 22px; height: 22px; fill: currentCo
 #licText { display: block; width: 100%; margin: 0 0 10px; padding: 10px; border: 1px solid #3a3a3a; border-radius: 10px; background: var(--panel-2); color: #fff; font: 13px/1.35 ui-monospace, Consolas, monospace; resize: vertical; }
 #licText::placeholder { color: #8a8a8a; }
 .plan-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 2px; font-size: 14px; }
-.layers-pop { position: fixed; right: calc(66px + var(--safe-r)); bottom: var(--ctrl-b, calc(var(--safe-b) + 18px)); z-index: 460; width: min(290px, calc(100% - 90px)); padding: 8px; border-radius: 12px;
+.layers-pop { position: fixed; right: calc(var(--ctrl-w, 44px) + 22px + var(--safe-r)); bottom: var(--ctrl-b, calc(var(--safe-b) + 18px)); z-index: 460; width: min(290px, calc(100% - 90px)); padding: 8px; border-radius: 12px;
   background: rgba(11,11,11,.9); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: 0 0 0 1.5px var(--lime), 0 6px 20px rgba(0,0,0,.45); }
 .lp-head { display: flex; align-items: center; justify-content: space-between; padding: 0 2px 6px 6px; font-family: var(--head); letter-spacing: 1px; text-transform: uppercase; color: var(--lime); }
 .lp-note { margin: 6px 4px 2px; font-size: 11px; line-height: 1.35; color: var(--muted); }

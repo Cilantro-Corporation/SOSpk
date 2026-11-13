@@ -97,7 +97,10 @@
     <button class="icon-btn" id="btnInfo" type="button" aria-label="Información sobre SOSpk" hidden>
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke-width="2"/><path d="M12 11v6" fill="none" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="7.6" r="1.3"/></svg>
     </button>
-    <button class="icon-btn" id="btnZoneAdd" type="button" aria-label="Añadir sector" hidden>
+    <button class="icon-btn" id="btnTracks" type="button" aria-label="Tracks" title="Tracks" hidden>
+      <svg viewBox="0 0 24 24"><circle cx="5.5" cy="18.5" r="2.4"/><circle cx="18.5" cy="5.5" r="2.4"/><path d="M5.5 18.5C13 18.5 6 12 12 12s-1-6.5 6.5-6.5" fill="none" stroke-width="2.2" stroke-linecap="round"/></svg>
+    </button>
+    <button class="icon-btn" id="btnZoneAdd" type="button" aria-label="Sectores" title="Sectores" hidden>
       <svg viewBox="0 0 24 24"><path d="M9 3l5.2 3v6M14.2 15.5V18L9 21 3.8 18V6L9 3" fill="none" stroke-width="2" stroke-linejoin="round"/><path d="M18 11v8M14 15h8" fill="none" stroke-width="2.4" stroke-linecap="round"/></svg>
     </button>
     <button class="icon-btn" id="btnLayers" type="button" aria-label="Capas PRO" hidden>
@@ -240,7 +243,7 @@
 
   <section class="panel settings" id="settings" hidden aria-label="Configuración">
     <div class="panel-head">
-      <h2>Configuración</h2>
+      <h2 id="settingsTitle">Configuración</h2>
       <button class="mini" id="settingsClose" type="button" aria-label="Cerrar">×</button>
     </div>
     <div class="set-scroll">
@@ -376,6 +379,15 @@
   <div class="img-view" id="imgView" hidden role="dialog" aria-label="Imagen"><img id="imgViewImg" alt="Imagen del favorito"></div>
 
   <div class="toast" id="toast" role="status" hidden></div>
+  <div class="loading" id="loading" role="status" aria-live="polite" hidden>
+    <svg class="penrose" viewBox="0 0 708 500" aria-hidden="true">
+      <path class="pz pz-b" fill="#99FF00" d="M333.15,114.11Q336.00,110.00 338.92,114.06L379.08,169.94Q382.00,174.00 379.16,178.12L216.84,413.88Q214.00,418.00 219.00,418.00L703.00,418.00Q708.00,418.00 705.18,422.13L654.82,495.87Q652.00,500.00 647.00,500.00L71.00,500.00Q66.00,500.00 68.85,495.89Z"/>
+      <path class="pz pz-a" fill="#99FF00" d="M294.92,4.06Q292.00,0.00 297.00,0.00L391.00,0.00Q396.00,0.00 398.95,4.03L614.05,297.97Q617.00,302.00 612.00,302.00L514.00,302.00Q509.00,302.00 506.08,297.94Z"/>
+      <path class="pz pz-c" fill="#FFFFFF" d="M271.13,30.09Q274.00,26.00 276.92,30.06L317.08,85.94Q320.00,90.00 317.13,94.09L48.87,475.91Q46.00,480.00 43.08,475.94L2.92,420.06Q0.00,416.00 2.87,411.91Z"/>
+      <path class="pz pz-d" fill="#FFFFFF" d="M303.15,328.11Q306.00,324.00 311.00,324.00L629.00,324.00Q634.00,324.00 636.93,328.05L683.07,391.95Q686.00,396.00 681.00,396.00L261.00,396.00Q256.00,396.00 258.85,391.89Z"/>
+    </svg>
+    <span id="loadingText">Cargando datos…</span>
+  </div>
 
   <script src="vendor/leaflet/leaflet.js"></script>
   <script src="vendor/nacl/nacl-fast.min.js"></script>

@@ -41,7 +41,9 @@
   // Lista firmada de la carpeta data/ de un origen (la propia app/web o la web pública); se pide una vez por origen
   function manifestFor(base) {
     if (!manifests[base]) {
-      manifests[base] = fetch(base + 'data/manifest.json', { credentials: 'omit', cache: 'no-cache' }).then(readText).then(function (t) {
+      var go = function () { return fetch(base + 'data/manifest.json', { credentials: base ? 'omit' : 'same-origin', cache: 'no-cache' }).then(readText); };
+      // Un fallo momentáneo (red lenta, la web publicándose) se reintenta una vez antes de rendirse
+      manifests[base] = go().catch(function () { return new Promise(function (r) { setTimeout(r, 1500); }).then(go); }).then(function (t) {
         var j = JSON.parse(t), pub = b64u(CFG.datosPublica), sig = b64u(j && j.s);
         if (!j || j.v !== 1 || typeof j.m !== 'string' || !pub || pub.length !== 32 || !sig || sig.length !== 64) throw new Error('manifiesto no válido');
         if (!root.nacl.sign.detached.verify(ascii(DATA_PREFIX + j.m), sig, pub)) throw new Error('firma de datos no válida');

@@ -2,12 +2,12 @@
    Las provincias descargadas las guarda la propia app en la caché "kmes-provincias" (aquí no se tocan).
    Una versión nueva se instala y se activa sola; la app se recarga cuando es seguro (al volver a ella). */
 'use strict';
-var CACHE = 'kmes-app-v1.2.34';
+var CACHE = 'kmes-app-v1.2.35';
 var KEEP = [CACHE, 'kmes-provincias'];
 var SHELL = [
   './', 'index.html', 'manifest.webmanifest',
   'css/app.css', 'js/config.js', 'js/calor-fijo.js', 'js/core.js', 'js/coords.js', 'js/store.js', 'js/tracks.js', 'js/licencia.js', 'vendor/nacl/nacl-fast.min.js', 'js/app.js',
-  'data/index.json', 'data/borders.json',
+  'data/index.json', 'data/borders.json', 'data/manifest.json',
   'vendor/leaflet/leaflet.js', 'vendor/leaflet/leaflet.css',
   'vendor/fonts/oswald-500.woff2', 'vendor/fonts/oswald-700.woff2',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'icons/favicon-32.png', 'icons/logo.png', 'icons/logo-credits.png', 'icons/cilantropic.png',
@@ -43,7 +43,7 @@ self.addEventListener('fetch', function (e) {
   // Pagos, licencias, información y datos en directo: nunca a la caché (renovaciones y revocadas al día; la página de gracias lleva la licencia)
   if (/\/(api|info|licencias|descargas|live)\//.test(url.pathname) || /\.php$/.test(url.pathname)) return;
   // Índice, límites y versión de los topónimos: primero la red (datos nuevos al momento); sin conexión, la copia guardada
-  if (/\/data\/(index|borders|lugares)\.json$/.test(url.pathname)) {
+  if (/\/data\/(index|borders|lugares|manifest)\.json$/.test(url.pathname)) {
     e.respondWith(caches.open(CACHE).then(function (cache) {
       var net = fromNetwork(cache, req).catch(function () { return null; });
       var slow = new Promise(function (resolve) { setTimeout(resolve, 5000); });

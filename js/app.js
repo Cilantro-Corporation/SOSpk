@@ -182,6 +182,7 @@
     var fw = framework();
     $('btnLayers').hidden = !fw;
     $('btnZoneAdd').hidden = !fw;
+    $('btnTracks').hidden = !fw;
     $('whatPrem').hidden = !fw;
     $('legendPrem').hidden = !fw;
     $('creditsPrem').hidden = !fw;
@@ -195,6 +196,7 @@
     $('testRow').hidden = !TESTERS;
     $('testPrem').checked = simPremium;
     if (!fw) $('layersPop').hidden = true;
+    if (typeof applyPos === 'function' && DESK) applyPos();   // cambian los botones visibles: se recoloca todo
   }
   // Al final de cada desplegable de Configuración, un botón para replegarlo sin volver arriba
   Array.prototype.forEach.call(document.querySelectorAll('#settings details.sec'), function (d) {
@@ -241,7 +243,20 @@
       openLink(u);
     });
   })();
-  $('btnZoneAdd').addEventListener('click', function () { if (!canAddZona(true)) return; $('layersPop').hidden = true; startDraw(); });
+  // Los iconos Sectores y Tracks abren, en la ventana central, solo ese apartado (con su «+ Nuevo sector» / «Importar tracks»)
+  function openSection(id, title) {
+    var s = $('settings');
+    closeBigPanels('settings');
+    s.classList.add('solo');
+    $('settingsTitle').textContent = title;
+    Array.prototype.forEach.call(s.querySelectorAll('.set-scroll > details.sec'), function (d) { d.classList.toggle('pick', d.id === id); });
+    $(id).open = true;
+    s.hidden = false;
+    s.querySelector('.set-scroll').scrollTop = 0;
+    renderZonasList(); renderTracksList();
+  }
+  $('btnZoneAdd').addEventListener('click', function () { if ($('settings').classList.contains('solo') && !$('settings').hidden && $('secSectores').classList.contains('pick')) { $('settings').hidden = true; return; } openSection('secSectores', 'Sectores'); });
+  $('btnTracks').addEventListener('click', function () { if ($('settings').classList.contains('solo') && !$('settings').hidden && $('secTracks').classList.contains('pick')) { $('settings').hidden = true; return; } openSection('secTracks', 'Tracks'); });
   $('btnLayers').addEventListener('click', function () {
     var pop = $('layersPop');
     if (!pop.hidden) { pop.hidden = true; return; }
@@ -354,45 +369,59 @@
   insetProbe.style.cssText = 'position:fixed;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)';
   document.body.appendChild(insetProbe);
   function sideInsets() { var cs = getComputedStyle(insetProbe); return { t: parseFloat(cs.paddingTop) || 0, r: parseFloat(cs.paddingRight) || 0, b: parseFloat(cs.paddingBottom) || 0, l: parseFloat(cs.paddingLeft) || 0 }; }
-  // Tres bloques que no se dividen: la caja, los avisos con el zoom (arriba a la derecha) y los botones del mapa (abajo a la derecha).
-  // Si la caja se lleva a la banda derecha, ocupa el hueco de arriba, el del medio o el de abajo y los otros dos bloques le hacen sitio.
-  // Devuelve la altura a la que suben los botones (0 = en su sitio).
+  // Colocación de lo que flota en la banda derecha: la columna de botones del mapa, el zoom (con los avisos) y la caja, que se puede llevar allí.
+  // Nada se pisa: la caja deja huecos verticales libres; la columna ocupa el hueco de más abajo que le cabe (si no cabe a lo alto, se parte en dos o más
+  // columnas) y el zoom el de más arriba (si comparte hueco con la columna y no caben apilados, va a su izquierda).
+  // Pone las variables CSS --ctrl-b (a qué altura queda la columna), --ctrl-h y --ctrl-w (si se parte en varias), --zoom-dy, --zoom-r y --chips-top-d.
   function blocks() {
-    var st = document.documentElement.style, W = window.innerWidth, H = window.innerHeight, lift = 0, zx = null, dy = null, ct = null;
-    if (lowCard()) lift = Math.round(bottomOffset() + 8);
-    else if (window.matchMedia('(min-width: 760px)').matches) {
-      var si = sideInsets(), node = document.querySelector('.top'), r = node.getBoundingClientRect();
-      var colH = document.querySelector('.map-ctrls').offsetHeight || 190, zc = document.querySelector('.leaflet-top.leaflet-right');
-      var zt = zc ? zc.getBoundingClientRect().top : 4, zel = document.querySelector('.leaflet-control-zoom'), zH = (zel && zel.offsetHeight) || 64;
-      var ch = document.querySelector('.chips'), chH = ch ? ch.offsetHeight : 0, chR = ch ? ch.getBoundingClientRect() : null;
-      var aBot = Math.max(zt + 10 + zH, chH ? 8 + chH : 0) + 6;             // borde inferior del bloque de avisos y zoom en su sitio
-      var bTop = H - si.b - 18 - colH;                                      // borde superior de los botones en su sitio
-      if (r.right > W - si.r - 60) {
-        var cy = (r.top + r.bottom) / 2, slot = cy < H / 3 ? 'top' : cy > H * 2 / 3 ? 'bottom' : 'mid';
-        if (slot === 'mid') {
-          var g0 = aBot + 8, g1 = bTop - 8;
-          if (r.height <= g1 - g0) { var y = Math.max(g0, Math.min(g1 - r.height, r.top)); if (Math.round(y) !== Math.round(r.top)) { node.style.top = Math.round(y) + 'px'; r = node.getBoundingClientRect(); } }
-          else slot = cy < H / 2 ? 'top' : 'bottom';
+    var st = document.documentElement.style, W = window.innerWidth, H = window.innerHeight, si = sideInsets(), desk = window.matchMedia('(min-width: 760px)').matches;
+    var node = document.querySelector('.top'), r = node.getBoundingClientRect(), ctrls = document.querySelector('.map-ctrls');
+    var btns = Array.prototype.filter.call(ctrls.querySelectorAll('.icon-btn'), function (b) { return !b.hidden; });
+    var n = Math.max(1, btns.length), s = (btns[0] && btns[0].offsetWidth) || 44, g = parseFloat(getComputedStyle(ctrls).rowGap) || 4;
+    var small = !!ctrls.closest('.fs-s'), baseB = si.b + (small ? 6 : 18), bot = H - baseB, top0 = si.t + 4;
+    var zel = document.querySelector('.leaflet-control-zoom'), zc = document.querySelector('.leaflet-top.leaflet-right');
+    var zoomOn = desk && !!zel, zH = (zel && zel.offsetHeight) || 64, zW = (zel && zel.offsetWidth) || 30;
+    // Borde de arriba del contenedor del zoom (sin su margen, que es lo que se ajusta)
+    var zt = (zc && zel) ? zel.getBoundingClientRect().top - (parseFloat(getComputedStyle(zel).marginTop) || 0) : 4;
+    var ch = document.querySelector('.chips'), chH = ch ? ch.offsetHeight : 0;
+    var best = null;
+    for (var k = 1; k <= n && !best; k++) {
+      var rows = Math.ceil(n / k), colH = rows * s + (rows - 1) * g, colW = k * s + (k - 1) * g, bandLeft = W - si.r - 4 - colW - 6;
+      var inBand = r.right > bandLeft;                                // ¿la caja llega a la franja de la derecha? (en el móvil en vertical ocupa todo el ancho)
+      var gaps = [], a0 = top0, a1 = bot;
+      if (!inBand) gaps.push([a0, a1]);
+      else { if (r.top - 8 - a0 > 0) gaps.push([a0, Math.min(a1, r.top - 8)]); if (a1 - (r.bottom + 8) > 0) gaps.push([Math.max(a0, r.bottom + 8), a1]); }
+      var cg = null; for (var i = gaps.length - 1; i >= 0; i--) if (gaps[i][1] - gaps[i][0] >= colH) { cg = gaps[i]; break; }
+      if (!cg) continue;
+      var cand = { k: k, colH: colH, colW: colW, colBottom: cg[1], zoomTop: null, beside: false };
+      if (zoomOn) {
+        var zg = gaps[0], zTop = zg[0] <= top0 + 10 ? si.t + 14 : zg[0];
+        if (zg !== cg) { if (zg[1] - zTop >= zH) cand.zoomTop = zTop; }
+        else if (cg[1] - colH - zTop >= zH + 8) cand.zoomTop = zTop;
+        if (cand.zoomTop == null) {
+          // A su izquierda: solo si la caja no estorba (en su franja vertical, la caja queda a la izquierda del zoom)
+          var zl = bandLeft - 8 - zW, zr = zl + zW;
+          if (!(r.right > zl - 4 && r.left < zr + 4 && r.bottom + 4 > zTop && r.top - 4 < zTop + zH)) { cand.zoomTop = zTop; cand.beside = true; }
         }
-        if (slot === 'top') {
-          dy = r.bottom + 8 - zt; ct = r.bottom + 6;
-          if (r.bottom + 8 + zH + 8 > bTop) zx = si.r + 52;                // sin hueco entre la caja y los botones: el zoom va a su lado
-        } else if (slot === 'bottom') {
-          lift = Math.round(H - r.top + 8);
-          var nt = r.top - 8 - colH;
-          if (nt < si.t + 4) lift = Math.round(H - (si.t + 4 + colH)); else if (nt < aBot) zx = si.r + 52;
-        }
-      } else {
-        // Caja fuera de la banda derecha: solo se aparta si llega al zoom o a los avisos
-        if (r.right > W - si.r - 56 && r.top < 120) dy = r.bottom + 8 - zt;
-        if (chR && chR.width && r.left < chR.right && r.right > chR.left && r.top < 8 + chH + 6 && r.bottom > 8) ct = r.bottom + 6;
+        if (cand.zoomTop == null) continue;
       }
+      best = cand;
     }
-    var set = function (k, v) { if (v == null) st.removeProperty(k); else st.setProperty(k, Math.round(v) + 'px'); };
-    set('--zoom-r', zx); set('--zoom-dy', dy); set('--chips-top-d', ct);
-    return lift;
+    var set = function (k2, v) { if (v == null) st.removeProperty(k2); else st.setProperty(k2, Math.round(v) + 'px'); };
+    if (!best) { set('--ctrl-h', null); set('--ctrl-w', null); set('--zoom-dy', null); set('--zoom-r', null); set('--chips-top-d', null); return 0; }
+    set('--ctrl-h', best.k > 1 ? best.colH : null); set('--ctrl-w', best.k > 1 ? best.colW : null);
+    if (zoomOn) {
+      set('--zoom-dy', best.zoomTop - zt);
+      set('--zoom-r', best.beside ? si.r + best.colW + 8 : null);
+      var ct = best.zoomTop - 6;
+      // Los avisos van a la izquierda del zoom; si la caja (fuera de la banda) les llega, bajan por debajo de ella
+      var chR = ch ? ch.getBoundingClientRect() : null;
+      if (chR && chR.width && r.left < chR.right && r.right > chR.left && r.top < ct + chH + 6 && r.bottom > ct) ct = r.bottom + 6;
+      set('--chips-top-d', Math.abs(ct - 8) < 1 ? null : ct);
+    } else { set('--zoom-dy', null); set('--zoom-r', null); set('--chips-top-d', null); }
+    return Math.round(H - best.colBottom);                           // distancia de la columna al borde de abajo
   }
-  function syncTop() { var st = document.documentElement.style; st.setProperty('--top-h', Math.round(topOffset()) + 'px'); var lift = blocks(); if (lift) st.setProperty('--ctrl-b', lift + 'px'); else st.removeProperty('--ctrl-b');
+  function syncTop() { var st = document.documentElement.style; st.setProperty('--top-h', Math.round(topOffset()) + 'px'); var lift = blocks(), si = sideInsets(), base = si.b + (document.querySelector('.map-ctrls').closest('.fs-s') ? 6 : 18); if (lift && Math.abs(lift - base) > 0.5) st.setProperty('--ctrl-b', lift + 'px'); else st.removeProperty('--ctrl-b');
     st.setProperty('--chips-top', lowCard() ? 'calc(var(--safe-t) + 6px)' : Math.round(topOffset()) + 6 + 'px'); }
   if (window.ResizeObserver) new ResizeObserver(function () { applyPos(); }).observe(document.querySelector('.top'));
   syncTop();
@@ -412,6 +441,8 @@
   // Doble clic en una parte negra: vuelve a su sitio.
   var PORT = window.matchMedia('(orientation: portrait)');
   function fixedTop() { return !window.matchMedia('(min-width: 760px)').matches && PORT.matches; }
+  // Móvil apaisado (pantalla baja en horizontal): la caja se queda a la izquierda y solo sube y baja; los iconos y los datos de la derecha no se mueven
+  function isLand() { return window.matchMedia('(orientation: landscape) and (max-height: 500px)').matches; }
   var pos = S.readJSON('card', {});
   if (!pos || typeof pos !== 'object') pos = {};
   function validPos(p) { return Array.isArray(p) && p.length === 2 && isFinite(p[0]) && isFinite(p[1]); }
@@ -421,9 +452,9 @@
   // Arriba llega hasta el borde de la pantalla (0): la banda vacía de la caja queda bajo la barra de estado del móvil
   function clampY(y, n) { var bb = DESK.matches ? sideInsets().b : 0; return Math.round(Math.max(0, Math.min(window.innerHeight - baseH(n) - bb, y))); }
   function applyPos() {
-    var top = document.querySelector('.top'), p = DESK.matches ? pos.d : pos.m;
-    if (DESK.matches && validPos(p)) { top.style.left = clampX(p[0], top) + 'px'; top.style.top = clampY(p[1], top) + 'px'; }
-    else if (!DESK.matches && !fixedTop() && typeof p === 'number' && isFinite(p)) {
+    var land = isLand(), top = document.querySelector('.top'), p = (DESK.matches && !land) ? pos.d : pos.m;
+    if (DESK.matches && !land && validPos(p)) { top.style.left = clampX(p[0], top) + 'px'; top.style.top = clampY(p[1], top) + 'px'; }
+    else if ((!DESK.matches || land) && !fixedTop() && typeof p === 'number' && isFinite(p)) {
       // Movida del sitio de origen: sin banda arriba; pegada abajo, con banda abajo para no pisar los botones del móvil
       var y = clampY(p, top), fl = y > 0;
       top.classList.toggle('float', fl);
@@ -442,7 +473,7 @@
     function cancel() { clearTimeout(timer); timer = null; }
     function move(cx, cy) {
       var y = clampY(cy - start[1], node);
-      if (DESK.matches) { pos.d = [clampX(cx - start[0], node), y]; } else { pos.m = y; }
+      if (DESK.matches && !isLand()) { pos.d = [clampX(cx - start[0], node), y]; } else { pos.m = y; }
       applyPos();
     }
     function begin(cx, cy) {
@@ -1883,6 +1914,8 @@
   window.addEventListener('offline', renderConn);
   $('btnSettings').addEventListener('click', function () {
     var p = $('settings'); if (p.hidden) closeBigPanels('settings');
+    // Configuración entera (no solo un apartado)
+    p.classList.remove('solo'); $('settingsTitle').textContent = 'Configuración';
     p.hidden = !p.hidden;
     if (!p.hidden) { pinnedProvs = selected.slice(); renderConn(); renderSettingsList(); loadPlacesMeta().then(renderSettingsList); }
   });
@@ -2907,12 +2940,7 @@
   // Tracks GPX en Configuración: lista con filtro (puede haber cientos), y edición de nombre, color y foto
   var TRK_PAGE = 40, trkShow = TRK_PAGE, editingT = null, tPic = null;
   function fmtKm(m) { return m >= 1000 ? (m / 1000).toLocaleString('es-ES', { maximumFractionDigits: 1 }) + ' km' : Math.round(m) + ' m'; }
-  function openTracksSection() {
-    $('layersPop').hidden = true;
-    $('settings').hidden = false;
-    var d = $('secTracks'); d.open = true;
-    d.scrollIntoView({ block: 'start' });
-  }
+  function openTracksSection() { openSection('secTracks', 'Tracks'); }
   function renderTracksList() {
     var box = $('tracksList');
     if (!box) return;
@@ -3374,8 +3402,21 @@
       return validData(r[1]) && r[1].index.v > r[0].index.v ? r[1] : r[0];
     });
   }
+  // Indicador de carga (anillo lima): se ve mientras arranca y mientras se reintenta una descarga que falla
+  function showLoading(t) { var b = $('loading'); if (!b) return; $('loadingText').textContent = t || 'Cargando datos…'; b.hidden = false; }
+  function hideLoading() { var b = $('loading'); if (b) b.hidden = true; }
+  // Un fallo momentáneo (red lenta, la web justo después de publicarse una versión) no debe dar error: se reintenta tres veces, esperando cada vez más
+  var RETRY_MS = [1500, 3500, 7000];
+  function loadBaseRetry(n) {
+    return loadBase().catch(function (e) {
+      if (n >= RETRY_MS.length) throw e;
+      showLoading('Reintentando…');
+      return new Promise(function (r) { setTimeout(r, RETRY_MS[n]); }).then(function () { return loadBaseRetry(n + 1); });
+    });
+  }
   function init() {
-    loadBase().then(function (d) {
+    showLoading('Cargando datos…');
+    loadBaseRetry(0).then(function (d) {
       if (!d.index || !Array.isArray(d.index.provs) || !d.index.roads) throw new Error('índice no válido');
       setIndex(d.index, d.borders);
       selected = readSelected();
@@ -3383,13 +3424,17 @@
       return Promise.all(selected.map(function (c) { return loadProvince(c, true); }));
     }).then(function (oks) {
       rebuild();
+      hideLoading();
       var failed = selected.filter(function (c, i) { return !oks[i]; });
       if (failed.length) toast('Sin conexión: no se pudo cargar ' + failed.map(function (c) { return provByCode[c].name; }).join(', '), 4000);
       else announceUpdates();
       if (!fromHash()) fitBounds(loadedBounds());
       checkUpdates();
     }).catch(function () {
-      toast('No se pudieron cargar los datos de la app. Comprueba la conexión y vuelve a abrirla.', 8000);
+      hideLoading();
+      toast('No se pudieron cargar los datos de la app. Comprueba la conexión; se reintentará sola al volver la red.', 8000);
+      // Si la red vuelve, se carga sin tener que recargar la página
+      window.addEventListener('online', function once() { window.removeEventListener('online', once); location.reload(); });
     });
   }
 
