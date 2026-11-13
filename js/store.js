@@ -25,8 +25,51 @@
     return d;
   }
 
+  // ---- Firma de los datos: cada archivo de data/ debe cuadrar con data/manifest.json, firmado con Ed25519 (tools/firmar-datos.mjs).
+  // Si alguien cambiara los datos donde se publican (por ejemplo, para mover un PK), la app los rechaza y sigue con lo que tenía.
+  var DATA_PREFIX = 'SOSPKDATA1.', B64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+  var manifests = {};
+  function b64u(s) {
+    s = String(s || '');
+    if (/[^A-Za-z0-9\-_]/.test(s) || s.length % 4 === 1) return null;
+    var out = [], bits = 0, acc = 0;
+    for (var i = 0; i < s.length; i++) { acc = (acc << 6) | B64.indexOf(s.charAt(i)); bits += 6; if (bits >= 8) { bits -= 8; out.push((acc >> bits) & 255); } }
+    return new Uint8Array(out);
+  }
+  function ascii(s) { var b = new Uint8Array(s.length); for (var i = 0; i < s.length; i++) b[i] = s.charCodeAt(i) & 255; return b; }
+  function signingOn() { return !!(CFG.datosPublica && root.nacl && root.crypto && root.crypto.subtle && root.TextEncoder); }
+  // Lista firmada de la carpeta data/ de un origen (la propia app/web o la web pública); se pide una vez por origen
+  function manifestFor(base) {
+    if (!manifests[base]) {
+      manifests[base] = fetch(base + 'data/manifest.json', { credentials: 'omit', cache: 'no-cache' }).then(readText).then(function (t) {
+        var j = JSON.parse(t), pub = b64u(CFG.datosPublica), sig = b64u(j && j.s);
+        if (!j || j.v !== 1 || typeof j.m !== 'string' || !pub || pub.length !== 32 || !sig || sig.length !== 64) throw new Error('manifiesto no válido');
+        if (!root.nacl.sign.detached.verify(ascii(DATA_PREFIX + j.m), sig, pub)) throw new Error('firma de datos no válida');
+        var files = JSON.parse(new TextDecoder().decode(b64u(j.m))).files;
+        if (!files || typeof files !== 'object') throw new Error('manifiesto no válido');
+        return files;
+      });
+      manifests[base].catch(function () { delete manifests[base]; });   // si falla (sin conexión), se reintenta la próxima vez
+    }
+    return manifests[base];
+  }
+  function hex(buf) { var b = new Uint8Array(buf), s = ''; for (var i = 0; i < b.length; i++) s += (b[i] < 16 ? '0' : '') + b[i].toString(16); return s; }
+  // url: «data/…» (relativa) o «<web pública>data/…». Lo que no está en data/ (version.json) no se comprueba
+  function verifyData(url, text) {
+    if (!signingOn()) return Promise.resolve(text);
+    var m = /^(.*?)data\/([A-Za-z0-9_\-\/]+\.json)(\?.*)?$/.exec(url);
+    if (!m) return Promise.resolve(text);
+    var base = m[1], rel = m[2];
+    return Promise.all([manifestFor(base), root.crypto.subtle.digest('SHA-256', new TextEncoder().encode(text))]).then(function (r) {
+      if (!r[0][rel] || r[0][rel] !== hex(r[1])) throw new Error('datos sin firma válida: ' + rel);
+      return text;
+    });
+  }
+
   function fetchJson(url) {
     return fetch(url, { credentials: 'omit', cache: 'no-cache', redirect: 'follow' }).then(readText).then(function (t) {
+      return verifyData(url, t);
+    }).then(function (t) {
       return { text: t };
     });
   }
@@ -173,7 +216,7 @@
     readJSON: readJSON,
     writeJSON: writeJSON,
     loadJSON: function (path) {
-      return fetch(path, { credentials: 'omit', cache: 'no-cache' }).then(readText).then(JSON.parse);
+      return fetch(path, { credentials: 'omit', cache: 'no-cache' }).then(readText).then(function (t) { return verifyData(path, t); }).then(JSON.parse);
     },
   };
 })(window);

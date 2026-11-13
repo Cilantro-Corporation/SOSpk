@@ -145,11 +145,12 @@
       try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
       if (!ok) toast('La licencia del enlace no es válida');
     }
-    // App de Android: enlace profundo sospk://licencia/<licencia> (botón «Abrir en la app» de la página de gracias)
+    // App de Android: enlace verificado https://sospk.app/activar#licencia=… (App Link: Android solo lo abre con esta app, firmada por nosotros)
+    // y, por compatibilidad, el antiguo sospk://licencia/<licencia>
     var capApp = IS_NATIVE && window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App;
     if (capApp && PRE.licenciaPublica) {
       var deep = function (u) {
-        if (typeof u !== 'string' || u.indexOf('sospk://') !== 0) return;
+        if (typeof u !== 'string' || !(u.indexOf('sospk://') === 0 || /^https:\/\/sospk\.app\/activar\/?(\?[^#]*)?#/.test(u))) return;
         if (!licActivate(u, true)) toast('La licencia del enlace no es válida');
       };
       capApp.addListener('appUrlOpen', function (e) { deep(e && e.url); });
