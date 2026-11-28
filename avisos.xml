@@ -1,0 +1,707 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:cap="urn:oasis:names:tc:emergency:cap:1.2">
+  <link rel="hub" href="https://pubsubhubbub.appspot.com/"/>
+  <link type="application/atom+xml" rel="self" href="https://feeds.meteoalarm.org/feeds/meteoalarm-legacy-atom-spain"/>
+  <link type="text/html" rel="alternate" href="https://meteoalarm.org"/>
+  <rights>Copyright © 2026 MeteoAlarm.Org. Licensed under terms equivalent to CC BY 4.0, with additional requirements for redistributing outlined in our Terms and Conditions.</rights>
+  <generator>MeteoAlarm Producer Server</generator>
+  <logo>https://feeds.meteoalarm.org/images/logo.svg</logo>
+  <author>
+    <name>meteoalarm.org</name>
+    <uri>https://meteoalarm.org</uri>
+    <email>meteoalarm@geosphere.at</email>
+  </author>
+  <id>tag:meteoalarm.org,2021-02-19:ES</id>
+  <title>MeteoAlarm - Alerting Europe for Extreme Weather</title>
+  <updated>2026-11-28T20:05:52.953233Z</updated>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES219</value>
+    </cap:geocode>
+    <link title="Metropolitana y Henares" href="https://meteoalarm.org?geocode=EMMA_ID:ES219" hreflang="en"/>
+    <cap:areaDesc>Metropolitana y Henares</cap:areaDesc>
+    <cap:event>Moderate fog warning</cap:event>
+    <cap:sent>2026-11-28T17:28:09+00:00</cap:sent>
+    <cap:expires>2026-11-29T08:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-28T17:25:56+00:00</cap:effective>
+    <cap:onset>2026-11-28T23:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261128172809.722802NINI290986889</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/8319be49-bd5b-47de-b855-e8c6008fc136"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-28T17:28:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/8319be49-bd5b-47de-b855-e8c6008fc136?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Fog Warning issued for Spain - Metropolitana y Henares</title>
+    <updated>2026-11-28T17:28:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES170</value>
+    </cap:geocode>
+    <link title="La Mancha conquense" href="https://meteoalarm.org?geocode=EMMA_ID:ES170" hreflang="en"/>
+    <cap:areaDesc>La Mancha conquense</cap:areaDesc>
+    <cap:event>Moderate fog warning</cap:event>
+    <cap:sent>2026-11-28T17:28:09+00:00</cap:sent>
+    <cap:expires>2026-11-29T08:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-28T17:25:56+00:00</cap:effective>
+    <cap:onset>2026-11-28T23:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261128172809.681603NINI290986889</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/74e05f09-4072-4d21-9ff9-d32dca05abb4"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-28T17:28:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/74e05f09-4072-4d21-9ff9-d32dca05abb4?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Fog Warning issued for Spain - La Mancha conquense</title>
+    <updated>2026-11-28T17:28:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES175</value>
+    </cap:geocode>
+    <link title="Valle del Tajo" href="https://meteoalarm.org?geocode=EMMA_ID:ES175" hreflang="en"/>
+    <cap:areaDesc>Valle del Tajo</cap:areaDesc>
+    <cap:event>Moderate fog warning</cap:event>
+    <cap:sent>2026-11-28T10:02:08+00:00</cap:sent>
+    <cap:expires>2026-11-29T08:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-28T09:58:54+00:00</cap:effective>
+    <cap:onset>2026-11-28T23:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Update</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261128100208.684502NINI290960128</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/e349849e-5d87-4d89-9567-2d431ebd6039"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-28T10:02:08Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/e349849e-5d87-4d89-9567-2d431ebd6039?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Fog Warning issued for Spain - Valle del Tajo</title>
+    <updated>2026-11-28T10:02:08Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES161</value>
+    </cap:geocode>
+    <link title="La Mancha albaceteña" href="https://meteoalarm.org?geocode=EMMA_ID:ES161" hreflang="en"/>
+    <cap:areaDesc>La Mancha albaceteña</cap:areaDesc>
+    <cap:event>Moderate fog warning</cap:event>
+    <cap:sent>2026-11-28T10:02:08+00:00</cap:sent>
+    <cap:expires>2026-11-29T08:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-28T09:58:54+00:00</cap:effective>
+    <cap:onset>2026-11-28T23:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261128100208.680201NINI290960128</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/bcf88e71-f738-442e-aed5-8802ae746af1"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-28T10:02:08Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/bcf88e71-f738-442e-aed5-8802ae746af1?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Fog Warning issued for Spain - La Mancha albaceteña</title>
+    <updated>2026-11-28T10:02:08Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES177</value>
+    </cap:geocode>
+    <link title="La Mancha toledana" href="https://meteoalarm.org?geocode=EMMA_ID:ES177" hreflang="en"/>
+    <cap:areaDesc>La Mancha toledana</cap:areaDesc>
+    <cap:event>Moderate fog warning</cap:event>
+    <cap:sent>2026-11-28T10:02:08+00:00</cap:sent>
+    <cap:expires>2026-11-29T08:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-28T09:58:54+00:00</cap:effective>
+    <cap:onset>2026-11-28T23:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261128100208.684504NINI290960128</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/a7566fdf-c3a2-4011-80c8-f5f52d47ce70"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-28T10:02:08Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/a7566fdf-c3a2-4011-80c8-f5f52d47ce70?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Fog Warning issued for Spain - La Mancha toledana</title>
+    <updated>2026-11-28T10:02:08Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES165</value>
+    </cap:geocode>
+    <link title="La Mancha de Ciudad Real" href="https://meteoalarm.org?geocode=EMMA_ID:ES165" hreflang="en"/>
+    <cap:areaDesc>La Mancha de Ciudad Real</cap:areaDesc>
+    <cap:event>Moderate fog warning</cap:event>
+    <cap:sent>2026-11-28T10:02:08+00:00</cap:sent>
+    <cap:expires>2026-11-29T08:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-28T09:58:54+00:00</cap:effective>
+    <cap:onset>2026-11-28T23:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261128100208.681302NINI290960128</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/1beb1db2-8c15-4929-80fa-9b2b15d9eb2f"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-28T10:02:08Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/1beb1db2-8c15-4929-80fa-9b2b15d9eb2f?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Fog Warning issued for Spain - La Mancha de Ciudad Real</title>
+    <updated>2026-11-28T10:02:08Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES166</value>
+    </cap:geocode>
+    <link title="Valle del Guadiana" href="https://meteoalarm.org?geocode=EMMA_ID:ES166" hreflang="en"/>
+    <cap:areaDesc>Valle del Guadiana</cap:areaDesc>
+    <cap:event>Moderate fog warning</cap:event>
+    <cap:sent>2026-11-28T10:02:08+00:00</cap:sent>
+    <cap:expires>2026-11-29T08:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-28T09:58:54+00:00</cap:effective>
+    <cap:onset>2026-11-28T23:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261128100208.681303NINI290960128</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/c1fcc11d-ef50-4e93-913b-03afc4a5e1e7"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-28T10:02:08Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/c1fcc11d-ef50-4e93-913b-03afc4a5e1e7?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Fog Warning issued for Spain - Valle del Guadiana</title>
+    <updated>2026-11-28T10:02:08Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES220</value>
+    </cap:geocode>
+    <link title="Sur, Vegas y Oeste" href="https://meteoalarm.org?geocode=EMMA_ID:ES220" hreflang="en"/>
+    <cap:areaDesc>Sur, Vegas y Oeste</cap:areaDesc>
+    <cap:event>Moderate fog warning</cap:event>
+    <cap:sent>2026-11-28T10:02:08+00:00</cap:sent>
+    <cap:expires>2026-11-29T08:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-28T09:58:54+00:00</cap:effective>
+    <cap:onset>2026-11-28T23:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261128100208.722803NINI290960128</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/661c7955-9116-4774-a93e-29fdd0217559"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-28T10:02:08Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/661c7955-9116-4774-a93e-29fdd0217559?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Fog Warning issued for Spain - Sur, Vegas y Oeste</title>
+    <updated>2026-11-28T10:02:08Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES194</value>
+    </cap:geocode>
+    <link title="Vegas del Guadiana" href="https://meteoalarm.org?geocode=EMMA_ID:ES194" hreflang="en"/>
+    <cap:areaDesc>Vegas del Guadiana</cap:areaDesc>
+    <cap:event>Moderate fog warning</cap:event>
+    <cap:sent>2026-11-28T09:54:09+00:00</cap:sent>
+    <cap:expires>2026-11-29T08:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-28T09:52:22+00:00</cap:effective>
+    <cap:onset>2026-11-28T23:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Update</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261128095409.700601NINI290959649</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/e2a56514-9d6c-46b9-831f-c2e0682df6b4"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-28T09:54:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/e2a56514-9d6c-46b9-831f-c2e0682df6b4?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Fog Warning issued for Spain - Vegas del Guadiana</title>
+    <updated>2026-11-28T09:54:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES200</value>
+    </cap:geocode>
+    <link title="Meseta cacereña" href="https://meteoalarm.org?geocode=EMMA_ID:ES200" hreflang="en"/>
+    <cap:areaDesc>Meseta cacereña</cap:areaDesc>
+    <cap:event>Moderate fog warning</cap:event>
+    <cap:sent>2026-11-28T09:54:09+00:00</cap:sent>
+    <cap:expires>2026-11-29T08:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-28T09:52:22+00:00</cap:effective>
+    <cap:onset>2026-11-28T23:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261128095409.701003NINI290959649</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/bb92ec3e-e93a-4005-995a-39965bb46c2b"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-28T09:54:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/bb92ec3e-e93a-4005-995a-39965bb46c2b?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Fog Warning issued for Spain - Meseta cacereña</title>
+    <updated>2026-11-28T09:54:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES199</value>
+    </cap:geocode>
+    <link title="Tajo y Alagón" href="https://meteoalarm.org?geocode=EMMA_ID:ES199" hreflang="en"/>
+    <cap:areaDesc>Tajo y Alagón</cap:areaDesc>
+    <cap:event>Moderate fog warning</cap:event>
+    <cap:sent>2026-11-28T09:54:09+00:00</cap:sent>
+    <cap:expires>2026-11-29T08:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-28T09:52:22+00:00</cap:effective>
+    <cap:onset>2026-11-28T23:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Update</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261128095409.701002NINI290959649</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/87692b15-7575-4abb-a4bf-11cdee40030a"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-28T09:54:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/87692b15-7575-4abb-a4bf-11cdee40030a?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Fog Warning issued for Spain - Tajo y Alagón</title>
+    <updated>2026-11-28T09:54:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES196</value>
+    </cap:geocode>
+    <link title="Barros y Serena" href="https://meteoalarm.org?geocode=EMMA_ID:ES196" hreflang="en"/>
+    <cap:areaDesc>Barros y Serena</cap:areaDesc>
+    <cap:event>Moderate fog warning</cap:event>
+    <cap:sent>2026-11-28T09:54:09+00:00</cap:sent>
+    <cap:expires>2026-11-29T08:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-28T09:52:22+00:00</cap:effective>
+    <cap:onset>2026-11-28T23:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Update</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261128095409.700603NINI290959649</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/482b276c-2a20-49f0-ba16-fc7f0cdc8c58"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-28T09:54:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/482b276c-2a20-49f0-ba16-fc7f0cdc8c58?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Fog Warning issued for Spain - Barros y Serena</title>
+    <updated>2026-11-28T09:54:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES196</value>
+    </cap:geocode>
+    <link title="Barros y Serena" href="https://meteoalarm.org?geocode=EMMA_ID:ES196" hreflang="en"/>
+    <cap:areaDesc>Barros y Serena</cap:areaDesc>
+    <cap:event>Moderate fog warning</cap:event>
+    <cap:sent>2026-11-27T18:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-28T08:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-27T18:44:28+00:00</cap:effective>
+    <cap:onset>2026-11-27T23:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261127184809.700603NINI280905289</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/a7361965-0936-493b-bfb3-2edd256ee0e7"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-27T18:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/a7361965-0936-493b-bfb3-2edd256ee0e7?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Fog Warning issued for Spain - Barros y Serena</title>
+    <updated>2026-11-27T18:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES199</value>
+    </cap:geocode>
+    <link title="Tajo y Alagón" href="https://meteoalarm.org?geocode=EMMA_ID:ES199" hreflang="en"/>
+    <cap:areaDesc>Tajo y Alagón</cap:areaDesc>
+    <cap:event>Moderate fog warning</cap:event>
+    <cap:sent>2026-11-27T18:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-28T08:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-27T18:44:28+00:00</cap:effective>
+    <cap:onset>2026-11-27T23:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261127184809.701002NINI280905289</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/704f5a3c-c0b9-4a7b-8c5c-e4423040ebde"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-27T18:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/704f5a3c-c0b9-4a7b-8c5c-e4423040ebde?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Fog Warning issued for Spain - Tajo y Alagón</title>
+    <updated>2026-11-27T18:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES194</value>
+    </cap:geocode>
+    <link title="Vegas del Guadiana" href="https://meteoalarm.org?geocode=EMMA_ID:ES194" hreflang="en"/>
+    <cap:areaDesc>Vegas del Guadiana</cap:areaDesc>
+    <cap:event>Moderate fog warning</cap:event>
+    <cap:sent>2026-11-27T18:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-28T08:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-27T18:44:28+00:00</cap:effective>
+    <cap:onset>2026-11-27T23:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Update</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261127184809.700601NINI280905289</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/9145dac9-a9cf-4445-8ae0-e2cbcd143097"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-27T18:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/9145dac9-a9cf-4445-8ae0-e2cbcd143097?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Fog Warning issued for Spain - Vegas del Guadiana</title>
+    <updated>2026-11-27T18:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES195</value>
+    </cap:geocode>
+    <link title="La Siberia extremeña" href="https://meteoalarm.org?geocode=EMMA_ID:ES195" hreflang="en"/>
+    <cap:areaDesc>La Siberia extremeña</cap:areaDesc>
+    <cap:event>Moderate fog warning</cap:event>
+    <cap:sent>2026-11-27T18:48:09+00:00</cap:sent>
+    <cap:expires>2026-11-28T08:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-27T18:44:28+00:00</cap:effective>
+    <cap:onset>2026-11-27T23:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Update</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261127184809.700602NINI280905289</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/4c18ed07-5e6d-4c6b-98fd-f1bd71720637"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-27T18:48:09Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/4c18ed07-5e6d-4c6b-98fd-f1bd71720637?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Fog Warning issued for Spain - La Siberia extremeña</title>
+    <updated>2026-11-27T18:48:09Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES166</value>
+    </cap:geocode>
+    <link title="Valle del Guadiana" href="https://meteoalarm.org?geocode=EMMA_ID:ES166" hreflang="en"/>
+    <cap:areaDesc>Valle del Guadiana</cap:areaDesc>
+    <cap:event>Moderate fog warning</cap:event>
+    <cap:sent>2026-11-27T17:36:08+00:00</cap:sent>
+    <cap:expires>2026-11-28T08:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-27T17:34:24+00:00</cap:effective>
+    <cap:onset>2026-11-27T23:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Update</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261127173608.681303NINI280900968</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/2b343b85-8a3f-43a6-a352-8934f8256fd0"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-27T17:36:08Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/2b343b85-8a3f-43a6-a352-8934f8256fd0?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Fog Warning issued for Spain - Valle del Guadiana</title>
+    <updated>2026-11-27T17:36:08Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES175</value>
+    </cap:geocode>
+    <link title="Valle del Tajo" href="https://meteoalarm.org?geocode=EMMA_ID:ES175" hreflang="en"/>
+    <cap:areaDesc>Valle del Tajo</cap:areaDesc>
+    <cap:event>Moderate fog warning</cap:event>
+    <cap:sent>2026-11-27T17:36:08+00:00</cap:sent>
+    <cap:expires>2026-11-28T08:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-27T17:34:24+00:00</cap:effective>
+    <cap:onset>2026-11-27T23:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Alert</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261127173608.684502NINI280900968</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/663aae9a-584b-4c3a-a3a6-85ad29b88992"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-27T17:36:08Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/663aae9a-584b-4c3a-a3a6-85ad29b88992?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Fog Warning issued for Spain - Valle del Tajo</title>
+    <updated>2026-11-27T17:36:08Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES126</value>
+    </cap:geocode>
+    <link title="Este de La Palma" href="https://meteoalarm.org?geocode=EMMA_ID:ES126" hreflang="en"/>
+    <cap:areaDesc>Este de La Palma</cap:areaDesc>
+    <cap:event>Moderate rain warning</cap:event>
+    <cap:sent>2026-11-27T10:56:08+00:00</cap:sent>
+    <cap:expires>2026-11-28T14:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-27T10:53:31+00:00</cap:effective>
+    <cap:onset>2026-11-28T00:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Update</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261127105608.659303PRP1281576968</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/d12ce303-fd65-4a36-8da3-d339c87ac553"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-27T10:56:08Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/d12ce303-fd65-4a36-8da3-d339c87ac553?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Rain Warning issued for Spain - Este de La Palma</title>
+    <updated>2026-11-27T10:56:08Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES867</value>
+    </cap:geocode>
+    <link title="Costa - Litoral sur de Tarragona" href="https://meteoalarm.org?geocode=EMMA_ID:ES867" hreflang="en"/>
+    <cap:areaDesc>Costa - Litoral sur de Tarragona</cap:areaDesc>
+    <cap:event>Moderate coastalevent warning</cap:event>
+    <cap:sent>2026-11-26T10:28:08+00:00</cap:sent>
+    <cap:expires>2026-11-27T04:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-26T10:24:49+00:00</cap:effective>
+    <cap:onset>2026-11-26T10:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Immediate</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Update</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261126102808.694304COCO270588888</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/292d65ce-9eed-418b-9038-31d7c50a0f8b"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-26T10:28:08Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/292d65ce-9eed-418b-9038-31d7c50a0f8b?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Coastalevent Warning issued for Spain - Costa - Litoral sur de Tarragona</title>
+    <updated>2026-11-26T10:28:08Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES890</value>
+    </cap:geocode>
+    <link title="Costa - Ampurdán" href="https://meteoalarm.org?geocode=EMMA_ID:ES890" hreflang="en"/>
+    <cap:areaDesc>Costa - Ampurdán</cap:areaDesc>
+    <cap:event>Moderate coastalevent warning</cap:event>
+    <cap:sent>2026-11-26T10:28:08+00:00</cap:sent>
+    <cap:expires>2026-11-27T06:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-26T10:24:49+00:00</cap:effective>
+    <cap:onset>2026-11-26T10:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Immediate</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Update</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261126102808.691703COCO270788888</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/a0ec543c-bc95-4f99-8dc4-45afcf84d71a"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-26T10:28:08Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/a0ec543c-bc95-4f99-8dc4-45afcf84d71a?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Coastalevent Warning issued for Spain - Costa - Ampurdán</title>
+    <updated>2026-11-26T10:28:08Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES099</value>
+    </cap:geocode>
+    <link title="Pirineo oscense" href="https://meteoalarm.org?geocode=EMMA_ID:ES099" hreflang="en"/>
+    <cap:areaDesc>Pirineo oscense</cap:areaDesc>
+    <cap:event>Moderate low-temperature warning</cap:event>
+    <cap:sent>2026-11-26T10:28:08+00:00</cap:sent>
+    <cap:expires>2026-11-27T07:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-26T10:24:49+00:00</cap:effective>
+    <cap:onset>2026-11-26T23:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Update</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261126102808.622201BTTI270888888</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/5c30e7d3-d9f7-49c1-8b22-0f1b1e4eea92"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-26T10:28:08Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/5c30e7d3-d9f7-49c1-8b22-0f1b1e4eea92?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Low-temperature Warning issued for Spain - Pirineo oscense</title>
+    <updated>2026-11-26T10:28:08Z</updated>
+  </entry>
+  <entry>
+    <cap:geocode>
+      <valueName>EMMA_ID</valueName>
+      <value>ES186</value>
+    </cap:geocode>
+    <link title="Valle de Arán" href="https://meteoalarm.org?geocode=EMMA_ID:ES186" hreflang="en"/>
+    <cap:areaDesc>Valle de Arán</cap:areaDesc>
+    <cap:event>Moderate low-temperature warning</cap:event>
+    <cap:sent>2026-11-26T10:28:08+00:00</cap:sent>
+    <cap:expires>2026-11-27T07:59:59+00:00</cap:expires>
+    <cap:effective>2026-11-26T10:24:49+00:00</cap:effective>
+    <cap:onset>2026-11-26T23:00:00+00:00</cap:onset>
+    <cap:certainty>Likely</cap:certainty>
+    <cap:severity>Moderate</cap:severity>
+    <cap:urgency>Future</cap:urgency>
+    <cap:scope>Public</cap:scope>
+    <cap:message_type>Update</cap:message_type>
+    <cap:status>Actual</cap:status>
+    <cap:identifier>2.49.0.0.724.0.ES.261126102808.692501BTTI270888888</cap:identifier>
+    <link type="application/cap+xml" href="https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/6cf5c367-8a1c-4914-a0d2-47c106e7bc55"/>
+    <link title="Spain" rel="related" href="https://meteoalarm.org?region=ES" hreflang="en"/>
+    <author>
+      <name>meteoalarm.org</name>
+      <uri>https://meteoalarm.org</uri>
+    </author>
+    <published>2026-11-26T10:28:08Z</published>
+    <id>https://feeds.meteoalarm.org/api/v1/warnings/feeds-spain/6cf5c367-8a1c-4914-a0d2-47c106e7bc55?index_info=1&amp;index_area=0&amp;index_geocode=0</id>
+    <title>Yellow Low-temperature Warning issued for Spain - Valle de Arán</title>
+    <updated>2026-11-26T10:28:08Z</updated>
+  </entry>
+</feed>
